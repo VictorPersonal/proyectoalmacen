@@ -18,7 +18,7 @@ app.get("/api/clienteusuario", async (req, res) => {
 
 // POST sirve para insertar platos
 app.post("/api/clienteusuario", async (req, res) => {
-  const { name, price } = req.body;
+  const { name, price } = req.body; //Correjir los nombres de las variables por los de la tabla clienteusuario
   try {
     const result = await pool.query(
       "INSERT INTO clienteusuario (cedula,nombre,apellido,direccion,email,ciudad,password) VALUES (?,?,?,?,?,?,?) RETURNING *",
