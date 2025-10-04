@@ -65,3 +65,4 @@ function Registro() {
 }
 
 export default Registro;
+/*hola*/
