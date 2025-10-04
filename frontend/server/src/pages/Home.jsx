@@ -1,7 +1,6 @@
-// src/pages/Home.jsx
 import "./Home.css"; 
 import logo from "../assets/Logo dulce hogar.png"; 
-
+import { Link } from "react-router-dom"; 
 function Home() {
   return (
     <div>
@@ -31,7 +30,7 @@ function Home() {
         </nav>
         
         <div className="auth-links" id="auth-links">
-          <a href="#" id="link-registrarse">Registrarse</a>
+          <Link to="/registro" id="link-registrarse">Registrarse</Link>
           <a href="#" id="link-login">Iniciar sesión</a>
         </div>
       </header>
