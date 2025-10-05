@@ -31,7 +31,7 @@ function Home() {
         
         <div className="auth-links" id="auth-links">
           <Link to="/registro" id="link-registrarse">Registrarse</Link>
-          <a href="#" id="link-login">Iniciar sesión</a>
+          <Link to="/login" id="link-login">Iniciar sesión</Link>
         </div>
       </header>
 
