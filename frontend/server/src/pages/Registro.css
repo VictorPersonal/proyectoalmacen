@@ -20,7 +20,7 @@ body {
 
 /* Header */
 #top-bar {
-    background-color: #c8c4c1;
+    background-color: #b8b4b1;
     padding: 20px 30px;
     display: flex;
     justify-content: space-between;
@@ -81,9 +81,9 @@ body {
 
 /* Formulario */
 #form-wrapper {
-    background-color: #d4d0cd;
+    background-color: #ffffff;
     border-radius: 10px;
-    padding: 40px 50px;
+    padding: 20px 40px;
     width: 100%;
     max-width: 600px;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
