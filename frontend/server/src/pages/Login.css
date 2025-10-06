@@ -117,6 +117,7 @@ body {
   border-radius: 4px;
   font-size: 12px;
   background-color: #fff;
+  color: #000;
   outline: none;
   transition: border-color 0.3s;
 }
