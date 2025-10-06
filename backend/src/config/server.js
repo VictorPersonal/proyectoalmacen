@@ -16,6 +16,33 @@ app.get("/api/clienteusuario", async (req, res) => {
   }
 });
 
+//GET de iniciar sesión
+app.get("/api/login", async (req, res) => {
+  const { email, password } = req.query;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Faltan campos requeridos" });
+  }
+
+  try {
+    const query = "SELECT * FROM clienteusuario WHERE email = $1 AND password = $2";
+    const result = await pool.query(query, [email, password]);
+
+    if (result.rows.length > 0) {
+      // Usuario encontrado: redirige o envía respuesta de éxito
+      res.json({ message: "Inicio de sesión exitoso", redirect: "/home" });
+    } else {
+      // Usuario no encontrado
+      res.status(401).json({ error: "Correo o contraseña incorrectos" });
+    }
+  } catch (err) {
+    console.error("Error al validar usuario:", err);
+    res.status(500).json({ error: "Error del servidor" });
+  }
+});
+
+
+
 app.post("/api/clienteusuario", async (req, res) => {
   const { email, cedula, nombre, contrasena } = req.body; // ✅ ahora usa cedula
 

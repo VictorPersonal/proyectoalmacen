@@ -1,8 +1,35 @@
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 import logo from "../assets/Logo dulce hogar.png";
-import { Link } from "react-router-dom";  
 
-const Login = () => {
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);
+        navigate("/home"); // Redirige a la página principal
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error);
+      }
+    } catch (err) {
+      console.error("Error al conectar con el backend:", err);
+      alert("Error al intentar iniciar sesión");
+    }
+  };
+
   return (
     <div className="page-wrapper">
       <header className="top-bar">
@@ -20,13 +47,16 @@ const Login = () => {
         <div className="login-box">
           <h1 className="form-title">Inicio de sesión</h1>
 
-          <form className="login-form">
+          <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="correo">Correo:</label>
               <input
                 type="text"
                 id="correo"
                 placeholder="Correo o Teléfono"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
@@ -36,6 +66,9 @@ const Login = () => {
                 type="password"
                 id="contrasena"
                 placeholder="********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
 
@@ -69,6 +102,6 @@ const Login = () => {
       </footer>
     </div>
   );
-};
+}
 
 export default Login;
