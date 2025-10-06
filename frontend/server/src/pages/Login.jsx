@@ -1,32 +1,50 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 import logo from "../assets/Logo dulce hogar.png";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import Swal from "sweetalert2";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Login = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const [correo, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
-      );
+    // 🔹 Validación de campos vacíos
+    if (!correo || !contrasena) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campos incompletos",
+        text: "Por favor, completa todos los campos.",
+        confirmButtonColor: "#3085d6",
+      });
+      return;
+    }
 
-      if (response.ok) {
-        const data = await response.json();
-        alert(data.message);
-        navigate("/home"); // Redirige a la página principal
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error);
-      }
-    } catch (err) {
-      console.error("Error al conectar con el backend:", err);
-      alert("Error al intentar iniciar sesión");
+    // 🔹 Simulación de validación de usuario
+    const correoValido = "admin@dulcehogar.com";
+    const contrasenaValida = "123456";
+
+    if (correo === correoValido && contrasena === contrasenaValida) {
+      Swal.fire({
+        icon: "success",
+        title: "Inicio de sesión exitoso",
+        text: "Bienvenido a Dulce Hogar",
+        showConfirmButton: false,
+        timer: 1800,
+      }).then(() => {
+        navigate("/"); // Redirige al home
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Credenciales incorrectas",
+        text: "Revisa tu usuario y contraseña e inténtalo de nuevo.",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -37,7 +55,9 @@ function Login() {
           <img src={logo} alt="Dulce hogar logo" id="logo-img" />
           <div className="logo-text">
             <span className="logo-title">Dulce hogar</span>
-            <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+            <span className="logo-subtitle">
+              ALMACÉN DE ELECTRODOMÉSTICOS
+            </span>
           </div>
         </div>
         <div className="help-icon">?</div>
@@ -54,9 +74,8 @@ function Login() {
                 type="text"
                 id="correo"
                 placeholder="Correo o Teléfono"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
               />
             </div>
 
@@ -66,9 +85,8 @@ function Login() {
                 type="password"
                 id="contrasena"
                 placeholder="********"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                value={contrasena}
+                onChange={(e) => setContrasena(e.target.value)}
               />
             </div>
 
@@ -102,6 +120,6 @@ function Login() {
       </footer>
     </div>
   );
-}
+};
 
 export default Login;
