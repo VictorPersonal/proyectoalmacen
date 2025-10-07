@@ -20,6 +20,18 @@ app.post("/api/clienteusuario", async (req, res) => {
   const { email, cedula, nombre, contrasena } = req.body; // ✅ ahora usa cedula
 
   try {
+    //Validación de cedula duplicada
+    const cedulaExiste = await pool.query(
+      "SELECT cedula FROM clienteusuario WHERE cedula = $1",
+      [cedula]
+    );
+
+    if (cedulaExiste.rows.length > 0) {
+      return res.status(400).json({ error: "La cédula ya está registrada" });
+    }
+
+
+    //Si no existe, insertar nuevo usuario
     const result = await pool.query(
       `INSERT INTO clienteusuario (cedula, nombre, apellido, direccion, email, ciudad, password)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
