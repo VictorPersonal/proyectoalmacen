@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./Login.css"; // ✅ Está en el mismo directorio
+import { useNavigate, Link } from "react-router-dom";
+import "./Login.css";
+import logo from "../assets/Logo dulce hogar.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -37,11 +38,9 @@ const Login = () => {
       setMensaje("Inicio de sesión exitoso");
       setTipoMensaje("exito");
 
-      // ✅ Redirigir al Home después de 1 segundo
       setTimeout(() => {
         navigate("/");
       }, 1000);
-
     } catch (error) {
       console.error("Error al conectar con el servidor:", error);
       setMensaje("Error al conectar con el servidor");
@@ -50,59 +49,93 @@ const Login = () => {
   };
 
   return (
-    <div className="container">
-      <div className="login-box">
-        <h2 className="form-title">Inicio de sesión</h2>
-
-        {mensaje && (
-          <div
-            className={`mensaje ${
-              tipoMensaje === "exito" ? "mensaje-exito" : "mensaje-error"
-            }`}
-          >
-            {mensaje}
+    <div className="page-wrapper">
+      {/* 🔹 Header igual al de RecuperarContraseña */}
+      <header className="top-bar">
+        <div className="logo-section">
+          <img src={logo} alt="Dulce hogar logo" id="logo-img" />
+          <div className="logo-text">
+            <span className="logo-title">Dulce hogar</span>
+            <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
           </div>
-        )}
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Correo:</label>
-            <input
-              type="email"
-              placeholder="correo@ejemplo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group password-group">
-            <label>Contraseña:</label>
-            <div className="password-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="********"
-                value={contrasena}
-                onChange={(e) => setContrasena(e.target.value)}
-              />
-              <i
-                className={`fa ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-password`}
-                onClick={() => setShowPassword(!showPassword)}
-              ></i>
-            </div>
-          </div>
-
-          <button type="submit" className="btn-ingresar">Ingresar</button>
-        </form>
-
-        <div className="form-links">
-          <p className="forgot-password">
-            ¿Olvidaste tu contraseña? <a href="#">Recupérala aquí</a>
-          </p>
-          <p className="register-link">
-            ¿No tienes cuenta? <a href="/registro">Regístrate aquí</a>
-          </p>
         </div>
-      </div>
+        <div className="help-icon">?</div>
+      </header>
+
+      {/* 🔹 Contenido principal (no modificado) */}
+      <main className="container">
+        <div className="login-box">
+          <h2 className="form-title">Inicio de sesión</h2>
+
+          {mensaje && (
+            <div
+              className={`mensaje ${
+                tipoMensaje === "exito" ? "mensaje-exito" : "mensaje-error"
+              }`}
+            >
+              {mensaje}
+            </div>
+          )}
+
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Correo:</label>
+              <input
+                type="email"
+                placeholder="correo@ejemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group password-group">
+              <label>Contraseña:</label>
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="********"
+                  value={contrasena}
+                  onChange={(e) => setContrasena(e.target.value)}
+                />
+                <i
+                  className={`fa ${
+                    showPassword ? "fa-eye-slash" : "fa-eye"
+                  } toggle-password`}
+                  onClick={() => setShowPassword(!showPassword)}
+                ></i>
+              </div>
+            </div>
+
+            <button type="submit" className="btn-ingresar">
+              Ingresar
+            </button>
+          </form>
+
+          <div className="form-links">
+            <p className="forgot-password">
+              ¿Olvidaste tu contraseña?{" "}
+              <Link to="/login/RecuperarContraseña">Recupérala aquí</Link>
+            </p>
+            <p className="register-link">
+              ¿No tienes cuenta? <Link to="/registro">Regístrate aquí</Link>
+            </p>
+          </div>
+        </div>
+      </main>
+
+      {/* 🔹 Footer igual al de RecuperarContraseña */}
+      <footer className="footer">
+        <div className="footer-links">
+          <a href="#">Preguntas frecuentes</a>
+          <span>/</span>
+          <a href="#">Consejos de seguridad</a>
+          <span>/</span>
+          <a href="#">Términos</a>
+        </div>
+        <div className="footer-copyright">
+          © 2025 FHO, todos los derechos reservados
+        </div>
+      </footer>
     </div>
   );
 };
