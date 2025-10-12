@@ -80,7 +80,7 @@ router.post("/producto", async (req, res) => {
       `INSERT INTO producto (nombre, precio, stock, descripcion, idmarca, idcategoria)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [nombre, precio, stock, descripcion || "", idmarca || null, idcategoria || null]
+      [nombre, precio, stock, descripcion, idmarca || null, idcategoria || null]
     );
     res.status(201).json({ message: "Producto creado", producto: result.rows[0] });
   } catch (error) {
