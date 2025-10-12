@@ -5,18 +5,27 @@ const router = express.Router();
 
 // 📌 Ruta para registrar un nuevo usuario
 router.post("/clienteusuario", async (req, res) => {
-  const { cedula, nombre, apellido, direccion, email, ciudad, contrasena } = req.body;
+  const { cedula, nombre, apellido, direccion, email, ciudad, contrasena, rol } = req.body;
 
   if (!cedula || !nombre || !email || !contrasena) {
     return res.status(400).json({ message: "Faltan datos obligatorios" });
   }
 
   try {
+    // Validar si la cédula ya existe
+    const cedulaExistente = await pool.query(
+      "SELECT 1 FROM clienteusuario WHERE cedula = $1",
+      [cedula]
+    );
+    if (cedulaExistente.rows.length > 0) {
+      return res.status(409).json({ message: "La cédula ya está registrada" });
+    }
+    
     const result = await pool.query(
-      `INSERT INTO clienteusuario (cedula, nombre, apellido, direccion, email, ciudad, password)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO clienteusuario (cedula, nombre, apellido, direccion, email, ciudad, password, rol)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", contrasena]
+      [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", contrasena, rol || ""]
     );
 
     res.status(201).json({ message: "Usuario registrado correctamente", usuario: result.rows[0] });
