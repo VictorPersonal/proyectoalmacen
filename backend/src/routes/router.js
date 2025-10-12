@@ -4,7 +4,7 @@ import { pool } from "../config/db.js";
 const router = express.Router();
 
 // 📌 Ruta para registrar un nuevo usuario
-router.post("/clienteusuario", async (req, res) => {
+router.post("/usuario", async (req, res) => {
   const { cedula, nombre, apellido, direccion, email, ciudad, contrasena, rol } = req.body;
 
   if (!cedula || !nombre || !email || !contrasena) {
@@ -14,7 +14,7 @@ router.post("/clienteusuario", async (req, res) => {
   try {
     // Validar si la cédula ya existe
     const cedulaExistente = await pool.query(
-      "SELECT 1 FROM clienteusuario WHERE cedula = $1",
+      "SELECT 1 FROM usuario WHERE cedula = $1",
       [cedula]
     );
     if (cedulaExistente.rows.length > 0) {
@@ -22,7 +22,7 @@ router.post("/clienteusuario", async (req, res) => {
     }
     
     const result = await pool.query(
-      `INSERT INTO clienteusuario (cedula, nombre, apellido, direccion, email, ciudad, password, rol)
+      `INSERT INTO usuario (cedula, nombre, apellido, direccion, email, ciudad, password, rol)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", contrasena, rol || ""]
@@ -44,7 +44,7 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    const result = await pool.query("SELECT * FROM clienteusuario WHERE email = $1", [email]);
+    const result = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Usuario no encontrado" });
