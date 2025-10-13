@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 import logo from "../assets/Logo dulce hogar.png";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,43 +13,48 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email || !contrasena) {
-      setMensaje("Correo y contraseña son obligatorios");
+  if (!email || !contrasena) {
+    setMensaje("Correo y contraseña son obligatorios");
+    setTipoMensaje("error");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:4000/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, contrasena }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMensaje(data.message || "Error al iniciar sesión");
       setTipoMensaje("error");
       return;
     }
 
-    try {
-      const response = await fetch("http://localhost:4000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, contrasena }),
-      });
+    setMensaje("Inicio de sesión exitoso");
+    setTipoMensaje("exito");
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setMensaje(data.message || "Error al iniciar sesión");
-        setTipoMensaje("error");
-        return;
-      }
-
-      setMensaje("Inicio de sesión exitoso");
-      setTipoMensaje("exito");
-
-      setTimeout(() => {
+    // 🔹 Redirigir según el rol
+    setTimeout(() => {
+      if (data.usuario.rol === "administrador") {
+        navigate("/admin");
+      } else {
         navigate("/");
-      }, 1000);
-    } catch (error) {
-      console.error("Error al conectar con el servidor:", error);
-      setMensaje("Error al conectar con el servidor");
-      setTipoMensaje("error");
-    }
-  };
+      }
+    }, 1000);
+  } catch (error) {
+    console.error("Error al conectar con el servidor:", error);
+    setMensaje("Error al conectar con el servidor");
+    setTipoMensaje("error");
+  }
+};
 
-  return (
+    return (
     <div className="page-wrapper">
       {/* 🔹 Header igual al de RecuperarContraseña */}
       <header className="top-bar">
@@ -113,8 +119,7 @@ const Login = () => {
 
           <div className="form-links">
             <p className="forgot-password">
-              ¿Olvidaste tu contraseña?{" "}
-              <Link to="/login/RecuperarContraseña">Recupérala aquí</Link>
+              ¿Olvidaste tu contraseña? <Link to="/login/Recuperar-Contrasena">Recupérala aquí</Link>
             </p>
             <p className="register-link">
               ¿No tienes cuenta? <Link to="/registro">Regístrate aquí</Link>
