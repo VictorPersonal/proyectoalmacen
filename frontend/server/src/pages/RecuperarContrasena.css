@@ -1,3 +1,4 @@
+/* ===== Reset ===== */
 * {
   margin: 0;
   padding: 0;
@@ -12,6 +13,15 @@ body {
   flex-direction: column;
 }
 
+/* ===== Estructura general ===== */
+.recuperar-wrapper {
+  background-color: #c8c4c1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Header ===== */
 .top-bar {
   background-color: #b8b4b1;
   padding: 30px 30px;
@@ -42,6 +52,12 @@ body {
   color: #000;
 }
 
+.logo-subtitle {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: #000;
+}
+
 .help-icon {
   width: 26px;
   height: 26px;
@@ -56,16 +72,18 @@ body {
   background-color: #fff;
 }
 
+/* ===== Contenedor principal ===== */
 .container {
+  all: unset;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  margin: 20px;
   background-color: #c8c4c1;
 }
 
+/* ===== Caja principal ===== */
 .recuperar-box {
   background-color: #fff;
   border-radius: 12px;
@@ -83,6 +101,7 @@ body {
   margin-bottom: 25px;
 }
 
+/* ===== Formulario ===== */
 .recuperar-form {
   display: flex;
   flex-direction: column;
@@ -128,6 +147,7 @@ body {
   text-align: left;
 }
 
+/* ===== Botón ===== */
 .recuperar-btn {
   background-color: #fff;
   color: #D84040;
@@ -146,7 +166,7 @@ body {
   color: #fff;
 }
 
-/* ===== MENSAJES ===== */
+/* ===== Mensajes ===== */
 .recuperar-mensaje {
   font-size: 12px;
   padding: 8px 10px;
@@ -167,7 +187,7 @@ body {
   border: 1px solid #c62828;
 }
 
-/* ===== ENLACES ===== */
+/* ===== Enlaces ===== */
 .recuperar-links {
   margin-top: 15px;
   font-size: 11px;
@@ -184,9 +204,10 @@ body {
   text-decoration: underline;
 }
 
+/* ===== Footer ===== */
 .footer {
   background-color: #b8b4b1;
-  padding: 30px 20px;
+  padding: 20px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -217,7 +238,7 @@ body {
   color: #333;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
   .recuperar-box {
     padding: 30px 35px;

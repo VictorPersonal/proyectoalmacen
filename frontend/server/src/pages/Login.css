@@ -7,7 +7,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #c8c4c1;
+  background-color: #d0cbc8; /* 🔹 Fondo gris claro igual al registro */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -65,14 +65,22 @@ body {
 }
 
 /* Container Principal */
+.page-wrapper {
+  background-color: #d0cbc8; /* 🔹 Mismo gris del fondo general */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Evita heredar estilos del anterior contenedor */
 .container {
+  all: unset;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  margin: 20px;
-  background-color: #c8c4c1;
+  background-color: #d0cbc8; /* 🔹 También igualado */
 }
 
 .login-box {
@@ -182,14 +190,13 @@ body {
 /* Footer */
 .footer {
   background-color: #b8b4b1;
-  padding: 20px 30px; /* ⬅️ Aumentado de 12px a 20px */
+  padding: 20px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 9px;
   color: #333;
 }
-
 
 .footer-links {
   display: flex;
@@ -267,7 +274,7 @@ body {
 
 .password-wrapper input {
   width: 100%;
-  padding-right: 36px; /* espacio para el ícono */
+  padding-right: 36px;
 }
 
 .toggle-password {
