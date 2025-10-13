@@ -12,4 +12,5 @@ app.use("/api", router);
 
 app.listen(process.env.PORT || 4000, () => {
   console.log(`Servidor corriendo en http://localhost:${process.env.PORT || 4000}`);
+
 });
