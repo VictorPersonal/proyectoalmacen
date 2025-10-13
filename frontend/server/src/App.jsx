@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import RecuperarContrasena from "./pages/RecuperarContrasena";
+import PanelAdmin from "./pages/PanelAdmin"; 
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/login/RecuperarContraseña" element={<RecuperarContrasena />} />
+        <Route path="/login/recuperar-contrasena" element={<RecuperarContrasena />} />
+        <Route path="/admin" element={<PanelAdmin />} />
       </Routes>
     </Router>
   );
