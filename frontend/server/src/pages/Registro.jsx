@@ -7,29 +7,37 @@ function Registro() {
   const [cedula, setCedula] = useState("");
   const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [mensaje, setMensaje] = useState(""); // Nuevo estado para mensajes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setMensaje(""); // Limpiar mensaje anterior
+
     const nuevoUsuario = {
       email,
-      cedula,      // ✅ ahora enviamos cedula
+      cedula,
       nombre,
       contrasena,
     };
 
     try {
-      const res = await fetch("http://localhost:4000/api/clienteusuario", {
+      const res = await fetch("http://localhost:4000/api/usuario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoUsuario),
       });
 
+      if (res.status === 409) {
+        setMensaje("La cédula ya está registrada ❌");
+        return;
+      }
+
+
       if (!res.ok) throw new Error("Error al registrar usuario");
 
       const data = await res.json();
-      console.log("Usuario registrado:", data);
-      alert("Cuenta creada exitosamente ✅");
+      setMensaje("Cuenta creada exitosamente ✅");
 
       // limpiar los campos
       setEmail("");
@@ -38,7 +46,7 @@ function Registro() {
       setContrasena("");
     } catch (error) {
       console.error("Error:", error);
-      alert("No se pudo registrar el usuario ❌");
+      setMensaje("No se pudo registrar el usuario ❌");
     }
   };
 
@@ -58,6 +66,18 @@ function Registro() {
       <main id="container">
         <div id="form-wrapper">
           <h1 id="form-title">Crear Cuenta</h1>
+
+          {mensaje && (
+            <div
+              style={{
+                color: mensaje.includes("exitosamente") ? "green" : "red",
+                marginBottom: "1rem",
+                fontWeight: "bold",
+              }}
+            >
+              {mensaje}
+            </div>
+          )}
 
           <form id="registro-form" onSubmit={handleSubmit}>
             <div className="form-group">
@@ -103,6 +123,7 @@ function Registro() {
                 onChange={(e) => setContrasena(e.target.value)}
                 required
               />
+              
               <small id="hint">
                 Al menos 8 caracteres (MAYÚSCULAS, minúsculas...)
               </small>
