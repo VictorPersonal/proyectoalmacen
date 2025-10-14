@@ -62,12 +62,13 @@ header {
     background-color: #fff;
     border-radius: 4px;
     padding: 8px 12px;
-    flex: 0 0 350px;
+    flex: 0 0 450px;
 }
 
 .search-container input {
     border: none;
     outline: none;
+    background: transparent;
     flex: 1;
     font-size: 14px;
     color: #666;
