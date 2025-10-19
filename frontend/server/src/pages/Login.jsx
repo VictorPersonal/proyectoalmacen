@@ -41,10 +41,15 @@ const Login = () => {
 
     // 🔹 Redirigir según el rol
     setTimeout(() => {
+  // Guardar información del usuario en localStorage
+      localStorage.setItem('usuarioInfo', JSON.stringify(data.usuario));
+      
       if (data.usuario.rol === "administrador") {
         navigate("/admin");
+        window.location.reload(); // Forzar recarga
       } else {
         navigate("/");
+        window.location.reload(); // Forzar recarga
       }
     }, 1000);
   } catch (error) {
