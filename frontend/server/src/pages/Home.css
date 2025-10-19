@@ -1,138 +1,147 @@
+/* ========== RESETEO GENERAL ========== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html, body, #root {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #c8c4c1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #c8c4c1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Header */
+/* ========== HEADER ========== */
 header {
-    background-color: #c8c4c1;
-    padding: 10px 20px;
-    width: 100%;
+  background-color: #c8c4c1;
+  padding: 10px 20px;
+  width: 100%;
 }
 
 .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    width: 100%; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  width: 100%;
 }
 
 .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .logo-icon img {
-    width: 60px;
-    height: auto;
+  width: 60px;
+  height: auto;
 }
 
 .logo-text h1 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #000;
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
 }
 
 .logo-text p {
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    color: #000;
-    margin-top: -2px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: #000;
+  margin-top: -2px;
 }
 
+/* --- BUSCADOR --- */
 .search-container {
-    display: flex;
-    align-items: center;
-    background-color: #fff;
-    border-radius: 4px;
-    padding: 8px 12px;
-    flex: 0 0 350px;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 8px 12px;
+  flex: 0 0 350px;
 }
 
 .search-container input {
-    border: none;
-    outline: none;
-    flex: 1;
-    font-size: 14px;
-    color: #666;
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  color: #666;
 }
 
 .search-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
 }
 
+/* --- ENLACES DE NAVEGACIÓN --- */
 .nav-links {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 .nav-link {
-    text-decoration: none;
-    color: #000;
-    font-size: 14px;
-    font-weight: 500;
+  text-decoration: none;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .nav-link:hover {
-    color: #D84040;
+  color: #D84040;
 }
 
+/* --- LOGIN / REGISTRO --- */
 .auth-links {
-    display: flex;
-    gap: 20px;
-    justify-content: flex-end;
-    padding: 8px 20px;
-    width: 100%;
+  display: flex;
+  gap: 20px;
+  justify-content: flex-end;
+  padding: 8px 20px;
+  width: 100%;
 }
 
 .auth-links a {
-    text-decoration: none;
-    color: #000;
-    font-size: 13px;
+  text-decoration: none;
+  color: #000;
+  font-size: 13px;
 }
 
 .auth-links a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-/* Main */
+/* ========== MAIN ========== */
 main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* ❌ ELIMINADO padding-bottom: 40px; */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: #edeae8;
+  min-height: calc(100vh - 150px);
 }
 
+/* --- SECCIÓN PRINCIPAL / CARRUSEL --- */
 .hero-section {
   position: relative;
+  flex: 1;
   width: 100%;
-  height: 80vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background-color: #f2f2f2;
+  margin: 0;
 }
+
 .carousel-container {
   width: 100%;
   height: 100%;
@@ -142,10 +151,10 @@ main {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
   transition: opacity 0.5s ease-in-out;
 }
 
+/* --- BOTONES DEL CARRUSEL --- */
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -171,35 +180,101 @@ main {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* Footer */
+/* --- ICONO DEL CARRITO --- */
+.cart-icon {
+  font-size: 22px;
+  color: #f0c000;
+  margin-left: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.cart-icon:hover {
+  transform: scale(1.1);
+}
+
+/* --- RESULTADOS DE BÚSQUEDA --- */
+.resultados {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Cambiado a flex-start para alinear a la izquierda */
+  padding: 15px 20px; /* Reducido el padding */
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* ETIQUETA DE RESULTADOS - ESQUINA SUPERIOR IZQUIERDA */
+.resultados-header {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 15px 0; /* Reducido margen inferior y quitado auto */
+  padding: 0;
+}
+
+.resultados-count {
+  font-size: 14px;
+  color: #666;
+  background-color: #f5f5f5;
+  padding: 6px 12px; /* Reducido padding */
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  display: inline-block;
+  font-weight: 500;
+  margin-left: 0; /* Sin margen izquierdo */
+}
+
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px; /* Reducido el gap entre productos */
+  justify-content: flex-start; /* Alineado a la izquierda */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0; /* Sin margen */
+  padding: 0; /* Sin padding */
+}
+
+.loading, .no-result {
+  text-align: center;
+  color: #333;
+  font-size: 16px;
+  width: 100%;
+  margin-top: 30px; /* Reducido margen superior */
+}
+
+/* ========== FOOTER ========== */
 footer {
-    background-color: #b8b4b1;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    color: #333;
-    width: 100%;
-    margin-top: auto; 
+  background-color: #b8b4b1;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #333;
+  width: 100%;
+  position: relative;
+  bottom: 0;
+  left: 0;
+  margin-top: auto;
 }
 
 .footer-links {
-    display: flex;
-    gap: 12px;
-    align-items: center;
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .footer-links a {
-    text-decoration: none;
-    color: #333;
+  text-decoration: none;
+  color: #333;
 }
 
 .footer-links a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .footer-copyright {
-    color: #333;
+  color: #333;
 }
-/*hola*/
