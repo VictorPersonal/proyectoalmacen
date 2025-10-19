@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./Home.css";
 import logo from "../assets/Logo dulce hogar.png";
-import { Link } from "react-router-dom";
-import { FaShoppingCart, FaChevronRight } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaShoppingCart, FaChevronRight, FaUserCircle } from "react-icons/fa";
 import image1 from "../assets/images.jpg";
 import image2 from "../assets/soga.jpg";
 import ProductCard from "../components/productoCard";
@@ -12,10 +12,16 @@ const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [submenuAbierto, setSubmenuAbierto] = useState(null);
+  const [perfilMenuAbierto, setPerfilMenuAbierto] = useState(false);
 
   const [busqueda, setBusqueda] = useState("");
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(false);
+  
+  // Estado para la autenticación
+  const [usuarioLogueado, setUsuarioLogueado] = useState(false);
+  const [usuarioInfo, setUsuarioInfo] = useState(null);
+  const navigate = useNavigate();
 
   const categorias = [
     "Muebles",
@@ -26,6 +32,26 @@ const Home = () => {
   const subcategorias = {
     "tecnología": ["Televisores", "Celulares", "Computadores"],
     "electrodomésticos": ["Neveras", "Lavadoras"]
+  };
+
+  // Verificar autenticación al cargar el componente
+  useEffect(() => {
+    verificarAutenticacion();
+  }, []);
+
+  const verificarAutenticacion = () => {
+    // Verificar si hay información de usuario en localStorage
+    const usuarioGuardado = localStorage.getItem('usuarioInfo');
+    if (usuarioGuardado) {
+      try {
+        const usuario = JSON.parse(usuarioGuardado);
+        setUsuarioLogueado(true);
+        setUsuarioInfo(usuario);
+      } catch (error) {
+        console.error('Error al parsear información del usuario:', error);
+        localStorage.removeItem('usuarioInfo');
+      }
+    }
   };
 
   const prevSlide = () => {
@@ -51,6 +77,22 @@ const Home = () => {
     } else {
       setSubmenuAbierto(categoria);
     }
+  };
+
+  const togglePerfilMenu = () => {
+    setPerfilMenuAbierto(!perfilMenuAbierto);
+  };
+
+  const handleCerrarSesion = () => {
+    // Limpiar datos de sesión
+    localStorage.removeItem('usuarioInfo');
+    setUsuarioLogueado(false);
+    setUsuarioInfo(null);
+    setPerfilMenuAbierto(false);
+    
+    // Redirigir al home
+    navigate('/');
+    window.location.reload(); // Recargar para asegurar que todo se resetee
   };
 
   const handleBuscar = async () => {
@@ -155,8 +197,38 @@ const Home = () => {
         </nav>
 
         <div className="auth-links" id="auth-links">
-          <Link to="/registro" id="link-registrarse">Registrarse</Link>
-          <Link to="/login" id="link-login">Iniciar sesión</Link>
+          {usuarioLogueado ? (
+            // Mostrar icono de perfil cuando el usuario está logueado
+            <div className="perfil-menu">
+              <button className="perfil-btn" onClick={togglePerfilMenu}>
+                <FaUserCircle className="perfil-icon" />
+                <span className="nombre-usuario">
+                  {usuarioInfo?.nombre || usuarioInfo?.cedula}
+                </span>
+              </button>
+              {perfilMenuAbierto && (
+                <div className="perfil-desplegable">
+                  <div className="info-usuario">
+                    <span className="usuario-nombre">{usuarioInfo.nombre}</span>
+                    <span className="usuario-cedula">Cédula: {usuarioInfo.cedula}</span>
+                    <span className="usuario-rol">Rol: {usuarioInfo.rol}</span>
+                  </div>
+                  <Link to="/ajustes-de-cuenta" className="perfil-item" onClick={() => setPerfilMenuAbierto(false)}>
+                    Ajustes de cuenta
+                  </Link>
+                  <button className="perfil-item cerrar-sesion" onClick={handleCerrarSesion}>
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Mostrar Registrarse e Iniciar sesión cuando no está logueado
+            <>
+              <Link to="/registro" id="link-registrarse">Registrarse</Link>
+              <Link to="/login" id="link-login">Iniciar sesión</Link>
+            </>
+          )}
           <div className="cart-icon">
             <FaShoppingCart />
           </div>

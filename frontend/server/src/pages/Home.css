@@ -250,6 +250,108 @@ header {
   color: #D84040;
 }
 
+/* MENÚ DE PERFIL */
+.perfil-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.perfil-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.perfil-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.perfil-icon {
+  font-size: 24px;
+  color: #000;
+}
+
+.nombre-usuario {
+  font-size: 14px;
+  color: #000;
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.perfil-desplegable {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+  margin-top: 10px;
+  padding: 0;
+}
+
+.info-usuario {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+.usuario-nombre {
+  display: block;
+  font-weight: bold;
+  color: #000;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.usuario-cedula,
+.usuario-rol {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.perfil-item {
+  display: block;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.perfil-item:hover {
+  background-color: #f5f5f5;
+  color: #D84040;
+}
+
+.cerrar-sesion {
+  border-top: 1px solid #e0e0e0;
+  margin-top: 0;
+  padding-top: 12px;
+  color: #D84040;
+}
+
 /* ========== MAIN ========== */
 main {
   flex: 1;
