@@ -1,16 +1,18 @@
 import express from "express";
 import cors from "cors";
-import router from "../routes/router.js";
+import dotenv from "dotenv";
+import authRoutes from "../routes/authRoutes.js";
 
+
+dotenv.config();
 const app = express();
 
-app.use(cors());
+// Middleware para leer JSON
 app.use(express.json());
+app.use(cors());
 
-// 👇 Todas las rutas del router estarán bajo /api
-app.use("/api", router);
+// Montar las rutas
+app.use("/api/auth", authRoutes); // 👈 Esto es clave
 
-app.listen(process.env.PORT || 4000, () => {
-  console.log(`Servidor corriendo en http://localhost:${process.env.PORT || 4000}`);
-
-});
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
