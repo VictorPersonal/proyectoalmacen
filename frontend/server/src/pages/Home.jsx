@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaChevronRight } from "react-icons/fa";
 import image1 from "../assets/images.jpg";
 import image2 from "../assets/soga.jpg";
 import ProductCard from "../components/productoCard";
@@ -10,10 +10,23 @@ import ProductCard from "../components/productoCard";
 const Home = () => {
   const images = [image1, image2];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [submenuAbierto, setSubmenuAbierto] = useState(null);
 
   const [busqueda, setBusqueda] = useState("");
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(false);
+
+  const categorias = [
+    "Muebles",
+    "Electrodomésticos", 
+    "Tecnología"
+  ];
+
+  const subcategorias = {
+    "tecnología": ["Televisores", "Celulares", "Computadores"],
+    "electrodomésticos": ["Neveras", "Lavadoras"]
+  };
 
   const prevSlide = () => {
     setCurrentIndex((prev) =>
@@ -25,6 +38,19 @@ const Home = () => {
     setCurrentIndex((prev) =>
       prev === images.length - 1 ? 0 : prev + 1
     );
+  };
+
+  const toggleMenu = () => {
+    setMenuAbierto(!menuAbierto);
+    setSubmenuAbierto(null);
+  };
+
+  const toggleSubmenu = (categoria) => {
+    if (submenuAbierto === categoria) {
+      setSubmenuAbierto(null);
+    } else {
+      setSubmenuAbierto(categoria);
+    }
   };
 
   const handleBuscar = async () => {
@@ -83,20 +109,57 @@ const Home = () => {
           </div>
 
           <div className="nav-links" id="nav-links">
-            <a href="#" className="nav-link">Categorías ∨</a>
+            {/* MENÚ DESPLEGABLE DE CATEGORÍAS */}
+            <div className="categorias-menu">
+              <button className="nav-link categorias-btn" onClick={toggleMenu}>
+                Categorías ∨
+              </button>
+              {menuAbierto && (
+                <div className="menu-desplegable">
+                  <div className="categorias-lista">
+                    {categorias.map((categoria, index) => (
+                      <div key={index} className="categoria-item-container">
+                        {(categoria === "Tecnología" || categoria === "Electrodomésticos") ? (
+                          <div 
+                            className="categoria-item con-submenu"
+                            onMouseEnter={() => toggleSubmenu(categoria.toLowerCase())}
+                            onMouseLeave={() => setSubmenuAbierto(null)}
+                          >
+                            <span>{categoria}</span>
+                            <FaChevronRight className="submenu-icon" />
+                            {submenuAbierto === categoria.toLowerCase() && subcategorias[categoria.toLowerCase()] && (
+                              <div className="submenu">
+                                {subcategorias[categoria.toLowerCase()].map((subitem, subIndex) => (
+                                  <a key={subIndex} href="#" className="submenu-item">
+                                    {subitem}
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <a href="#" className="categoria-item">
+                            {categoria}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <a href="#" className="nav-link">Promociones</a>
             <a href="#" className="nav-link">Contacto</a>
             <a href="#" className="nav-link">Ayuda</a>
-          </div>
-
-          <div className="cart-icon">
-            <FaShoppingCart />
           </div>
         </nav>
 
         <div className="auth-links" id="auth-links">
           <Link to="/registro" id="link-registrarse">Registrarse</Link>
           <Link to="/login" id="link-login">Iniciar sesión</Link>
+          <div className="cart-icon">
+            <FaShoppingCart />
+          </div>
         </div>
       </header>
 
