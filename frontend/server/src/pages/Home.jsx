@@ -208,11 +208,6 @@ const Home = () => {
               </button>
               {perfilMenuAbierto && (
                 <div className="perfil-desplegable">
-                  <div className="info-usuario">
-                    <span className="usuario-nombre">{usuarioInfo.nombre}</span>
-                    <span className="usuario-cedula">Cédula: {usuarioInfo.cedula}</span>
-                    <span className="usuario-rol">Rol: {usuarioInfo.rol}</span>
-                  </div>
                   <Link to="/ajustes-de-cuenta" className="perfil-item" onClick={() => setPerfilMenuAbierto(false)}>
                     Ajustes de cuenta
                   </Link>
