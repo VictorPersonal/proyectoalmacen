@@ -29,7 +29,7 @@ router.post("/usuario", async (req, res) => {
       `INSERT INTO usuario (cedula, nombre, apellido, direccion, email, ciudad, password, rol)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", contrasena, rol || "Cliente"]
+      [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", contrasena, rol || "cliente"]
 
     );
 
@@ -67,6 +67,10 @@ router.post("/login", async (req, res) => {
       usuario: {
         cedula: usuario.cedula,
         nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        email: usuario.email,       
+        direccion: usuario.direccion,
+        ciudad: usuario.ciudad,
         rol: usuario.rol
       }
     });
@@ -113,20 +117,32 @@ router.get("/producto", async (req, res) => {
   }
 });
 
-// Obtener un producto por ID
-router.get("/producto/:id", async (req, res) => {
-  const { id } = req.params;
+// 🔍 Buscar productos por nombre o categoría
+router.get("/productos", async (req, res) => {
+  const { search } = req.query;
+
   try {
-    const result = await pool.query("SELECT * FROM producto WHERE idproducto = $1", [id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Producto no encontrado" });
+    // Si no hay término de búsqueda, devolver todos los productos
+    if (!search || search.trim() === "") {
+      const result = await pool.query("SELECT * FROM producto");
+      return res.status(200).json(result.rows);
     }
-    res.status(200).json(result.rows[0]);
+
+    // Buscar coincidencias en nombre o descripción (y opcionalmente categoría)
+    const result = await pool.query(
+      `SELECT * FROM producto
+       WHERE LOWER(nombre) LIKE LOWER($1)
+       OR LOWER(descripcion) LIKE LOWER($1)`,
+      [`%${search}%`]
+    );
+
+    res.status(200).json(result.rows);
   } catch (error) {
-    console.error("❌ Error al obtener producto:", error);
-    res.status(500).json({ message: "Error al obtener producto" });
+    console.error("❌ Error al buscar productos:", error);
+    res.status(500).json({ message: "Error al buscar productos" });
   }
 });
+
 
 // Actualizar producto
 router.put("/producto/:id", async (req, res) => {
@@ -174,3 +190,53 @@ router.delete("/producto/:id", async (req, res) => {
 
 
 export default router;
+
+
+// 📌 ACTUALIZAR PERFIL DEL USUARIO (PUT)
+router.put("/usuario/perfil", async (req, res) => {
+  const { cedula, nombre, apellido, direccion, ciudad } = req.body;
+
+  // Validar campos obligatorios
+  if (!cedula) {
+    return res.status(400).json({ message: "Cédula es requerida" });
+  }
+
+  if (!nombre || !apellido) {
+    return res.status(400).json({ message: "Nombre y apellido son obligatorios" });
+  }
+
+  try {
+    // Verificar si el usuario existe
+    const usuarioExistente = await pool.query(
+      "SELECT cedula FROM usuario WHERE cedula = $1",
+      [cedula]
+    );
+
+    if (usuarioExistente.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Actualizar solo los campos permitidos (sin updated_at)
+    const result = await pool.query(
+      `UPDATE usuario 
+       SET nombre = $1,
+           apellido = $2,
+           direccion = $3,
+           ciudad = $4
+       WHERE cedula = $5
+       RETURNING cedula, nombre, apellido, email, direccion, ciudad`,
+      [nombre, apellido, direccion, ciudad, cedula]
+    );
+
+    console.log("✅ Perfil actualizado para cédula:", cedula);
+    
+    res.status(200).json({ 
+      message: "Perfil actualizado correctamente", 
+      usuario: result.rows[0] 
+    });
+
+  } catch (error) {
+    console.error("❌ Error al actualizar perfil:", error);
+    res.status(500).json({ message: "Error al actualizar el perfil del usuario" });
+  }
+});
