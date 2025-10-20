@@ -1,0 +1,355 @@
+/* Reset general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body, #root {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #d0cbc8;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+#top-bar {
+    background-color: #b8b4b1;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-shrink: 0; /* Evita que se reduzca */
+}
+
+#logo-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#logo-img {
+    width: 80px;
+    height: auto;
+}
+
+#logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+#logo-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+}
+
+#logo-subtitle {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    color: #000;
+}
+
+#help-icon {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Container - CENTRADO Y ALTURA REDUCIDA */
+#container {
+    width: 100%;
+    flex: 1; /* Ocupa el espacio disponible entre header y footer */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Centrado vertical */
+    padding: 20px; /* Reducido el padding */
+    background-color: #d0cbc8;
+    min-height: auto; /* Elimina altura mínima fija */
+}
+
+/* Formulario - ALTURA REDUCIDA */
+#form-wrapper {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 25px 35px; /* Reducido el padding */
+    width: 100%;
+    max-width: 650px; /* Ligeramente reducido */
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    margin: 0; /* Elimina márgenes extra */
+    max-height: 85vh; /* Limita la altura máxima */
+    overflow-y: auto; /* Scroll si es necesario */
+}
+
+#form-title {
+    text-align: center;
+    font-size: 22px; /* Ligeramente reducido */
+    font-weight: normal;
+    color: #D84040;
+    margin-bottom: 20px; /* Reducido */
+}
+
+/* Mensajes */
+.mensaje {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.mensaje.exito {
+    background-color: #e6f7e6;
+    color: #2d662d;
+    border: 1px solid #2d662d;
+}
+
+.mensaje.error {
+    background-color: #ffe6e6;
+    color: #cc0000;
+    border: 1px solid #cc0000;
+}
+
+.cargando {
+    text-align: center;
+    padding: 8px;
+    color: #666;
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* Formulario - ESPACIOS REDUCIDOS */
+#actualizar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Reducido el gap */
+}
+
+.campos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px; /* Reducido el gap */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Reducido el gap */
+}
+
+.form-group.direccion-completa {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 13px;
+    color: #000;
+    font-weight: 500;
+}
+
+.form-group input {
+    padding: 8px 12px; /* Reducido el padding */
+    border: 1px solid #999;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #D84040;
+    background-color: #fff8f8;
+}
+
+.form-group input::placeholder {
+    color: #999;
+    font-size: 12px;
+}
+
+/* Campos bloqueados */
+.campo-bloqueado {
+    background-color: #f5f5f5 !important;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.texto-ayuda {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px; /* Reducido */
+    font-style: italic;
+}
+
+/* Botones */
+.botones-accion {
+    display: flex;
+    gap: 12px; /* Reducido */
+    justify-content: center;
+    margin-top: 20px; /* Reducido */
+    grid-column: 1 / -1;
+}
+
+#btn-actualizar {
+    background-color: #D84040;
+    color: #fff;
+    border: 1px solid #D84040;
+    padding: 10px 20px; /* Reducido */
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 150px; /* Ligeramente reducido */
+}
+
+#btn-actualizar:hover:not(:disabled) {
+    background-color: #c03939;
+    border-color: #c03939;
+}
+
+#btn-actualizar:disabled {
+    background-color: #cccccc;
+    border-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#btn-cancelar {
+    background-color: #fff;
+    color: #666;
+    border: 1px solid #999;
+    padding: 10px 20px; /* Reducido */
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 110px; /* Ligeramente reducido */
+}
+
+#btn-cancelar:hover {
+    background-color: #f5f5f5;
+    border-color: #666;
+}
+
+/* Footer */
+#footer {
+    background-color: #b8b4b1;
+    padding: 15px 30px; /* Reducido */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #333;
+    width: 100%;
+    margin-top: auto;
+    flex-shrink: 0; /* Evita que se reduzca */
+}
+
+#footer-links {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#footer-links a {
+    text-decoration: none;
+    color: #333;
+}
+
+#footer-links a:hover {
+    text-decoration: underline;
+}
+
+#footer-copy {
+    color: #333;
+}
+
+.info-ayuda {
+  text-align: center;
+  margin-top: 15px;
+  color: #666;
+  font-size: 12px;
+}
+
+.info-ayuda small {
+  color: #888;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #container {
+        padding: 15px; /* Reducido en móviles */
+        align-items: flex-start; /* En móviles empieza desde arriba */
+    }
+    
+    #form-wrapper {
+        padding: 20px 25px; /* Reducido en móviles */
+        max-width: 100%;
+        margin: 10px 0;
+    }
+    
+    .campos-grid {
+        grid-template-columns: 1fr;
+        gap: 12px; /* Reducido en móviles */
+    }
+    
+    .botones-accion {
+        flex-direction: column;
+        gap: 8px; /* Reducido en móviles */
+    }
+    
+    #btn-actualizar,
+    #btn-cancelar {
+        width: 100%;
+        min-width: auto;
+    }
+
+    #footer {
+        flex-direction: column;
+        gap: 6px; /* Reducido */
+        text-align: center;
+        padding: 12px 20px; /* Reducido */
+    }
+
+    #top-bar {
+        padding: 15px 20px; /* Reducido */
+    }
+}
+
+@media (max-width: 480px) {
+    #container {
+        padding: 10px; /* Mínimo padding en móviles pequeños */
+    }
+    
+    #form-wrapper {
+        padding: 15px 20px; /* Mínimo padding */
+    }
+    
+    #form-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .form-group input {
+        padding: 6px 10px; /* Mínimo padding */
+    }
+    
+    #btn-actualizar,
+    #btn-cancelar {
+        padding: 8px 16px; /* Mínimo padding */
+    }
+}
