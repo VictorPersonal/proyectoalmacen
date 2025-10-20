@@ -6,6 +6,7 @@ import { FaShoppingCart, FaChevronRight, FaUserCircle } from "react-icons/fa";
 import image1 from "../assets/images.jpg";
 import image2 from "../assets/soga.jpg";
 import ProductCard from "../components/productoCard";
+import DescripcionProducto from "../components/DescripcionProducto";
 
 const Home = () => {
   const images = [image1, image2];
@@ -17,21 +18,18 @@ const Home = () => {
   const [busqueda, setBusqueda] = useState("");
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(false);
-  
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+
   // Estado para la autenticación
   const [usuarioLogueado, setUsuarioLogueado] = useState(false);
   const [usuarioInfo, setUsuarioInfo] = useState(null);
   const navigate = useNavigate();
 
-  const categorias = [
-    "Muebles",
-    "Electrodomésticos", 
-    "Tecnología"
-  ];
+  const categorias = ["Muebles", "Electrodomésticos", "Tecnología"];
 
   const subcategorias = {
-    "tecnología": ["Televisores", "Celulares", "Computadores"],
-    "electrodomésticos": ["Neveras", "Lavadoras"]
+    tecnología: ["Televisores", "Celulares", "Computadores"],
+    electrodomésticos: ["Neveras", "Lavadoras"],
   };
 
   // Verificar autenticación al cargar el componente
@@ -40,30 +38,25 @@ const Home = () => {
   }, []);
 
   const verificarAutenticacion = () => {
-    // Verificar si hay información de usuario en localStorage
-    const usuarioGuardado = localStorage.getItem('usuarioInfo');
+    const usuarioGuardado = localStorage.getItem("usuarioInfo");
     if (usuarioGuardado) {
       try {
         const usuario = JSON.parse(usuarioGuardado);
         setUsuarioLogueado(true);
         setUsuarioInfo(usuario);
       } catch (error) {
-        console.error('Error al parsear información del usuario:', error);
-        localStorage.removeItem('usuarioInfo');
+        console.error("Error al parsear información del usuario:", error);
+        localStorage.removeItem("usuarioInfo");
       }
     }
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
   const nextSlide = () => {
-    setCurrentIndex((prev) =>
-      prev === images.length - 1 ? 0 : prev + 1
-    );
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
   const toggleMenu = () => {
@@ -84,15 +77,12 @@ const Home = () => {
   };
 
   const handleCerrarSesion = () => {
-    // Limpiar datos de sesión
-    localStorage.removeItem('usuarioInfo');
+    localStorage.removeItem("usuarioInfo");
     setUsuarioLogueado(false);
     setUsuarioInfo(null);
     setPerfilMenuAbierto(false);
-    
-    // Redirigir al home
-    navigate('/');
-    window.location.reload(); // Recargar para asegurar que todo se resetee
+    navigate("/");
+    window.location.reload();
   };
 
   const handleBuscar = async () => {
@@ -151,7 +141,6 @@ const Home = () => {
           </div>
 
           <div className="nav-links" id="nav-links">
-            {/* MENÚ DESPLEGABLE DE CATEGORÍAS */}
             <div className="categorias-menu">
               <button className="nav-link categorias-btn" onClick={toggleMenu}>
                 Categorías ∨
@@ -161,23 +150,26 @@ const Home = () => {
                   <div className="categorias-lista">
                     {categorias.map((categoria, index) => (
                       <div key={index} className="categoria-item-container">
-                        {(categoria === "Tecnología" || categoria === "Electrodomésticos") ? (
-                          <div 
+                        {categoria === "Tecnología" || categoria === "Electrodomésticos" ? (
+                          <div
                             className="categoria-item con-submenu"
                             onMouseEnter={() => toggleSubmenu(categoria.toLowerCase())}
                             onMouseLeave={() => setSubmenuAbierto(null)}
                           >
                             <span>{categoria}</span>
                             <FaChevronRight className="submenu-icon" />
-                            {submenuAbierto === categoria.toLowerCase() && subcategorias[categoria.toLowerCase()] && (
-                              <div className="submenu">
-                                {subcategorias[categoria.toLowerCase()].map((subitem, subIndex) => (
-                                  <a key={subIndex} href="#" className="submenu-item">
-                                    {subitem}
-                                  </a>
-                                ))}
-                              </div>
-                            )}
+                            {submenuAbierto === categoria.toLowerCase() &&
+                              subcategorias[categoria.toLowerCase()] && (
+                                <div className="submenu">
+                                  {subcategorias[categoria.toLowerCase()].map(
+                                    (subitem, subIndex) => (
+                                      <a key={subIndex} href="#" className="submenu-item">
+                                        {subitem}
+                                      </a>
+                                    )
+                                  )}
+                                </div>
+                              )}
                           </div>
                         ) : (
                           <a href="#" className="categoria-item">
@@ -190,15 +182,20 @@ const Home = () => {
                 </div>
               )}
             </div>
-            <a href="#" className="nav-link">Promociones</a>
-            <a href="#" className="nav-link">Contacto</a>
-            <a href="#" className="nav-link">Ayuda</a>
+            <a href="#" className="nav-link">
+              Promociones
+            </a>
+            <a href="#" className="nav-link">
+              Contacto
+            </a>
+            <a href="#" className="nav-link">
+              Ayuda
+            </a>
           </div>
         </nav>
 
         <div className="auth-links" id="auth-links">
           {usuarioLogueado ? (
-            // Mostrar icono de perfil cuando el usuario está logueado
             <div className="perfil-menu">
               <button className="perfil-btn" onClick={togglePerfilMenu}>
                 <FaUserCircle className="perfil-icon" />
@@ -208,7 +205,11 @@ const Home = () => {
               </button>
               {perfilMenuAbierto && (
                 <div className="perfil-desplegable">
-                  <Link to="/ajustes-de-cuenta" className="perfil-item" onClick={() => setPerfilMenuAbierto(false)}>
+                  <Link
+                    to="/ajustes-de-cuenta"
+                    className="perfil-item"
+                    onClick={() => setPerfilMenuAbierto(false)}
+                  >
                     Ajustes de cuenta
                   </Link>
                   <button className="perfil-item cerrar-sesion" onClick={handleCerrarSesion}>
@@ -218,10 +219,13 @@ const Home = () => {
               )}
             </div>
           ) : (
-            // Mostrar Registrarse e Iniciar sesión cuando no está logueado
             <>
-              <Link to="/registro" id="link-registrarse">Registrarse</Link>
-              <Link to="/login" id="link-login">Iniciar sesión</Link>
+              <Link to="/registro" id="link-registrarse">
+                Registrarse
+              </Link>
+              <Link to="/login" id="link-login">
+                Iniciar sesión
+              </Link>
             </>
           )}
           <div className="cart-icon">
@@ -231,10 +235,17 @@ const Home = () => {
       </header>
 
       {/* CONTENIDO PRINCIPAL */}
-      {busqueda.trim() === "" ? (
+      {productoSeleccionado ? (
+        <DescripcionProducto
+          producto={productoSeleccionado}
+          onVolver={() => setProductoSeleccionado(null)}
+        />
+      ) : busqueda.trim() === "" ? (
         <main id="main">
           <section className="hero-section" id="hero-section">
-            <button className="carousel-btn prev" onClick={prevSlide}>‹</button>
+            <button className="carousel-btn prev" onClick={prevSlide}>
+              ‹
+            </button>
             <div className="carousel-container">
               <img
                 src={images[currentIndex]}
@@ -242,12 +253,13 @@ const Home = () => {
                 className="carousel-image"
               />
             </div>
-            <button className="carousel-btn next" onClick={nextSlide}>›</button>
+            <button className="carousel-btn next" onClick={nextSlide}>
+              ›
+            </button>
           </section>
         </main>
       ) : (
         <main className="resultados">
-          {/* ETIQUETA DE RESULTADOS - ESQUINA IZQUIERDA */}
           {!cargando && productos.length > 0 && (
             <div className="resultados-header">
               <span className="resultados-count">
@@ -255,13 +267,18 @@ const Home = () => {
               </span>
             </div>
           )}
-          
+
           {cargando ? (
             <p className="loading">Cargando productos...</p>
           ) : productos.length > 0 ? (
             <div className="productos-grid">
               {productos.map((prod) => (
-                <ProductCard key={prod.id_producto || prod.id} producto={prod} />
+                <div
+                  key={prod.id_producto || prod.id}
+                  onClick={() => setProductoSeleccionado(prod)}
+                >
+                  <ProductCard producto={prod} />
+                </div>
               ))}
             </div>
           ) : (
