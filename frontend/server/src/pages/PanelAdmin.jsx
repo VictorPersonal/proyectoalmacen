@@ -1,50 +1,88 @@
 import React, { useState, useEffect } from "react";
-import "./PanelAdmin.css";
-import axios from "axios"; // Asegúrate de instalarlo: npm install axios
+import "./PanelAdmin.css"; 
+import axios from "axios";
+
+// 🚨 CORRECCIÓN 1: Asegura que el puerto coincida con tu backend (3000 o 4000)
+const API_URL = "http://localhost:4000/api/productos";
 
 const PanelAdmin = () => {
-  // Estado de productos (inicialmente vacío, se cargará desde el backend)
+    
+  // Estados para la gestión de datos y UI
   const [products, setProducts] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ nombre: "", precio: "", stock: "", categoria: "" });
+  
+  // 🚨 CORRECCIÓN 3: Inicialización segura para los campos numéricos del formulario
+  const [formData, setFormData] = useState({
+    nombre: "",
+    precio: "", // Inicializado como string vacío para React
+    stock: "",  // Inicializado como string vacío para React
+    categoria: "", // Inicializado como string vacío para React
+  });
+  
   const [currentId, setCurrentId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Cargar productos desde el backend al montar el componente
+  // Función de Carga Principal (Llamada GET)
+  const fetchProducts = () => {
+    setCargando(true);
+    axios.get(API_URL) 
+      .then((res) => {
+        setProducts(res.data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Error al cargar productos:", err);
+        setError(`Error de conexión. Asegúrate de que el backend esté activo en ${API_URL}`);
+        setProducts([]);
+      })
+      .finally(() => {
+        setCargando(false);
+      });
+  };
+
   useEffect(() => {
-    axios.get("http://localhost:5000/api/producto")
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.error("Error al cargar productos:", err));
+    fetchProducts();
   }, []);
 
-  // Filtro de búsqueda
+  // Filtro y Paginación (sin cambios)
   const filteredProducts = products.filter((p) =>
-    p.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    p.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-  // Abrir modal para agregar/editar
+
+  // Manejo de Modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    // Reinicializamos con valores seguros
+    setFormData({ nombre: "", precio: "", stock: "", categoria: "" }); 
+    setCurrentId(null);
+  };
+  
   const handleShowModal = (product = null) => {
-    setCurrentId(product?.idproducto || null);
-    setFormData(product || { nombre: "", precio: "", stock: "", categoria: "" });
+    // 🚨 CORRECCIÓN 2: Aseguramos que currentId siempre se asigne a product.id
+    setCurrentId(product?.id || null);
+    
+    // Al cargar, convertimos los números (precio, stock, categoria) a String para el input type="number"
+    const initialFormData = product ? {
+        ...product,
+        precio: String(product.precio || ""),
+        stock: String(product.stock || ""),
+        categoria: String(product.categoria || ""),
+    } : { nombre: "", precio: "", stock: "", categoria: "" };
+
+    setFormData(initialFormData);
     setShowModal(true);
   };
 
-  // Cerrar modal
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setFormData({ nombre: "", precio: "", stock: "", categoria: "" });
-    setCurrentId(null);
-  };
-
-  // Guardar (agregar o editar)
+  // Guardar (POST/PUT)
   const handleSave = () => {
     if (!formData.nombre || !formData.precio || !formData.stock || !formData.categoria) {
       alert("Por favor completa todos los campos.");
@@ -55,42 +93,43 @@ const PanelAdmin = () => {
       nombre: formData.nombre,
       precio: parseFloat(formData.precio),
       stock: parseInt(formData.stock),
-      categoria: formData.categoria,
-      // Nota: idmarca e idcategoria no están en el formulario actual, ajusta si los necesitas
+      categoria: parseInt(formData.categoria), 
     };
 
-    if (currentId) {
-      // Editar
-      axios.put(`http://localhost:5000/api/producto/${currentId}`, payload)
-        .then(() => {
-          setProducts(products.map((p) => p.idproducto === currentId ? { ...p, ...payload } : p));
-          handleCloseModal();
-        })
-        .catch((err) => console.error("Error al actualizar:", err));
-    } else {
-      // Agregar
-      axios.post("http://localhost:5000/api/producto", payload)
-        .then((res) => {
-          setProducts([...products, { idproducto: res.data.producto.idproducto, ...payload }]);
-          handleCloseModal();
-        })
-        .catch((err) => console.error("Error al crear:", err));
-    }
+    const request = currentId
+      ? axios.put(`${API_URL}/${currentId}`, payload) 
+      : axios.post(API_URL, payload); 
+
+    request
+      .then(() => {
+        fetchProducts(); 
+        handleCloseModal();
+      })
+      .catch((err) => console.error("Error al guardar producto:", err));
   };
 
-  // Eliminar
+  // Eliminar (DELETE)
   const handleDelete = (id) => {
+    // 🚨 CORRECCIÓN 2: Verificamos que el ID no sea undefined
+    if (!id) {
+        console.error("Error: ID de producto no definido para eliminar.");
+        return;
+    }
+    
     if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
-      axios.delete(`http://localhost:5000/api/producto/${id}`)
+      axios.delete(`${API_URL}/${id}`)
         .then(() => {
-          setProducts(products.filter((p) => p.idproducto !== id));
+          fetchProducts(); 
         })
         .catch((err) => console.error("Error al eliminar:", err));
     }
   };
 
+
+  // --- Renderizado ---
   return (
     <div className="admin-panel">
+      {/* ... Sidebar ... */}
       <aside className="sidebar">
         <div className="admin-profile">
           <div className="admin-avatar">👤</div>
@@ -107,6 +146,7 @@ const PanelAdmin = () => {
       </aside>
 
       <main className="main-content">
+        {/* ... (Controles de búsqueda y botón) ... */}
         <div className="search-wrapper">
           <div className="search-container">
             <span className="search-icon">🔍</span>
@@ -125,6 +165,8 @@ const PanelAdmin = () => {
           </button>
         </div>
 
+        {error && <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
+        
         <div className="table-wrapper">
           <table className="products-table">
             <thead>
@@ -138,19 +180,25 @@ const PanelAdmin = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.length > 0 ? (
+              {cargando ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>Cargando datos...</td>
+                </tr>
+              ) : currentItems.length > 0 ? (
                 currentItems.map((product) => (
-                  <tr key={product.idproducto}>
-                    <td>{product.idproducto}</td>
+                  // Prop 'key' obligatoria en <tr>
+                  <tr key={product.id}>
+                    <td>{product.id}</td> 
                     <td>{product.nombre}</td>
-                    <td>{product.precio}</td>
+                    <td>${parseFloat(product.precio || 0).toFixed(2)}</td> 
                     <td>{product.stock}</td>
-                    <td>{product.categoria || "Sin categoría"}</td>
+                    <td>{product.categoria || "N/A"}</td>
                     <td className="actions-cell">
                       <button className="btn btn--edit" onClick={() => handleShowModal(product)}>
                         ✏️
                       </button>
-                      <button className="btn btn--delete" onClick={() => handleDelete(product.idproducto)}>
+                      {/* 🚨 CORRECCIÓN 2: Aseguramos el paso de product.id */}
+                      <button className="btn btn--delete" onClick={() => handleDelete(product.id)}>
                         🗑
                       </button>
                     </td>
@@ -167,6 +215,7 @@ const PanelAdmin = () => {
           </table>
         </div>
 
+        {/* Paginación */}
         <div className="pagination">
           <button
             className="page-btn"
@@ -205,6 +254,7 @@ const PanelAdmin = () => {
               value={formData.nombre}
               onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
             />
+            {/* 🚨 CORRECCIÓN 3: El valor del input ya viene como string desde handleShowModal */}
             <input
               type="number"
               placeholder="Precio"
@@ -218,8 +268,8 @@ const PanelAdmin = () => {
               onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
             />
             <input
-              type="text"
-              placeholder="Categoría"
+              type="number" 
+              placeholder="ID Categoría (Ej: 1)"
               value={formData.categoria}
               onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
             />
