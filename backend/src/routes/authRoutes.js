@@ -6,6 +6,6 @@ const router = express.Router();
 
 // Rutas para recuperación de contraseña
 router.post("/recuperar", enviarCorreoRecuperacion);
-router.post("/reestablecer", restablecerContrasena);
+router.post("/restablecer", restablecerContrasena);
 
 export default router;

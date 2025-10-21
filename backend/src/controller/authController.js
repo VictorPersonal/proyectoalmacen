@@ -21,9 +21,10 @@ const pool = new Pool({
 const brevoClient = new brevo.TransactionalEmailsApi();
 brevoClient.authentications["apiKey"].apiKey = process.env.BREVO_API_KEY;
 
-// ---------------------------
-// 1️⃣ Enviar correo de recuperación
-// ---------------------------
+
+/**
+ * 📩 Enviar correo de recuperación de contraseña
+ */
 export const enviarCorreoRecuperacion = async (req, res) => {
   const { email } = req.body;
 
@@ -36,10 +37,10 @@ export const enviarCorreoRecuperacion = async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // Generar token temporal (expira en 1 hora)
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    // ✅ Generar token temporal (expira en 1 hora) — usando el email
+    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    // Construir URL de recuperación
+    // Construir URL de recuperación (usa FRONTEND_URL del .env)
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
     // Crear correo con Brevo
@@ -73,26 +74,43 @@ export const enviarCorreoRecuperacion = async (req, res) => {
   }
 };
 
-// ---------------------------
-// 2️⃣ Restablecer contraseña
-// ---------------------------
+/**
+ * 🔑 Restablecer la contraseña
+ */
 export const restablecerContrasena = async (req, res) => {
-  const { token, nuevaContrasena } = req.body;
-
   try {
-    // Verificar token JWT
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const { token, nuevaContrasena } = req.body;
 
-    // Encriptar nueva contraseña
+    if (!token || !nuevaContrasena) {
+      return res.status(400).json({ message: "Faltan datos requeridos" });
+    }
+
+    // ✅ Verificar y decodificar el token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decoded.email;
+
+    if (!email) {
+      return res.status(400).json({ message: "Token inválido o sin correo" });
+    }
+
+    // ✅ Encriptar la nueva contraseña
     const hashedPassword = await bcrypt.hash(nuevaContrasena, 10);
 
-    // Actualizar contraseña en la base de datos
-    await pool.query("UPDATE usuario SET password = $1 WHERE id = $2", [hashedPassword, userId]);
+    // ✅ Actualizar la contraseña en la base de datos
+    const result = await pool.query(
+      "UPDATE usuario SET password = $1 WHERE email = $2",
+      [hashedPassword, email]
+    );
 
-    res.json({ message: "Contraseña restablecida correctamente" });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.json({ message: "Contraseña actualizada correctamente" });
   } catch (error) {
     console.error("Error al restablecer contraseña:", error);
-    res.status(400).json({ message: "Token inválido o expirado" });
+    res.status(400).json({
+      message: "Token inválido, expirado o error en el proceso",
+    });
   }
 };
