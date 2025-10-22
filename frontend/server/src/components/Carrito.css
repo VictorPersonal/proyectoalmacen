@@ -1,0 +1,35 @@
+.carrito-modal {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 350px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 1000;
+}
+
+.carrito-modal.visible {
+  right: 0;
+}
+
+.carrito-contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cerrar-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
