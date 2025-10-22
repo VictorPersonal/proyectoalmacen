@@ -7,6 +7,7 @@ import image1 from "../assets/images.jpg";
 import image2 from "../assets/soga.jpg";
 import ProductCard from "../components/productoCard";
 import DescripcionProducto from "../components/DescripcionProducto";
+import Carrito from "../components/Carrito";
 
 const Home = () => {
   const images = [image1, image2];
@@ -24,6 +25,9 @@ const Home = () => {
   const [usuarioLogueado, setUsuarioLogueado] = useState(false);
   const [usuarioInfo, setUsuarioInfo] = useState(null);
   const navigate = useNavigate();
+
+  // 🛒 Estado para el carrito
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
 
   const categorias = ["Muebles", "Electrodomésticos", "Tecnología"];
 
@@ -112,6 +116,11 @@ const Home = () => {
     if (e.key === "Enter") handleBuscar();
   };
 
+  // 🛒 Alternar el carrito
+  const toggleCarrito = () => {
+    setMostrarCarrito(!mostrarCarrito);
+  };
+
   return (
     <div>
       {/* ENCABEZADO */}
@@ -150,10 +159,13 @@ const Home = () => {
                   <div className="categorias-lista">
                     {categorias.map((categoria, index) => (
                       <div key={index} className="categoria-item-container">
-                        {categoria === "Tecnología" || categoria === "Electrodomésticos" ? (
+                        {categoria === "Tecnología" ||
+                        categoria === "Electrodomésticos" ? (
                           <div
                             className="categoria-item con-submenu"
-                            onMouseEnter={() => toggleSubmenu(categoria.toLowerCase())}
+                            onMouseEnter={() =>
+                              toggleSubmenu(categoria.toLowerCase())
+                            }
                             onMouseLeave={() => setSubmenuAbierto(null)}
                           >
                             <span>{categoria}</span>
@@ -161,13 +173,17 @@ const Home = () => {
                             {submenuAbierto === categoria.toLowerCase() &&
                               subcategorias[categoria.toLowerCase()] && (
                                 <div className="submenu">
-                                  {subcategorias[categoria.toLowerCase()].map(
-                                    (subitem, subIndex) => (
-                                      <a key={subIndex} href="#" className="submenu-item">
-                                        {subitem}
-                                      </a>
-                                    )
-                                  )}
+                                  {subcategorias[
+                                    categoria.toLowerCase()
+                                  ].map((subitem, subIndex) => (
+                                    <a
+                                      key={subIndex}
+                                      href="#"
+                                      className="submenu-item"
+                                    >
+                                      {subitem}
+                                    </a>
+                                  ))}
                                 </div>
                               )}
                           </div>
@@ -212,7 +228,10 @@ const Home = () => {
                   >
                     Ajustes de cuenta
                   </Link>
-                  <button className="perfil-item cerrar-sesion" onClick={handleCerrarSesion}>
+                  <button
+                    className="perfil-item cerrar-sesion"
+                    onClick={handleCerrarSesion}
+                  >
                     Cerrar sesión
                   </button>
                 </div>
@@ -228,17 +247,27 @@ const Home = () => {
               </Link>
             </>
           )}
-          <div className="cart-icon">
+          <div className="cart-icon" onClick={toggleCarrito}>
             <FaShoppingCart />
           </div>
         </div>
       </header>
+
+      {/* 🛒 Mostrar carrito si está activo */}
+      {mostrarCarrito && (
+        <Carrito
+          abierto={mostrarCarrito}
+          cedula={usuarioInfo?.cedula}
+          onCerrar={() => setMostrarCarrito(false)}
+        />
+      )}
 
       {/* CONTENIDO PRINCIPAL */}
       {productoSeleccionado ? (
         <DescripcionProducto
           producto={productoSeleccionado}
           onVolver={() => setProductoSeleccionado(null)}
+          cedula={usuarioInfo?.cedula} // ✅ se pasa la cédula al componente
         />
       ) : busqueda.trim() === "" ? (
         <main id="main">
