@@ -395,7 +395,7 @@ router.delete("/carrito/vaciar/:cedula", async (req, res) => {
 });
 
 
-export default router;
+
 
 
 

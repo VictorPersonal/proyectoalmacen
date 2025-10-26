@@ -19,11 +19,9 @@ const RecuperarContrasena = () => {
     }
 
     try {
-<<<<<<< HEAD
-      const response = await fetch("http://localhost:4000/api/recuperar", {
-=======
+
       const response = await fetch("http://localhost:4000/api/auth/recuperar", {
->>>>>>> Victor1
+        
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
