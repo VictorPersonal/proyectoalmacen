@@ -5,7 +5,7 @@
   width: 350px;
   height: 100%;
   background: #fff;
-  box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
   padding: 20px;
   transition: right 0.3s ease;
   z-index: 1000;
@@ -27,6 +27,43 @@
   font-size: 20px;
   cursor: pointer;
   align-self: flex-end;
+}
+
+.botones-carrito {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.btn-comprar2,
+.btn-vaciar {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* 🟦 Botón azul para diferenciar del verde del otro */
+.btn-comprar2 {
+  background-color: #2196f3;
+  color: white;
+}
+
+.btn-comprar2:hover {
+  background-color: #1976d2;
+}
+
+.btn-vaciar {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-vaciar:hover {
+  background-color: #d32f2f;
 }
 
 ul {
