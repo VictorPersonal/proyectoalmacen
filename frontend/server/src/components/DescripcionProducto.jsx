@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import "./DescripcionProducto.css";
 import { FaStar } from "react-icons/fa";
+import axios from "axios";
 
-const DescripcionProducto = ({ producto, onVolver }) => {
+const DescripcionProducto = ({ producto, onVolver, cedula }) => {
+  const [cantidad, setCantidad] = useState(1);
+
   if (!producto || !producto.nombre) {
     return (
       <div className="descripcion-producto-error">
@@ -15,6 +18,32 @@ const DescripcionProducto = ({ producto, onVolver }) => {
       </div>
     );
   }
+
+  // 👉 Función para agregar al carrito
+  const handleAgregarCarrito = async () => {
+    try {
+      const usuario = JSON.parse(localStorage.getItem("usuarioInfo"));
+      if (!usuario?.cedula) {
+        alert("Para agregar productos. Inicia sesión primero.");
+        return;
+      }
+
+      const productoData = {
+        cedula: usuario.cedula,
+        idproducto: producto.id_producto || producto.id || producto.idproducto, // 👈 usa este nombre exacto
+        cantidad: cantidad,
+      };
+
+
+      const res = await axios.post("http://localhost:4000/api/carrito/agregar", productoData);
+      console.log("✅ Producto agregado:", res.data);
+      alert("Producto agregado al carrito");
+    } catch (error) {
+      console.error("❌ Error al agregar producto:", error);
+      alert("Error al agregar producto al carrito");
+    }
+  };
+
 
   return (
     <div className="descripcion-producto">
@@ -46,10 +75,14 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
           <div className="producto-cantidad">
             <label htmlFor="cantidad">Cantidad: </label>
-            <select id="cantidad">
-              <option>1 unidad</option>
-              <option>2 unidades</option>
-              <option>3 unidades</option>
+            <select
+              id="cantidad"
+              value={cantidad}
+              onChange={(e) => setCantidad(Number(e.target.value))}
+            >
+              <option value={1}>1 unidad</option>
+              <option value={2}>2 unidades</option>
+              <option value={3}>3 unidades</option>
             </select>
 
             <div className="producto-stock">
@@ -59,14 +92,14 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
           <div className="medios-pago">
             <p>Medios de pago</p>
-            <div className="logos-pago">
-              {/* Aquí irán los logos más adelante */}
-            </div>
+            <div className="logos-pago">{/* Aquí irán los logos más adelante */}</div>
           </div>
 
           <div className="botones-compra">
             <button className="btn-comprar">Comprar Ahora</button>
-            <button className="btn-agregar">Agregar al carrito</button>
+            <button className="btn-agregar" onClick={handleAgregarCarrito}>
+              Agregar al carrito
+            </button>
           </div>
 
           {onVolver && (

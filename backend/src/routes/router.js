@@ -209,30 +209,24 @@ router.get("/productos/:id", async (req, res) => {
 
 
 // RUTA 2: POST /productos (CREAR)
-router.post("/productos", async (req, res) => {
-    try {
-        const { nombre, precio, stock, categoria } = req.body;
+router.post("/api/carrito/agregar", async (req, res) => {
+  try {
+    const { cedula, idproducto, cantidad, subtotal } = req.body;
 
-        if (!nombre || !precio || !stock || !categoria) {
-            return res.status(400).json({ message: "Faltan campos obligatorios (nombre, precio, stock, categoría)." });
-        }
-
-        const result = await pool.query(
-            `INSERT INTO public.producto (nombre, precio, stock, idcategoria) 
-             VALUES ($1, $2, $3, $4) 
-             RETURNING idproducto AS id, nombre, precio, stock, idcategoria AS categoria;`,
-            [nombre, precio, stock, categoria]
-        );
-
-        res.status(201).json({
-            message: "Producto creado exitosamente",
-            producto: result.rows[0]
-        });
-
-    } catch (error) {
-        console.error("❌ Error al crear producto:", error);
-        res.status(500).json({ message: "Error al crear producto", error: error.message });
+    if (!cedula || !idproducto) {
+      return res.status(400).json({ error: "Faltan datos obligatorios" });
     }
+
+    const result = await pool.query(
+      "INSERT INTO carrito (cedula, idproducto, cantidad, subtotal) VALUES ($1, $2, $3, $4) RETURNING *",
+      [cedula, idproducto, cantidad, subtotal]
+    );
+
+    res.json({ success: true, carrito: result.rows[0] });
+  } catch (err) {
+    console.error("❌ Error al agregar producto al carrito:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 
@@ -288,5 +282,92 @@ router.delete("/productos/:id", async (req, res) => {
     }
 });
 
+// Obtener productos del carrito de un usuario
+router.get("/carrito/:cedula", async (req, res) => {
+  const { cedula } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT 
+         c.idproducto, 
+         p.nombre, 
+         c.cantidad, 
+         (p.precio * c.cantidad) AS subtotal
+       FROM public.carrito c
+       JOIN public.producto p ON c.idproducto = p.idproducto
+       WHERE c.cedula = $1`,
+      [cedula]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("❌ Error al obtener carrito:", error);
+    res.status(500).json({ error: "Error al obtener el carrito" });
+  }
+});
+
+// Agregar al carrito
+router.post("/carrito/agregar", async (req, res) => {
+  const { cedula, idproducto, cantidad } = req.body;
+  try {
+    // Verificar si ya existe
+    const existe = await pool.query(
+      "SELECT * FROM public.carrito WHERE cedula = $1 AND idproducto = $2",
+      [cedula, idproducto]
+    );
+
+    if (existe.rows.length > 0) {
+      await pool.query(
+        "UPDATE public.carrito SET cantidad = cantidad + $1 WHERE cedula = $2 AND idproducto = $3",
+        [cantidad, cedula, idproducto]
+      );
+    } else {
+      await pool.query(
+        "INSERT INTO public.carrito (cedula, idproducto, cantidad) VALUES ($1, $2, $3)",
+        [cedula, idproducto, cantidad]
+      );
+    }
+
+    res.json({ message: "Producto agregado correctamente al carrito" });
+  } catch (error) {
+    console.error("❌ Error al agregar al carrito:", error);
+    res.status(500).json({ error: "Error al agregar producto al carrito" });
+  }
+});
+
+// 🗑️ Eliminar un solo producto del carrito
+router.delete("/carrito/eliminar/:cedula/:idproducto", async (req, res) => {
+  const { cedula, idproducto } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM public.carrito WHERE cedula = $1 AND idproducto = $2",
+      [cedula, idproducto]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Producto no encontrado en el carrito" });
+    }
+
+    res.json({ message: "Producto eliminado del carrito correctamente" });
+  } catch (error) {
+    console.error("❌ Error al eliminar producto del carrito:", error);
+    res.status(500).json({ error: "Error al eliminar producto del carrito" });
+  }
+});
+
+
+// 🧹 Vaciar todo el carrito de un usuario
+router.delete("/carrito/vaciar/:cedula", async (req, res) => {
+  const { cedula } = req.params;
+  try {
+    await pool.query("DELETE FROM public.carrito WHERE cedula = $1", [cedula]);
+    res.json({ message: "Carrito vaciado con éxito" });
+  } catch (error) {
+    console.error("❌ Error al vaciar carrito:", error);
+    res.status(500).json({ error: "Error al vaciar carrito" });
+  }
+});
+
 
 export default router;
+
+
+
