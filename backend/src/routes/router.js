@@ -333,6 +333,40 @@ router.post("/carrito/agregar", async (req, res) => {
   }
 });
 
+// 🗑️ Eliminar un solo producto del carrito
+router.delete("/carrito/eliminar/:cedula/:idproducto", async (req, res) => {
+  const { cedula, idproducto } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM public.carrito WHERE cedula = $1 AND idproducto = $2",
+      [cedula, idproducto]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Producto no encontrado en el carrito" });
+    }
+
+    res.json({ message: "Producto eliminado del carrito correctamente" });
+  } catch (error) {
+    console.error("❌ Error al eliminar producto del carrito:", error);
+    res.status(500).json({ error: "Error al eliminar producto del carrito" });
+  }
+});
+
+
+// 🧹 Vaciar todo el carrito de un usuario
+router.delete("/carrito/vaciar/:cedula", async (req, res) => {
+  const { cedula } = req.params;
+  try {
+    await pool.query("DELETE FROM public.carrito WHERE cedula = $1", [cedula]);
+    res.json({ message: "Carrito vaciado con éxito" });
+  } catch (error) {
+    console.error("❌ Error al vaciar carrito:", error);
+    res.status(500).json({ error: "Error al vaciar carrito" });
+  }
+});
+
+
 export default router;
 
 
