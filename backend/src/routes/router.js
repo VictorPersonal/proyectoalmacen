@@ -209,7 +209,6 @@ router.get("/productos/:id", async (req, res) => {
 
 
 // RUTA 2: POST /productos (CREAR)
-<<<<<<< HEAD
 router.post("/api/carrito/agregar", async (req, res) => {
   try {
     const { cedula, idproducto, cantidad, subtotal } = req.body;
@@ -228,7 +227,8 @@ router.post("/api/carrito/agregar", async (req, res) => {
     console.error("❌ Error al agregar producto al carrito:", err);
     res.status(500).json({ error: err.message });
   }
-=======
+});
+
 router.post("/productos", async (req, res) => {
     try {
         const { nombre, precio, stock, categoria } = req.body;
@@ -253,7 +253,7 @@ router.post("/productos", async (req, res) => {
         console.error("❌ Error al crear producto:", error);
         res.status(500).json({ message: "Error al crear producto", error: error.message });
     }
->>>>>>> Victor1
+
 });
 
 
@@ -309,7 +309,7 @@ router.delete("/productos/:id", async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
+
 // Obtener productos del carrito de un usuario
 router.get("/carrito/:cedula", async (req, res) => {
   const { cedula } = req.params;
@@ -399,7 +399,7 @@ export default router;
 
 
 
-=======
+
 
 
 // ====================================================================
@@ -500,4 +500,4 @@ router.delete("/favoritos/:cedula/:idproducto", async (req, res) => {
 
 
 export default router;
->>>>>>> Victor1
+
