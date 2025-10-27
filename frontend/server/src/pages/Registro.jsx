@@ -1,8 +1,5 @@
 import { useState } from "react";
-<<<<<<< HEAD
-=======
 import { useNavigate } from "react-router-dom";
->>>>>>> fdb062a
 import "./Registro.css";
 import logo from "../assets/Logo dulce hogar.png";
 
@@ -11,12 +8,8 @@ function Registro() {
   const [cedula, setCedula] = useState("");
   const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");
-<<<<<<< HEAD
-  const [mensaje, setMensaje] = useState(""); // Nuevo estado para mensajes
-=======
   const [mensaje, setMensaje] = useState(""); // Estado para mensajes
   const navigate = useNavigate(); // Hook para redirigir
->>>>>>> fdb062a
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,10 +35,6 @@ function Registro() {
         return;
       }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> fdb062a
       if (!res.ok) throw new Error("Error al registrar usuario");
 
       const data = await res.json();
@@ -56,14 +45,11 @@ function Registro() {
       setCedula("");
       setNombre("");
       setContrasena("");
-<<<<<<< HEAD
-=======
 
       // redirigir al login después de 2 segundos
       setTimeout(() => {
         navigate("/login");
       }, 2000);
->>>>>>> fdb062a
     } catch (error) {
       console.error("Error:", error);
       setMensaje("No se pudo registrar el usuario ❌");
@@ -93,10 +79,7 @@ function Registro() {
                 color: mensaje.includes("exitosamente") ? "green" : "red",
                 marginBottom: "1rem",
                 fontWeight: "bold",
-<<<<<<< HEAD
-=======
                 textAlign: "center",
->>>>>>> fdb062a
               }}
             >
               {mensaje}
@@ -147,10 +130,6 @@ function Registro() {
                 onChange={(e) => setContrasena(e.target.value)}
                 required
               />
-<<<<<<< HEAD
-              
-=======
->>>>>>> fdb062a
               <small id="hint">
                 Al menos 8 caracteres (MAYÚSCULAS, minúsculas...)
               </small>
@@ -177,8 +156,4 @@ function Registro() {
   );
 }
 
-<<<<<<< HEAD
 export default Registro;
-=======
-export default Registro;
->>>>>>> fdb062a
