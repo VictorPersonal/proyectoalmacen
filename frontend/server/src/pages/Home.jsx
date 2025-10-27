@@ -89,6 +89,26 @@ const Home = () => {
     window.location.reload();
   };
 
+<<<<<<< HEAD
+=======
+  // 🔍 Normalizar texto para ignorar tildes y mayúsculas
+  const normalizar = (texto) =>
+    texto ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+
+  // 🔍 Ordenar resultados por relevancia
+  const ordenarPorRelevancia = (lista, query) => {
+    const q = normalizar(query);
+    return lista.sort((a, b) => {
+      const aNombre = normalizar(a.nombre);
+      const bNombre = normalizar(b.nombre);
+      const aCoin = aNombre.startsWith(q) ? 2 : aNombre.includes(q) ? 1 : 0;
+      const bCoin = bNombre.startsWith(q) ? 2 : bNombre.includes(q) ? 1 : 0;
+      return bCoin - aCoin;
+    });
+  };
+
+  // 🔍 Buscar productos
+>>>>>>> fdb062a
   const handleBuscar = async () => {
     const query = busqueda.trim();
     if (query === "") {
@@ -103,7 +123,17 @@ const Home = () => {
       );
       if (!res.ok) throw new Error("Error en la búsqueda");
       const data = await res.json();
+<<<<<<< HEAD
       setProductos(Array.isArray(data) ? data : []);
+=======
+
+      // Normaliza y ordena resultados por relevancia
+      const productosOrdenados = ordenarPorRelevancia(
+        Array.isArray(data) ? data : [],
+        query
+      );
+      setProductos(productosOrdenados);
+>>>>>>> fdb062a
     } catch (error) {
       console.error("Error al buscar productos:", error);
       setProductos([]);
@@ -112,6 +142,22 @@ const Home = () => {
     }
   };
 
+<<<<<<< HEAD
+=======
+  // ⏳ Búsqueda reactiva (debounce de 500ms)
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (busqueda.trim() !== "") {
+        handleBuscar();
+      } else {
+        setProductos([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [busqueda]);
+
+>>>>>>> fdb062a
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleBuscar();
   };
@@ -267,7 +313,11 @@ const Home = () => {
         <DescripcionProducto
           producto={productoSeleccionado}
           onVolver={() => setProductoSeleccionado(null)}
+<<<<<<< HEAD
           cedula={usuarioInfo?.cedula} // ✅ se pasa la cédula al componente
+=======
+          cedula={usuarioInfo?.cedula}
+>>>>>>> fdb062a
         />
       ) : busqueda.trim() === "" ? (
         <main id="main">
