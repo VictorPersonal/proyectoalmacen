@@ -303,6 +303,24 @@ router.post("/favoritos", async (req, res) => {
     }
 
     try {
+        // Validar que la cédula exista en la tabla usuario
+        const usuarioExiste = await pool.query(
+            "SELECT 1 FROM usuario WHERE cedula = $1", // El 1 en el SELECT es una práctica para optimizar la consulta, pues se necesita saber si el registro existe, NO se NECESITAN obtener todos los datos
+            [cedula]
+        );
+        if (usuarioExiste.rows.length === 0) {
+            return res.status(404).json({ message: `No existe un usuario con la cédula ${cedula}.` });
+        }
+
+        // Validar que el producto exista en la tabla producto
+        const productoExiste = await pool.query(
+            "SELECT 1 FROM producto WHERE idproducto = $1",
+            [idproducto]
+        );
+        if (productoExiste.rows.length === 0) {
+            return res.status(404).json({ message: `No existe un producto con el ID ${idproducto}.` });
+        }
+
         // Verificar si ya está en favoritos
         const existe = await pool.query(
             "SELECT 1 FROM favoritoproducto WHERE cedula = $1 AND idproducto = $2",
@@ -328,7 +346,7 @@ router.post("/favoritos", async (req, res) => {
 
     } catch (error) {
         console.error("❌ Error al agregar favorito:", error);
-        res.status(500).json({ message: "Error al agregar favorito" });
+        res.status(500).json({ message: "Error interno al agregar favorito." });
     }
 });
 
