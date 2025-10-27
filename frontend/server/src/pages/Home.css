@@ -447,15 +447,6 @@ main {
 
 .productos-grid {
   display: grid;
-<<<<<<< HEAD
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-  justify-content: flex-start;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0;
-  padding: 0;
-=======
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 20px;
   justify-items: center;
@@ -464,7 +455,6 @@ main {
   max-width: none;
   padding: 0 40px; /* margen lateral opcional */
   box-sizing: border-box;
->>>>>>> fdb062a
 }
 
 .loading, .no-result {

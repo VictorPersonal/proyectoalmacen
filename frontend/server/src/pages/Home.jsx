@@ -89,8 +89,6 @@ const Home = () => {
     window.location.reload();
   };
 
-<<<<<<< HEAD
-=======
   // 🔍 Normalizar texto para ignorar tildes y mayúsculas
   const normalizar = (texto) =>
     texto ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
@@ -108,7 +106,6 @@ const Home = () => {
   };
 
   // 🔍 Buscar productos
->>>>>>> fdb062a
   const handleBuscar = async () => {
     const query = busqueda.trim();
     if (query === "") {
@@ -123,9 +120,6 @@ const Home = () => {
       );
       if (!res.ok) throw new Error("Error en la búsqueda");
       const data = await res.json();
-<<<<<<< HEAD
-      setProductos(Array.isArray(data) ? data : []);
-=======
 
       // Normaliza y ordena resultados por relevancia
       const productosOrdenados = ordenarPorRelevancia(
@@ -133,7 +127,6 @@ const Home = () => {
         query
       );
       setProductos(productosOrdenados);
->>>>>>> fdb062a
     } catch (error) {
       console.error("Error al buscar productos:", error);
       setProductos([]);
@@ -142,8 +135,6 @@ const Home = () => {
     }
   };
 
-<<<<<<< HEAD
-=======
   // ⏳ Búsqueda reactiva (debounce de 500ms)
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -157,7 +148,6 @@ const Home = () => {
     return () => clearTimeout(delayDebounce);
   }, [busqueda]);
 
->>>>>>> fdb062a
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleBuscar();
   };
@@ -313,11 +303,7 @@ const Home = () => {
         <DescripcionProducto
           producto={productoSeleccionado}
           onVolver={() => setProductoSeleccionado(null)}
-<<<<<<< HEAD
-          cedula={usuarioInfo?.cedula} // ✅ se pasa la cédula al componente
-=======
           cedula={usuarioInfo?.cedula}
->>>>>>> fdb062a
         />
       ) : busqueda.trim() === "" ? (
         <main id="main">
