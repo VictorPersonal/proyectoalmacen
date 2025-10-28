@@ -500,4 +500,3 @@ router.delete("/favoritos/:cedula/:idproducto", async (req, res) => {
 
 
 export default router;
-

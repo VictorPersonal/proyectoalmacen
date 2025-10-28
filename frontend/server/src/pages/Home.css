@@ -451,8 +451,14 @@ main {
   gap: 20px;
   justify-items: center;
   width: 100%;
+<<<<<<< HEAD
+  /* quita la limitación de ancho */
+  max-width: none;
+  padding: 0 40px; /* margen lateral opcional */
+=======
   max-width: none;
   padding: 0 40px; 
+>>>>>>> 522049e04dff4b212fb69028281738447c5db81e
   box-sizing: border-box;
 }
 
@@ -497,4 +503,8 @@ footer {
 
 .footer-copyright {
   color: #333;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 522049e04dff4b212fb69028281738447c5db81e
