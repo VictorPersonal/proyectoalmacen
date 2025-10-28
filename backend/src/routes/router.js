@@ -229,6 +229,33 @@ router.post("/api/carrito/agregar", async (req, res) => {
   }
 });
 
+router.post("/productos", async (req, res) => {
+    try {
+        const { nombre, precio, stock, categoria } = req.body;
+
+        if (!nombre || !precio || !stock || !categoria) {
+            return res.status(400).json({ message: "Faltan campos obligatorios (nombre, precio, stock, categoría)." });
+        }
+
+        const result = await pool.query(
+            `INSERT INTO public.producto (nombre, precio, stock, idcategoria) 
+             VALUES ($1, $2, $3, $4) 
+             RETURNING idproducto AS id, nombre, precio, stock, idcategoria AS categoria;`,
+            [nombre, precio, stock, categoria]
+        );
+
+        res.status(201).json({
+            message: "Producto creado exitosamente",
+            producto: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("❌ Error al crear producto:", error);
+        res.status(500).json({ message: "Error al crear producto", error: error.message });
+    }
+
+});
+
 
 // RUTA 3: PUT /productos/:id (ACTUALIZAR)
 router.put("/productos/:id", async (req, res) => {
@@ -281,6 +308,7 @@ router.delete("/productos/:id", async (req, res) => {
         res.status(500).json({ message: "Error al eliminar producto", error: error.message });
     }
 });
+
 
 // Obtener productos del carrito de un usuario
 router.get("/carrito/:cedula", async (req, res) => {
@@ -367,7 +395,108 @@ router.delete("/carrito/vaciar/:cedula", async (req, res) => {
 });
 
 
+
+
+
+
+
+
+
+// ====================================================================
+// 💖 RUTAS DE FAVORITOS DE PRODUCTOS
+// ====================================================================
+
+// 📌 Agregar producto a favoritos
+router.post("/favoritos", async (req, res) => {
+    const { cedula, idproducto } = req.body;
+
+    if (!cedula || !idproducto) {
+        return res.status(400).json({ message: "Faltan datos obligatorios (cedula, idproducto)." });
+    }
+
+    try {
+        // Verificar si ya está en favoritos
+        const existe = await pool.query(
+            "SELECT 1 FROM favoritoproducto WHERE cedula = $1 AND idproducto = $2",
+            [cedula, idproducto]
+        );
+
+        if (existe.rows.length > 0) {
+            return res.status(400).json({ message: "El producto ya está en favoritos." });
+        }
+
+        // Insertar nuevo favorito
+        const result = await pool.query(
+            `INSERT INTO favoritoproducto (fechaagregado, cedula, idproducto)
+             VALUES (CURRENT_DATE, $1, $2)
+             RETURNING idfavorito, fechaagregado, cedula, idproducto;`,
+            [cedula, idproducto]
+        );
+
+        res.status(201).json({
+            message: "Producto agregado a favoritos correctamente.",
+            favorito: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("❌ Error al agregar favorito:", error);
+        res.status(500).json({ message: "Error al agregar favorito" });
+    }
+});
+
+
+// 📌 Obtener todos los favoritos de un usuario
+router.get("/favoritos/:cedula", async (req, res) => {
+    const { cedula } = req.params;
+
+    try {
+        const result = await pool.query(
+            `SELECT 
+                f.idfavorito, 
+                f.fechaagregado, 
+                p.idproducto, 
+                p.nombre, 
+                p.precio, 
+                p.descripcion, 
+                p.stock
+             FROM favoritoproducto f
+             INNER JOIN producto p ON f.idproducto = p.idproducto
+             WHERE f.cedula = $1
+             ORDER BY f.fechaagregado DESC;`,
+            [cedula]
+        );
+
+        res.status(200).json(result.rows);
+
+    } catch (error) {
+        console.error("❌ Error al obtener favoritos:", error);
+        res.status(500).json({ message: "Error al obtener favoritos" });
+    }
+});
+
+
+// 📌 Eliminar un producto de favoritos
+router.delete("/favoritos/:cedula/:idproducto", async (req, res) => {
+    const { cedula, idproducto } = req.params;
+
+    try {
+        const result = await pool.query(
+            "DELETE FROM favoritoproducto WHERE cedula = $1 AND idproducto = $2 RETURNING *",
+            [cedula, idproducto]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: "El producto no estaba en favoritos." });
+        }
+
+        res.status(200).json({ message: "Producto eliminado de favoritos correctamente." });
+
+    } catch (error) {
+        console.error("❌ Error al eliminar favorito:", error);
+        res.status(500).json({ message: "Error al eliminar favorito" });
+    }
+});
+
+
+
 export default router;
-
-
-
