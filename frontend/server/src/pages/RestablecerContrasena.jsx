@@ -1,11 +1,14 @@
-import { useNavigate, useParams } from "react-router-dom";
 import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import "./RestablecerContrasena.css"; // 👈 importante importar los estilos
+
+import logo from "../assets/Logo dulce hogar.png"; // si tienes logo
 
 const RestablecerContrasena = () => {
   const [nuevaContrasena, setNuevaContrasena] = useState("");
   const [mensaje, setMensaje] = useState("");
   const navigate = useNavigate();
-  const { token } = useParams(); // 👈 cambia esto
+  const { token } = useParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,20 +40,71 @@ const RestablecerContrasena = () => {
   };
 
   return (
-    <div className="restablecer-wrapper">
-      <h2>Restablecer Contraseña</h2>
+    <div className="recuperar-wrapper">
+      {/* ===== HEADER ===== */}
+      <header className="top-bar">
+        <div className="logo-section">
+          <img src={logo} alt="Logo" className="logo-icon" />
+          <div className="logo-text">
+            <span className="logo-title">Dulce Hogar</span>
+            <span className="logo-subtitle">Tu espacio de confianza</span>
+          </div>
+        </div>
+        <div className="help-icon">?</div>
+      </header>
 
-      {mensaje && <p>{mensaje}</p>}
+      {/* ===== BODY ===== */}
+      <main className="container">
+        <div className="recuperar-box">
+          <h2 className="recuperar-title">Restablecer Contraseña</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="password"
-          placeholder="Nueva contraseña"
-          value={nuevaContrasena}
-          onChange={(e) => setNuevaContrasena(e.target.value)}
-        />
-        <button type="submit">Actualizar Contraseña</button>
-      </form>
+          {mensaje && (
+            <p
+              className={`recuperar-mensaje ${
+                mensaje.includes("correctamente")
+                  ? "recuperar-exito"
+                  : "recuperar-error"
+              }`}
+            >
+              {mensaje}
+            </p>
+          )}
+
+          <form className="recuperar-form" onSubmit={handleSubmit}>
+            <div className="recuperar-group">
+              <label>Nueva Contraseña</label>
+              <input
+                type="password"
+                placeholder="Ingresa tu nueva contraseña"
+                value={nuevaContrasena}
+                onChange={(e) => setNuevaContrasena(e.target.value)}
+              />
+            </div>
+
+            <button type="submit" className="recuperar-btn">
+              Actualizar Contraseña
+            </button>
+          </form>
+
+          <div className="recuperar-links">
+            <a href="/login">Volver al inicio de sesión</a>
+          </div>
+        </div>
+      </main>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="footer">
+        <div className="footer-links">
+          <a href="#">Términos</a>
+          <span>|</span>
+          <a href="#">Privacidad</a>
+          <span>|</span>
+          <a href="#">Ayuda</a>
+        </div>
+        <div className="footer-copyright">
+          © 2025 Dulce Hogar. Todos los derechos reservados.
+        </div>
+      </footer>
     </div>
   );
 };

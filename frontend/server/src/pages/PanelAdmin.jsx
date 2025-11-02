@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./PanelAdmin.css";
 import axios from "axios";
+import Dashboard from "../components/dashboard";
 
 const API_URL = "http://localhost:4000/api/productos";
 
@@ -10,13 +11,14 @@ const PanelAdmin = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [currentSection, setCurrentSection] = useState("productos"); // 🆕 nueva vista
 
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
     stock: "",
     categoria: "",
-    imagen: null, // Nueva propiedad para el archivo de imagen
+    imagen: null,
   });
 
   const [currentId, setCurrentId] = useState(null);
@@ -52,10 +54,7 @@ const PanelAdmin = () => {
   );
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredProducts.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   const handleCloseModal = () => {
@@ -78,14 +77,13 @@ const PanelAdmin = () => {
           precio: String(product.precio || ""),
           stock: String(product.stock || ""),
           categoria: String(product.categoria || ""),
-          imagen: null, // al editar no cambiamos la imagen automáticamente
+          imagen: null,
         }
       : { nombre: "", precio: "", stock: "", categoria: "", imagen: null };
     setFormData(initialFormData);
     setShowModal(true);
   };
 
-  // ✅ Guardar producto con imagen (POST o PUT)
   const handleSave = async () => {
     if (!formData.nombre || !formData.precio || !formData.stock || !formData.categoria) {
       alert("Por favor completa todos los campos obligatorios.");
@@ -94,8 +92,6 @@ const PanelAdmin = () => {
 
     try {
       let imageUrl = null;
-
-      // Si hay una imagen seleccionada, la enviamos a Cloudinary mediante el backend
       if (formData.imagen) {
         const imageData = new FormData();
         imageData.append("imagen", formData.imagen);
@@ -103,9 +99,7 @@ const PanelAdmin = () => {
         const uploadRes = await axios.post(
           "http://localhost:4000/api/productos/upload",
           imageData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
 
         imageUrl = uploadRes.data.secure_url;
@@ -134,155 +128,177 @@ const PanelAdmin = () => {
   };
 
   const handleDelete = (id) => {
-    if (!id) {
-      console.error("Error: ID de producto no definido para eliminar.");
-      return;
-    }
+    if (!id) return;
     if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
       axios
         .delete(`${API_URL}/${id}`)
-        .then(() => {
-          fetchProducts();
-        })
+        .then(() => fetchProducts())
         .catch((err) => console.error("Error al eliminar:", err));
     }
   };
 
   return (
     <div className="admin-panel">
+      {/* 🧭 Sidebar */}
       <aside className="sidebar">
         <div className="admin-profile">
           <div className="admin-avatar">👤</div>
           <span className="admin-name">Admin Enrique</span>
         </div>
+
         <nav className="sidebar-nav">
-          <a href="#" className="nav-item active">
+          <a
+            href="#"
+            className={`nav-item ${currentSection === "productos" ? "active" : ""}`}
+            onClick={() => setCurrentSection("productos")}
+          >
             <span className="nav-icon">📦</span> Productos
           </a>
-          <a href="#" className="nav-item">
+
+          <a
+            href="#"
+            className={`nav-item ${currentSection === "dashboard" ? "active" : ""}`}
+            onClick={() => setCurrentSection("dashboard")}
+          >
             <span className="nav-icon">📊</span> Dashboard
           </a>
         </nav>
       </aside>
 
+      {/* 🧩 Contenido principal */}
       <main className="main-content">
-        <div className="search-wrapper">
-          <div className="search-container">
-            <span className="search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
+        {currentSection === "productos" && (
+          <>
+            <div className="search-wrapper">
+              <div className="search-container">
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Buscar productos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className="form-wrapper">
-          <button className="btn btn--add" onClick={() => handleShowModal()}>
-            ➕ Agregar
-          </button>
-        </div>
+            <div className="form-wrapper">
+              <button className="btn btn--add" onClick={() => handleShowModal()}>
+                ➕ Agregar
+              </button>
+            </div>
 
-        {error && (
-          <div className="error-message" style={{ color: "red", margin: "10px 0" }}>
-            {error}
-          </div>
+            {error && (
+              <div className="error-message" style={{ color: "red", margin: "10px 0" }}>
+                {error}
+              </div>
+            )}
+
+            <div className="table-wrapper">
+              <table className="products-table">
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Categoría</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cargando ? (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
+                        Cargando datos...
+                      </td>
+                    </tr>
+                  ) : currentItems.length > 0 ? (
+                    currentItems.map((product) => (
+                      <tr key={product.id}>
+                        <td>{product.id}</td>
+                        <td>
+                          {product.imagen_url ? (
+                            <img
+                              src={product.imagen_url}
+                              alt={product.nombre}
+                              style={{
+                                width: "60px",
+                                height: "60px",
+                                objectFit: "cover",
+                                borderRadius: "6px",
+                              }}
+                            />
+                          ) : (
+                            "Sin imagen"
+                          )}
+                        </td>
+                        <td>{product.nombre}</td>
+                        <td>${parseFloat(product.precio || 0).toFixed(2)}</td>
+                        <td>{product.stock}</td>
+                        <td>{product.categoria || "N/A"}</td>
+                        <td className="actions-cell">
+                          <button
+                            className="btn btn--edit"
+                            onClick={() => handleShowModal(product)}
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            className="btn btn--delete"
+                            onClick={() => handleDelete(product.id)}
+                          >
+                            🗑
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: "center", padding: "10px" }}>
+                        No se encontraron productos.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="pagination">
+              <button
+                className="page-btn"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                ‹
+              </button>
+              {[...Array(totalPages)].map((_, index) => (
+                <span
+                  key={index + 1}
+                  className={`page-number ${currentPage === index + 1 ? "active" : ""}`}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </span>
+              ))}
+              <button
+                className="page-btn"
+                onClick={() =>
+                  setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))
+                }
+                disabled={currentPage === totalPages}
+              >
+                ›
+              </button>
+            </div>
+          </>
         )}
 
-        <div className="table-wrapper">
-          <table className="products-table">
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Imagen</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Categoría</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cargando ? (
-                <tr>
-                  <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
-                    Cargando datos...
-                  </td>
-                </tr>
-              ) : currentItems.length > 0 ? (
-                currentItems.map((product) => (
-                  <tr key={product.id}>
-                    <td>{product.id}</td>
-                    <td>
-                      {product.imagen_url ? (
-                        <img
-                          src={product.imagen_url}
-                          alt={product.nombre}
-                          style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }}
-                        />
-                      ) : (
-                        "Sin imagen"
-                      )}
-                    </td>
-                    <td>{product.nombre}</td>
-                    <td>${parseFloat(product.precio || 0).toFixed(2)}</td>
-                    <td>{product.stock}</td>
-                    <td>{product.categoria || "N/A"}</td>
-                    <td className="actions-cell">
-                      <button
-                        className="btn btn--edit"
-                        onClick={() => handleShowModal(product)}
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="btn btn--delete"
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        🗑
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" style={{ textAlign: "center", padding: "10px" }}>
-                    No se encontraron productos.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="pagination">
-          <button
-            className="page-btn"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            ‹
-          </button>
-          {[...Array(totalPages)].map((_, index) => (
-            <span
-              key={index + 1}
-              className={`page-number ${currentPage === index + 1 ? "active" : ""}`}
-              onClick={() => setCurrentPage(index + 1)}
-            >
-              {index + 1}
-            </span>
-          ))}
-          <button
-            className="page-btn"
-            onClick={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-            disabled={currentPage === totalPages}
-          >
-            ›
-          </button>
-        </div>
+        {/* 🆕 Dashboard integrado */}
+        {currentSection === "dashboard" && <Dashboard />}
       </main>
 
+      {/* Modal */}
       {showModal && (
         <div className="modal">
           <div className="modal-content">

@@ -1,0 +1,262 @@
+/* ===== Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #c8c4c1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Estructura general ===== */
+.recuperar-wrapper {
+  background-color: #c8c4c1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Header ===== */
+.top-bar {
+  background-color: #b8b4b1;
+  padding: 30px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 80px;
+  height: auto;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+.logo-subtitle {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: #000;
+}
+
+.help-icon {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+/* ===== Contenedor principal ===== */
+.container {
+  all: unset;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: #c8c4c1;
+}
+
+/* ===== Caja principal ===== */
+.recuperar-box {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 35px 45px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.recuperar-title {
+  font-size: 18px;
+  font-weight: normal;
+  color: #D84040;
+  margin-bottom: 25px;
+}
+
+/* ===== Formulario ===== */
+.recuperar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.recuperar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.recuperar-group label {
+  font-size: 12px;
+  color: #000;
+  font-weight: 500;
+}
+
+.recuperar-group input {
+  padding: 10px 14px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: #fff;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.recuperar-group input:focus {
+  border-color: #D84040;
+}
+
+.recuperar-group input::placeholder {
+  color: #999;
+  font-size: 11px;
+}
+
+.recuperar-info {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* ===== Botón ===== */
+.recuperar-btn {
+  background-color: #fff;
+  color: #D84040;
+  border: 1px solid #D84040;
+  padding: 10px 20px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 8px;
+  text-transform: capitalize;
+}
+
+.recuperar-btn:hover {
+  background-color: #D84040;
+  color: #fff;
+}
+
+/* ===== Mensajes ===== */
+.recuperar-mensaje {
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.recuperar-exito {
+  background-color: #e2f5e2;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+}
+
+.recuperar-error {
+  background-color: #fdecea;
+  color: #c62828;
+  border: 1px solid #c62828;
+}
+
+/* ===== Enlaces ===== */
+.recuperar-links {
+  margin-top: 15px;
+  font-size: 11px;
+  color: #000;
+}
+
+.recuperar-links a {
+  color: #D84040;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.recuperar-links a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Footer ===== */
+.footer {
+  background-color: #b8b4b1;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  color: #333;
+}
+
+.footer-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: #333;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.footer-links span {
+  color: #333;
+}
+
+.footer-copyright {
+  color: #333;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .recuperar-box {
+    padding: 30px 35px;
+    max-width: 380px;
+  }
+
+  .container {
+    margin: 15px;
+    padding: 30px 15px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .top-bar {
+    padding: 10px 20px;
+  }
+}
