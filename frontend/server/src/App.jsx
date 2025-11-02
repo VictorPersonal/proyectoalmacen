@@ -7,6 +7,7 @@ import RestablecerContrasena from "./pages/RestablecerContrasena";
 import PanelAdmin from "./pages/PanelAdmin"; 
 import ActualizarDatos from "./pages/ActualizarDatos";
 
+
 function App() {
   return (
     <Router>

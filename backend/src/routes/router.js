@@ -1,8 +1,29 @@
 import express from "express";
 import { pool } from "../config/db.js";
+import cloudinary from '../config/cloudinary.js';
+import upload from '../config/multer.js';
+import fs from 'fs';
+import productoRoutes from "../routes/productoRoutes.js";
+
+
 // import bcrypt from "bcrypt"; // No se usa para mantener tu lógica original
 
 const router = express.Router();
+
+// Ruta para subir imagen a Cloudinary
+router.post('/upload', upload.single('image'), async (req, res) => {
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'productos_tienda'
+    });
+
+    fs.unlinkSync(req.file.path); // elimina el archivo temporal
+
+    res.json({ secure_url: result.secure_url });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al subir imagen', error });
+  }
+});
 
 // ====================================================================
 // 📌 RUTAS DE USUARIO Y AUTENTICACIÓN (USANDO LÓGICA DE CONTRASEÑA INSEGURA)
@@ -380,6 +401,8 @@ router.delete("/carrito/eliminar/:cedula/:idproducto", async (req, res) => {
     res.status(500).json({ error: "Error al eliminar producto del carrito" });
   }
 });
+
+    router.use("/productos", productoRoutes);
 
 
 // 🧹 Vaciar todo el carrito de un usuario
