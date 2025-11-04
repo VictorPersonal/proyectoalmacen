@@ -228,6 +228,9 @@ const Home = () => {
               </Link>
             </>
           )}
+          <Link to="/favoritos" className="nav-link favoritos-link">
+            ❤️ Favoritos
+          </Link>
           <div className="cart-icon">
             <FaShoppingCart />
           </div>
