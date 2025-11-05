@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import pkg from "pg";
 import router from "../routes/router.js";
 import authRoutes from "../routes/authRoutes.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 const app = express();
@@ -38,8 +39,12 @@ app.use((req, res, next) => {
 app.use("/api", router);           // Rutas generales (productos, favoritos, etc.)
 app.use("/api/auth", authRoutes);  // Rutas de autenticación
 
+app.use(cookieParser());
+
 // Servidor activo
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
 });
+
+

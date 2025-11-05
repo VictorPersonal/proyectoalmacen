@@ -4,6 +4,8 @@ import cloudinary from '../config/cloudinary.js';
 import upload from '../config/multer.js';
 import fs from 'fs';
 import productoRoutes from "../routes/productoRoutes.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 
 // import bcrypt from "bcrypt"; // No se usa para mantener tu lógica original
@@ -47,12 +49,15 @@ router.post("/usuario", async (req, res) => {
             return res.status(409).json({ message: "La cédula ya está registrada" });
         }
 
-        // 2. Insertar el nuevo usuario con la contraseña en texto plano (⚠️ INSEGURO)
+        // 2. Cifrar la contraseña antes de guardar
+        const hashedPassword = await bcrypt.hash(contrasena, 10);
+
+        // 3. Insertar el nuevo usuario con la contraseña cifrada
         const result = await pool.query(
             `INSERT INTO usuario (cedula, nombre, apellido, direccion, email, ciudad, password, rol)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
              RETURNING cedula, nombre, apellido, email, ciudad, rol`,
-            [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", contrasena, rol || "cliente"] // Usa 'contrasena' directamente
+            [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", hashedPassword, rol || "cliente"]
         );
 
         res.status(201).json({ message: "Usuario registrado correctamente", usuario: result.rows[0] });
@@ -65,42 +70,54 @@ router.post("/usuario", async (req, res) => {
 
 // Iniciar sesión (válido para cliente y administrador)
 router.post("/login", async (req, res) => {
-    const { email, contrasena } = req.body;
+  const { email, contrasena } = req.body;
 
-    if (!email || !contrasena) {
-        return res.status(400).json({ message: "Correo y contraseña son obligatorios" });
+  if (!email || !contrasena) {
+    return res.status(400).json({ message: "Correo y contraseña son obligatorios" });
+  }
+
+  try {
+    const result = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    try {
-        const result = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
+    const usuario = result.rows[0];
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
-
-        const usuario = result.rows[0];
-
-        // ⚠️ Comparación de contraseña en texto plano (INSEGURO)
-        if (usuario.password !== contrasena) {
-            return res.status(401).json({ message: "Contraseña incorrecta" });
-        }
-
-        res.status(200).json({
-            message: "Inicio de sesión exitoso",
-            usuario: {
-                cedula: usuario.cedula,
-                nombre: usuario.nombre,
-                apellido: usuario.apellido,
-                email: usuario.email,
-                direccion: usuario.direccion,
-                ciudad: usuario.ciudad,
-                rol: usuario.rol
-            }
-        });
-    } catch (error) {
-        console.error("❌ Error en el login:", error);
-        res.status(500).json({ message: "Error en el servidor" });
+    // ✅ Comparar contraseña cifrada con bcrypt
+    const validPassword = await bcrypt.compare(contrasena, usuario.password);
+    if (!validPassword) {
+      return res.status(401).json({ message: "Contraseña incorrecta" });
     }
+
+    // ✅ Crear token JWT
+    const token = jwt.sign(
+      { id: usuario.cedula, rol: usuario.rol },
+      "clave_secreta_segura", // cámbiala por una más fuerte y guarda en variables de entorno (.env)
+      { expiresIn: "1h" }
+    );
+
+    // ✅ Enviar cookie HTTP-only
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,       // true si usas HTTPS
+      sameSite: "strict", // previene ataques CSRF
+      maxAge: 60 * 60 * 1000 // 1 hora
+    });
+
+    // ✅ Solo enviamos información mínima al frontend
+    res.status(200).json({
+      message: "Inicio de sesión exitoso",
+      usuario: {
+        nombre: usuario.nombre
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ Error en el login:", error);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
 });
 
 

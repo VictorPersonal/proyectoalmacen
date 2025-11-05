@@ -42,7 +42,7 @@ const Login = () => {
     // 🔹 Redirigir según el rol
     setTimeout(() => {
   // Guardar información del usuario en localStorage
-      localStorage.setItem('usuarioInfo', JSON.stringify(data.usuario));
+      localStorage.setItem('usuarioInfo', JSON.stringify(data.usuario));//Permite que el nombre y el icono de usuario se vean al iniciar sesión
       
       if (data.usuario.rol === "administrador") {
         navigate("/admin");
