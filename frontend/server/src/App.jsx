@@ -8,6 +8,7 @@ import PanelAdmin from "./pages/PanelAdmin";
 import ActualizarDatos from "./pages/ActualizarDatos";
 import Favoritos from "./pages/Favorito";
 
+
 function App() {
   return (
     <Router>

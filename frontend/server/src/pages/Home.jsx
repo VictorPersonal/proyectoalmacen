@@ -7,6 +7,7 @@ import image1 from "../assets/images.jpg";
 import image2 from "../assets/soga.jpg";
 import ProductCard from "../components/productoCard";
 import DescripcionProducto from "../components/DescripcionProducto";
+import Carrito from "../components/Carrito";
 
 const Home = () => {
   const images = [image1, image2];
@@ -24,6 +25,9 @@ const Home = () => {
   const [usuarioLogueado, setUsuarioLogueado] = useState(false);
   const [usuarioInfo, setUsuarioInfo] = useState(null);
   const navigate = useNavigate();
+
+  // 🛒 Estado para el carrito
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
 
   const categorias = ["Muebles", "Electrodomésticos", "Tecnología"];
 
@@ -85,6 +89,23 @@ const Home = () => {
     window.location.reload();
   };
 
+  // 🔍 Normalizar texto para ignorar tildes y mayúsculas
+  const normalizar = (texto) =>
+    texto ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+
+  // 🔍 Ordenar resultados por relevancia
+  const ordenarPorRelevancia = (lista, query) => {
+    const q = normalizar(query);
+    return lista.sort((a, b) => {
+      const aNombre = normalizar(a.nombre);
+      const bNombre = normalizar(b.nombre);
+      const aCoin = aNombre.startsWith(q) ? 2 : aNombre.includes(q) ? 1 : 0;
+      const bCoin = bNombre.startsWith(q) ? 2 : bNombre.includes(q) ? 1 : 0;
+      return bCoin - aCoin;
+    });
+  };
+
+  // 🔍 Buscar productos
   const handleBuscar = async () => {
     const query = busqueda.trim();
     if (query === "") {
@@ -99,7 +120,13 @@ const Home = () => {
       );
       if (!res.ok) throw new Error("Error en la búsqueda");
       const data = await res.json();
-      setProductos(Array.isArray(data) ? data : []);
+
+      // Normaliza y ordena resultados por relevancia
+      const productosOrdenados = ordenarPorRelevancia(
+        Array.isArray(data) ? data : [],
+        query
+      );
+      setProductos(productosOrdenados);
     } catch (error) {
       console.error("Error al buscar productos:", error);
       setProductos([]);
@@ -108,8 +135,26 @@ const Home = () => {
     }
   };
 
+  // ⏳ Búsqueda reactiva (debounce de 500ms)
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (busqueda.trim() !== "") {
+        handleBuscar();
+      } else {
+        setProductos([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [busqueda]);
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleBuscar();
+  };
+
+  // 🛒 Alternar el carrito
+  const toggleCarrito = () => {
+    setMostrarCarrito(!mostrarCarrito);
   };
 
   return (
@@ -150,10 +195,13 @@ const Home = () => {
                   <div className="categorias-lista">
                     {categorias.map((categoria, index) => (
                       <div key={index} className="categoria-item-container">
-                        {categoria === "Tecnología" || categoria === "Electrodomésticos" ? (
+                        {categoria === "Tecnología" ||
+                        categoria === "Electrodomésticos" ? (
                           <div
                             className="categoria-item con-submenu"
-                            onMouseEnter={() => toggleSubmenu(categoria.toLowerCase())}
+                            onMouseEnter={() =>
+                              toggleSubmenu(categoria.toLowerCase())
+                            }
                             onMouseLeave={() => setSubmenuAbierto(null)}
                           >
                             <span>{categoria}</span>
@@ -161,13 +209,17 @@ const Home = () => {
                             {submenuAbierto === categoria.toLowerCase() &&
                               subcategorias[categoria.toLowerCase()] && (
                                 <div className="submenu">
-                                  {subcategorias[categoria.toLowerCase()].map(
-                                    (subitem, subIndex) => (
-                                      <a key={subIndex} href="#" className="submenu-item">
-                                        {subitem}
-                                      </a>
-                                    )
-                                  )}
+                                  {subcategorias[
+                                    categoria.toLowerCase()
+                                  ].map((subitem, subIndex) => (
+                                    <a
+                                      key={subIndex}
+                                      href="#"
+                                      className="submenu-item"
+                                    >
+                                      {subitem}
+                                    </a>
+                                  ))}
                                 </div>
                               )}
                           </div>
@@ -237,11 +289,21 @@ const Home = () => {
         </div>
       </header>
 
+      {/* 🛒 Mostrar carrito si está activo */}
+      {mostrarCarrito && (
+        <Carrito
+          abierto={mostrarCarrito}
+          cedula={usuarioInfo?.cedula}
+          onCerrar={() => setMostrarCarrito(false)}
+        />
+      )}
+
       {/* CONTENIDO PRINCIPAL */}
       {productoSeleccionado ? (
         <DescripcionProducto
           producto={productoSeleccionado}
           onVolver={() => setProductoSeleccionado(null)}
+          cedula={usuarioInfo?.cedula}
         />
       ) : busqueda.trim() === "" ? (
         <main id="main">

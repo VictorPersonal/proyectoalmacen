@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Registro.css";
 import logo from "../assets/Logo dulce hogar.png";
 
@@ -7,7 +8,8 @@ function Registro() {
   const [cedula, setCedula] = useState("");
   const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");
-  const [mensaje, setMensaje] = useState(""); // Nuevo estado para mensajes
+  const [mensaje, setMensaje] = useState(""); // Estado para mensajes
+  const navigate = useNavigate(); // Hook para redirigir
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +35,6 @@ function Registro() {
         return;
       }
 
-
       if (!res.ok) throw new Error("Error al registrar usuario");
 
       const data = await res.json();
@@ -44,6 +45,11 @@ function Registro() {
       setCedula("");
       setNombre("");
       setContrasena("");
+
+      // redirigir al login después de 2 segundos
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error) {
       console.error("Error:", error);
       setMensaje("No se pudo registrar el usuario ❌");
@@ -73,6 +79,7 @@ function Registro() {
                 color: mensaje.includes("exitosamente") ? "green" : "red",
                 marginBottom: "1rem",
                 fontWeight: "bold",
+                textAlign: "center",
               }}
             >
               {mensaje}
@@ -123,7 +130,6 @@ function Registro() {
                 onChange={(e) => setContrasena(e.target.value)}
                 required
               />
-              
               <small id="hint">
                 Al menos 8 caracteres (MAYÚSCULAS, minúsculas...)
               </small>

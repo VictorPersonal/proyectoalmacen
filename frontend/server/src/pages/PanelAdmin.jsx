@@ -1,42 +1,41 @@
 import React, { useState, useEffect } from "react";
-import "./PanelAdmin.css"; 
+import "./PanelAdmin.css";
 import axios from "axios";
 
-// 🚨 CORRECCIÓN 1: Asegura que el puerto coincida con tu backend (3000 o 4000)
 const API_URL = "http://localhost:4000/api/productos";
 
 const PanelAdmin = () => {
-    
-  // Estados para la gestión de datos y UI
   const [products, setProducts] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
-  
-  // 🚨 CORRECCIÓN 3: Inicialización segura para los campos numéricos del formulario
+
   const [formData, setFormData] = useState({
     nombre: "",
-    precio: "", // Inicializado como string vacío para React
-    stock: "",  // Inicializado como string vacío para React
-    categoria: "", // Inicializado como string vacío para React
+    precio: "",
+    stock: "",
+    categoria: "",
+    imagen: null, // Nueva propiedad para el archivo de imagen
   });
-  
+
   const [currentId, setCurrentId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Función de Carga Principal (Llamada GET)
   const fetchProducts = () => {
     setCargando(true);
-    axios.get(API_URL) 
+    axios
+      .get(API_URL)
       .then((res) => {
         setProducts(res.data);
         setError(null);
       })
       .catch((err) => {
         console.error("Error al cargar productos:", err);
-        setError(`Error de conexión. Asegúrate de que el backend esté activo en ${API_URL}`);
+        setError(
+          `Error de conexión. Asegúrate de que el backend esté activo en ${API_URL}`
+        );
         setProducts([]);
       })
       .finally(() => {
@@ -48,88 +47,109 @@ const PanelAdmin = () => {
     fetchProducts();
   }, []);
 
-  // Filtro y Paginación (sin cambios)
   const filteredProducts = products.filter((p) =>
     p.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredProducts.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-
-  // Manejo de Modal
   const handleCloseModal = () => {
     setShowModal(false);
-    // Reinicializamos con valores seguros
-    setFormData({ nombre: "", precio: "", stock: "", categoria: "" }); 
+    setFormData({
+      nombre: "",
+      precio: "",
+      stock: "",
+      categoria: "",
+      imagen: null,
+    });
     setCurrentId(null);
   };
-  
-  const handleShowModal = (product = null) => {
-    // 🚨 CORRECCIÓN 2: Aseguramos que currentId siempre se asigne a product.id
-    setCurrentId(product?.id || null);
-    
-    // Al cargar, convertimos los números (precio, stock, categoria) a String para el input type="number"
-    const initialFormData = product ? {
-        ...product,
-        precio: String(product.precio || ""),
-        stock: String(product.stock || ""),
-        categoria: String(product.categoria || ""),
-    } : { nombre: "", precio: "", stock: "", categoria: "" };
 
+  const handleShowModal = (product = null) => {
+    setCurrentId(product?.id || null);
+    const initialFormData = product
+      ? {
+          ...product,
+          precio: String(product.precio || ""),
+          stock: String(product.stock || ""),
+          categoria: String(product.categoria || ""),
+          imagen: null, // al editar no cambiamos la imagen automáticamente
+        }
+      : { nombre: "", precio: "", stock: "", categoria: "", imagen: null };
     setFormData(initialFormData);
     setShowModal(true);
   };
 
-  // Guardar (POST/PUT)
-  const handleSave = () => {
+  // ✅ Guardar producto con imagen (POST o PUT)
+  const handleSave = async () => {
     if (!formData.nombre || !formData.precio || !formData.stock || !formData.categoria) {
-      alert("Por favor completa todos los campos.");
+      alert("Por favor completa todos los campos obligatorios.");
       return;
     }
 
-    const payload = {
-      nombre: formData.nombre,
-      precio: parseFloat(formData.precio),
-      stock: parseInt(formData.stock),
-      categoria: parseInt(formData.categoria), 
-    };
+    try {
+      let imageUrl = null;
 
-    const request = currentId
-      ? axios.put(`${API_URL}/${currentId}`, payload) 
-      : axios.post(API_URL, payload); 
+      // Si hay una imagen seleccionada, la enviamos a Cloudinary mediante el backend
+      if (formData.imagen) {
+        const imageData = new FormData();
+        imageData.append("imagen", formData.imagen);
 
-    request
-      .then(() => {
-        fetchProducts(); 
-        handleCloseModal();
-      })
-      .catch((err) => console.error("Error al guardar producto:", err));
+        const uploadRes = await axios.post(
+          "http://localhost:4000/api/productos/upload",
+          imageData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+
+        imageUrl = uploadRes.data.secure_url;
+      }
+
+      const payload = {
+        nombre: formData.nombre,
+        precio: parseFloat(formData.precio),
+        stock: parseInt(formData.stock),
+        categoria: parseInt(formData.categoria),
+        imagen_url: imageUrl || formData.imagen_url || null,
+      };
+
+      if (currentId) {
+        await axios.put(`${API_URL}/${currentId}`, payload);
+      } else {
+        await axios.post(API_URL, payload);
+      }
+
+      fetchProducts();
+      handleCloseModal();
+    } catch (err) {
+      console.error("Error al guardar producto:", err);
+      alert("Error al guardar producto. Revisa la consola.");
+    }
   };
 
-  // Eliminar (DELETE)
   const handleDelete = (id) => {
-    // 🚨 CORRECCIÓN 2: Verificamos que el ID no sea undefined
     if (!id) {
-        console.error("Error: ID de producto no definido para eliminar.");
-        return;
+      console.error("Error: ID de producto no definido para eliminar.");
+      return;
     }
-    
     if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
-      axios.delete(`${API_URL}/${id}`)
+      axios
+        .delete(`${API_URL}/${id}`)
         .then(() => {
-          fetchProducts(); 
+          fetchProducts();
         })
         .catch((err) => console.error("Error al eliminar:", err));
     }
   };
 
-
-  // --- Renderizado ---
   return (
     <div className="admin-panel">
-      {/* ... Sidebar ... */}
       <aside className="sidebar">
         <div className="admin-profile">
           <div className="admin-avatar">👤</div>
@@ -146,7 +166,6 @@ const PanelAdmin = () => {
       </aside>
 
       <main className="main-content">
-        {/* ... (Controles de búsqueda y botón) ... */}
         <div className="search-wrapper">
           <div className="search-container">
             <span className="search-icon">🔍</span>
@@ -165,13 +184,18 @@ const PanelAdmin = () => {
           </button>
         </div>
 
-        {error && <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
-        
+        {error && (
+          <div className="error-message" style={{ color: "red", margin: "10px 0" }}>
+            {error}
+          </div>
+        )}
+
         <div className="table-wrapper">
           <table className="products-table">
             <thead>
               <tr>
                 <th>Id</th>
+                <th>Imagen</th>
                 <th>Nombre</th>
                 <th>Precio</th>
                 <th>Stock</th>
@@ -182,23 +206,40 @@ const PanelAdmin = () => {
             <tbody>
               {cargando ? (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>Cargando datos...</td>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
+                    Cargando datos...
+                  </td>
                 </tr>
               ) : currentItems.length > 0 ? (
                 currentItems.map((product) => (
-                  // Prop 'key' obligatoria en <tr>
                   <tr key={product.id}>
-                    <td>{product.id}</td> 
+                    <td>{product.id}</td>
+                    <td>
+                      {product.imagen_url ? (
+                        <img
+                          src={product.imagen_url}
+                          alt={product.nombre}
+                          style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }}
+                        />
+                      ) : (
+                        "Sin imagen"
+                      )}
+                    </td>
                     <td>{product.nombre}</td>
-                    <td>${parseFloat(product.precio || 0).toFixed(2)}</td> 
+                    <td>${parseFloat(product.precio || 0).toFixed(2)}</td>
                     <td>{product.stock}</td>
                     <td>{product.categoria || "N/A"}</td>
                     <td className="actions-cell">
-                      <button className="btn btn--edit" onClick={() => handleShowModal(product)}>
+                      <button
+                        className="btn btn--edit"
+                        onClick={() => handleShowModal(product)}
+                      >
                         ✏️
                       </button>
-                      {/* 🚨 CORRECCIÓN 2: Aseguramos el paso de product.id */}
-                      <button className="btn btn--delete" onClick={() => handleDelete(product.id)}>
+                      <button
+                        className="btn btn--delete"
+                        onClick={() => handleDelete(product.id)}
+                      >
                         🗑
                       </button>
                     </td>
@@ -206,7 +247,7 @@ const PanelAdmin = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center", padding: "10px" }}>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "10px" }}>
                     No se encontraron productos.
                   </td>
                 </tr>
@@ -215,7 +256,6 @@ const PanelAdmin = () => {
           </table>
         </div>
 
-        {/* Paginación */}
         <div className="pagination">
           <button
             className="page-btn"
@@ -243,7 +283,6 @@ const PanelAdmin = () => {
         </div>
       </main>
 
-      {/* Modal para agregar/editar */}
       {showModal && (
         <div className="modal">
           <div className="modal-content">
@@ -254,7 +293,6 @@ const PanelAdmin = () => {
               value={formData.nombre}
               onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
             />
-            {/* 🚨 CORRECCIÓN 3: El valor del input ya viene como string desde handleShowModal */}
             <input
               type="number"
               placeholder="Precio"
@@ -268,11 +306,19 @@ const PanelAdmin = () => {
               onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
             />
             <input
-              type="number" 
+              type="number"
               placeholder="ID Categoría (Ej: 1)"
               value={formData.categoria}
               onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
             />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setFormData({ ...formData, imagen: e.target.files[0] })
+              }
+            />
+
             <div className="modal-actions">
               <button className="btn btn--add" onClick={handleSave}>
                 💾 Guardar
