@@ -19,7 +19,8 @@ function Dashboard() {
   const [usuarios, setUsuarios] = useState([]);
   const [estadosPedido, setEstadosPedido] = useState([]);
 
-  useEffect(() => {
+  // 🔁 Función para cargar datos (reutilizable)
+  const cargarDatos = () => {
     // 🔹 Ventas mensuales
     fetch("http://localhost:4000/api/estadisticas/ventas-mensuales")
       .then((res) => res.json())
@@ -57,6 +58,12 @@ function Dashboard() {
         setEstadosPedido(estadosConvertidos);
       })
       .catch((err) => console.error("Error cargando estados de pedido:", err));
+  };
+
+  useEffect(() => {
+    cargarDatos(); // Primera carga
+    const intervalo = setInterval(cargarDatos, 10000); // 🔁 Recarga cada 30 segundos
+    return () => clearInterval(intervalo); // Limpieza al desmontar
   }, []);
 
   const colores = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#C77DFF"];
