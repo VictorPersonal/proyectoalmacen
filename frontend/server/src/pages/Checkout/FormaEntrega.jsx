@@ -8,7 +8,7 @@ const FormaEntrega = () => {
   const navigate = useNavigate();
 
   const handleContinuar = () => {
-    navigate("/pago");
+    navigate("/checkout/forma-entrega/pago");
   };
 
   return (

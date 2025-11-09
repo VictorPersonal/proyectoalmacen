@@ -7,6 +7,7 @@ import RestablecerContrasena from "./pages/RestablecerContrasena";
 import PanelAdmin from "./pages/PanelAdmin"; 
 import ActualizarDatos from "./pages/ActualizarDatos";
 import FormaEntrega from "./pages/Checkout/FormaEntrega";
+import Pago from "./pages/Checkout/Pago";
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/ajustes-de-cuenta" element={<ActualizarDatos />} />
         <Route path="/reset-password/:token" element={<RestablecerContrasena />} />
         <Route path="/checkout/forma-entrega" element={<FormaEntrega />} />
+        <Route path="/checkout/forma-entrega/pago" element={<Pago />} />
       </Routes>
     </Router>
   );
