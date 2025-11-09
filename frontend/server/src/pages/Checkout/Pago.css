@@ -1,4 +1,4 @@
-/* ===== Reset ===== */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -7,21 +7,13 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #c8c4c1;
+  background-color: #d0cbc8; /* 🔹 Fondo gris claro igual al registro */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* ===== Estructura general ===== */
-.recuperar-wrapper {
-  background-color: #c8c4c1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ===== Header ===== */
+/* Header */
 .top-bar {
   background-color: #b8b4b1;
   padding: 30px 30px;
@@ -69,10 +61,18 @@ body {
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  background-color: #c8c4c1;
+  background-color: #fff;
 }
 
-/* ===== Contenedor principal ===== */
+/* Container Principal */
+.page-wrapper {
+  background-color: #d0cbc8; /* 🔹 Mismo gris del fondo general */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Evita heredar estilos del anterior contenedor */
 .container {
   all: unset;
   flex: 1;
@@ -80,80 +80,73 @@ body {
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  background-color: #c8c4c1;
+  background-color: #d0cbc8; /* 🔹 También igualado */
 }
 
-/* ===== Caja principal ===== */
-.recuperar-box {
+.login-box {
   background-color: #fff;
   border-radius: 12px;
   padding: 35px 45px;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  text-align: center;
 }
 
-.recuperar-title {
+.form-title {
+  text-align: center;
   font-size: 18px;
   font-weight: normal;
   color: #D84040;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
-/* ===== Formulario ===== */
-.recuperar-form {
+/* Formulario */
+.login-form {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.recuperar-group {
+.form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  text-align: left;
 }
 
-.recuperar-group label {
+.form-group label {
   font-size: 12px;
   color: #000;
   font-weight: 500;
 }
 
-.recuperar-group input {
+.form-group input {
   padding: 10px 14px;
   border: 1px solid #999;
   border-radius: 4px;
   font-size: 12px;
   background-color: #fff;
+  color: #000;
   outline: none;
   transition: border-color 0.3s;
 }
 
-.recuperar-group input:focus {
+.form-group input:focus {
   border-color: #D84040;
 }
 
-.recuperar-group input::placeholder {
+.form-group input::placeholder {
   color: #999;
   font-size: 11px;
 }
 
-.recuperar-info {
-  font-size: 11px;
-  color: #555;
-  line-height: 1.4;
-  text-align: left;
-}
-
-/* ===== Botón ===== */
-.recuperar-btn {
+/* Botón */
+.btn-ingresar {
   background-color: #fff;
   color: #D84040;
   border: 1px solid #D84040;
   padding: 10px 20px;
   font-size: 12px;
+  font-weight: normal;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
@@ -161,50 +154,41 @@ body {
   text-transform: capitalize;
 }
 
-.recuperar-btn:hover {
+.btn-ingresar:hover {
   background-color: #D84040;
   color: #fff;
 }
 
-/* ===== Mensajes ===== */
-.recuperar-mensaje {
-  font-size: 12px;
-  padding: 8px 10px;
-  border-radius: 4px;
-  margin-bottom: 12px;
+/* Enlaces */
+.form-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+
+.forgot-password,
+.register-link {
+  font-size: 11px;
+  color: #000;
   text-align: center;
 }
 
-.recuperar-exito {
-  background-color: #e2f5e2;
-  color: #2e7d32;
-  border: 1px solid #2e7d32;
-}
-
-.recuperar-error {
-  background-color: #fdecea;
-  color: #c62828;
-  border: 1px solid #c62828;
-}
-
-/* ===== Enlaces ===== */
-.recuperar-links {
-  margin-top: 15px;
-  font-size: 11px;
-  color: #000;
-}
-
-.recuperar-links a {
+.forgot-password a,
+.register-link a {
   color: #D84040;
   text-decoration: none;
   font-weight: 500;
 }
 
-.recuperar-links a:hover {
+.forgot-password a:hover,
+.register-link a:hover {
   text-decoration: underline;
 }
 
-/* ===== Footer ===== */
+/* Footer */
 .footer {
   background-color: #b8b4b1;
   padding: 20px 30px;
@@ -238,9 +222,9 @@ body {
   color: #333;
 }
 
-/* ===== Responsive ===== */
+/* Responsive */
 @media (max-width: 768px) {
-  .recuperar-box {
+  .login-box {
     padding: 30px 35px;
     max-width: 380px;
   }
@@ -259,4 +243,49 @@ body {
   .top-bar {
     padding: 10px 20px;
   }
+}
+
+.mensaje {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.mensaje-exito {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mensaje-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* ---- Ícono de mostrar/ocultar contraseña ---- */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 36px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: #555;
+  font-size: 16px;
+}
+
+.toggle-password:hover {
+  color: #D84040;
 }

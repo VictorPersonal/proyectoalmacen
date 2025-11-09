@@ -1,5 +1,13 @@
+.productos-container {
+  display: flex;              
+  flex-wrap: wrap;             
+  justify-content: center;     
+  gap: 20px; 
+}                  
+
 .producto-card {
   width: 200px;
+  min-height: 275px;           
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 15px;
@@ -7,6 +15,9 @@
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .producto-card:hover {
