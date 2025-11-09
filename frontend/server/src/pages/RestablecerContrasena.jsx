@@ -47,7 +47,7 @@ const RestablecerContrasena = () => {
           <img src={logo} alt="Logo" className="logo-icon" />
           <div className="logo-text">
             <span className="logo-title">Dulce Hogar</span>
-            <span className="logo-subtitle">Tu espacio de confianza</span>
+            <span className="logo-subtitle">Almacen de electrodomesticos</span>
           </div>
         </div>
         <div className="help-icon">?</div>
@@ -95,14 +95,14 @@ const RestablecerContrasena = () => {
       {/* ===== FOOTER ===== */}
       <footer className="footer">
         <div className="footer-links">
-          <a href="#">Términos</a>
-          <span>|</span>
-          <a href="#">Privacidad</a>
-          <span>|</span>
-          <a href="#">Ayuda</a>
+          <a href="#">Preguntas frecuentes</a>
+          <span>/</span>
+          <a href="#">Consejos de seguridad</a>
+          <span>/</span>
+          <a href="#">Terminos</a>
         </div>
         <div className="footer-copyright">
-          © 2025 Dulce Hogar. Todos los derechos reservados.
+          © 2025 help. Todos los derechos reservados.
         </div>
       </footer>
     </div>

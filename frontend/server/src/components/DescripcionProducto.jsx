@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import "./DescripcionProducto.css";
 import { FaStar } from "react-icons/fa";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // 👈 Importamos para redirigir
 
 const DescripcionProducto = ({ producto, onVolver, cedula }) => {
   const [cantidad, setCantidad] = useState(1);
+  const navigate = useNavigate(); // 👈 Inicializamos el hook
 
   if (!producto || !producto.nombre) {
     return (
@@ -30,10 +32,9 @@ const DescripcionProducto = ({ producto, onVolver, cedula }) => {
 
       const productoData = {
         cedula: usuario.cedula,
-        idproducto: producto.id_producto || producto.id || producto.idproducto, // 👈 usa este nombre exacto
+        idproducto: producto.id_producto || producto.id || producto.idproducto,
         cantidad: cantidad,
       };
-
 
       const res = await axios.post("http://localhost:4000/api/carrito/agregar", productoData);
       console.log("✅ Producto agregado:", res.data);
@@ -44,16 +45,19 @@ const DescripcionProducto = ({ producto, onVolver, cedula }) => {
     }
   };
 
+  // 👉 Función para ir al checkout
+  const handleComprarAhora = () => {
+    navigate("/checkout/forma-entrega"); // 👈 Redirige al componente FormaEntrega
+  };
 
   return (
     <div className="descripcion-producto">
       <div className="producto-detalle">
-        {/* 📦 Cuadro de imagen grande */}
+        {/* 📦 Imagen */}
         <div className="producto-imagen-placeholder">
           <div className="imagen-cuadro">
             <p>Imagen del producto</p>
           </div>
-          {/* 🔵 Círculos de navegación */}
           <div className="imagen-circulos">
             {[...Array(4)].map((_, i) => (
               <span key={i} className="circulo"></span>
@@ -61,7 +65,7 @@ const DescripcionProducto = ({ producto, onVolver, cedula }) => {
           </div>
         </div>
 
-        {/* 📋 Información del producto */}
+        {/* 📋 Información */}
         <div className="producto-info">
           <h2>{producto.nombre}</h2>
           <p>{producto.descripcion}</p>
@@ -96,7 +100,9 @@ const DescripcionProducto = ({ producto, onVolver, cedula }) => {
           </div>
 
           <div className="botones-compra">
-            <button className="btn-comprar">Comprar Ahora</button>
+            <button className="btn-comprar" onClick={handleComprarAhora}>
+              Comprar Ahora
+            </button>
             <button className="btn-agregar" onClick={handleAgregarCarrito}>
               Agregar al carrito
             </button>
