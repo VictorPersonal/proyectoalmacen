@@ -4,6 +4,8 @@ import cloudinary from '../config/cloudinary.js';
 import upload from '../config/multer.js';
 import fs from 'fs';
 import productoRoutes from "../routes/productoRoutes.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 
 // import bcrypt from "bcrypt"; // No se usa para mantener tu lógica original
@@ -47,12 +49,15 @@ router.post("/usuario", async (req, res) => {
             return res.status(409).json({ message: "La cédula ya está registrada" });
         }
 
-        // 2. Insertar el nuevo usuario con la contraseña en texto plano (⚠️ INSEGURO)
+        // 2. Cifrar la contraseña antes de guardar
+        const hashedPassword = await bcrypt.hash(contrasena, 10);
+
+        // 3. Insertar el nuevo usuario con la contraseña cifrada
         const result = await pool.query(
             `INSERT INTO usuario (cedula, nombre, apellido, direccion, email, ciudad, password, rol)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
              RETURNING cedula, nombre, apellido, email, ciudad, rol`,
-            [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", contrasena, rol || "cliente"] // Usa 'contrasena' directamente
+            [cedula, nombre, apellido || "", direccion || "", email, ciudad || "", hashedPassword, rol || "cliente"]
         );
 
         res.status(201).json({ message: "Usuario registrado correctamente", usuario: result.rows[0] });
@@ -65,42 +70,55 @@ router.post("/usuario", async (req, res) => {
 
 // Iniciar sesión (válido para cliente y administrador)
 router.post("/login", async (req, res) => {
-    const { email, contrasena } = req.body;
+  const { email, contrasena } = req.body;
 
-    if (!email || !contrasena) {
-        return res.status(400).json({ message: "Correo y contraseña son obligatorios" });
+  if (!email || !contrasena) {
+    return res.status(400).json({ message: "Correo y contraseña son obligatorios" });
+  }
+
+  try {
+    const result = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    try {
-        const result = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
+    const usuario = result.rows[0];
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
-
-        const usuario = result.rows[0];
-
-        // ⚠️ Comparación de contraseña en texto plano (INSEGURO)
-        if (usuario.password !== contrasena) {
-            return res.status(401).json({ message: "Contraseña incorrecta" });
-        }
-
-        res.status(200).json({
-            message: "Inicio de sesión exitoso",
-            usuario: {
-                cedula: usuario.cedula,
-                nombre: usuario.nombre,
-                apellido: usuario.apellido,
-                email: usuario.email,
-                direccion: usuario.direccion,
-                ciudad: usuario.ciudad,
-                rol: usuario.rol
-            }
-        });
-    } catch (error) {
-        console.error("❌ Error en el login:", error);
-        res.status(500).json({ message: "Error en el servidor" });
+    // ✅ Comparar contraseña cifrada con bcrypt
+    const validPassword = await bcrypt.compare(contrasena, usuario.password);
+    if (!validPassword) {
+      return res.status(401).json({ message: "Contraseña incorrecta" });
     }
+
+    // ✅ Crear token JWT
+    const token = jwt.sign(
+      { id: usuario.cedula, rol: usuario.rol },
+      "clave_secreta_segura", // cámbiala por una más fuerte y guarda en variables de entorno (.env)
+      { expiresIn: "1h" }
+    );
+
+    // ✅ Enviar cookie HTTP-only
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,       // true si usas HTTPS
+      //sameSite: "strict",  previene ataques CSRF
+      sameSite: "lax",
+      maxAge: 60 * 60 * 1000 // 1 hora
+    });
+
+    // ✅ Solo enviamos información mínima al frontend
+    res.status(200).json({
+      message: "Inicio de sesión exitoso",
+      usuario: {
+        nombre: usuario.nombre
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ Error en el login:", error);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
 });
 
 
@@ -429,6 +447,44 @@ router.delete("/carrito/vaciar/:cedula", async (req, res) => {
 // 💖 RUTAS DE FAVORITOS DE PRODUCTOS
 // ====================================================================
 
+
+// GET: Obtiene los favoritos del usuario autenticado
+router.get("/favoritos", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "No autenticado" });
+    }
+
+    const decoded = jwt.verify(token, "clave_secreta_segura");
+    const cedula = decoded.id;
+
+    const result = await pool.query(
+      `SELECT 
+          f.idfavorito, 
+          f.fechaagregado, 
+          p.idproducto, 
+          p.nombre, 
+          p.precio, 
+          p.descripcion, 
+          p.stock
+       FROM favoritoproducto f
+       INNER JOIN producto p ON f.idproducto = p.idproducto
+       WHERE f.cedula = $1
+       ORDER BY f.fechaagregado DESC;`,
+      [cedula]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("❌ Error al obtener favoritos del usuario autenticado:", error);
+    res.status(500).json({ message: "Error al obtener favoritos" });
+  }
+});
+
+
+
+
 // 📌 Agregar producto a favoritos
 router.post("/favoritos", async (req, res) => {
     const { cedula, idproducto } = req.body;
@@ -438,6 +494,24 @@ router.post("/favoritos", async (req, res) => {
     }
 
     try {
+        // Validar que la cédula exista en la tabla usuario
+        const usuarioExiste = await pool.query(
+            "SELECT 1 FROM usuario WHERE cedula = $1", // El 1 en el SELECT es una práctica para optimizar la consulta, pues se necesita saber si el registro existe, NO se NECESITAN obtener todos los datos
+            [cedula]
+        );
+        if (usuarioExiste.rows.length === 0) {
+            return res.status(404).json({ message: `No existe un usuario con la cédula ${cedula}.` });
+        }
+
+        // Validar que el producto exista en la tabla producto
+        const productoExiste = await pool.query(
+            "SELECT 1 FROM producto WHERE idproducto = $1",
+            [idproducto]
+        );
+        if (productoExiste.rows.length === 0) {
+            return res.status(404).json({ message: `No existe un producto con el ID ${idproducto}.` });
+        }
+
         // Verificar si ya está en favoritos
         const existe = await pool.query(
             "SELECT 1 FROM favoritoproducto WHERE cedula = $1 AND idproducto = $2",
@@ -463,39 +537,10 @@ router.post("/favoritos", async (req, res) => {
 
     } catch (error) {
         console.error("❌ Error al agregar favorito:", error);
-        res.status(500).json({ message: "Error al agregar favorito" });
+        res.status(500).json({ message: "Error interno al agregar favorito." });
     }
 });
 
-
-// 📌 Obtener todos los favoritos de un usuario
-router.get("/favoritos/:cedula", async (req, res) => {
-    const { cedula } = req.params;
-
-    try {
-        const result = await pool.query(
-            `SELECT 
-                f.idfavorito, 
-                f.fechaagregado, 
-                p.idproducto, 
-                p.nombre, 
-                p.precio, 
-                p.descripcion, 
-                p.stock
-             FROM favoritoproducto f
-             INNER JOIN producto p ON f.idproducto = p.idproducto
-             WHERE f.cedula = $1
-             ORDER BY f.fechaagregado DESC;`,
-            [cedula]
-        );
-
-        res.status(200).json(result.rows);
-
-    } catch (error) {
-        console.error("❌ Error al obtener favoritos:", error);
-        res.status(500).json({ message: "Error al obtener favoritos" });
-    }
-});
 
 
 // 📌 Eliminar un producto de favoritos
@@ -520,78 +565,6 @@ router.delete("/favoritos/:cedula/:idproducto", async (req, res) => {
     }
 });
 
-router.get("/estadisticas/ventas-mensuales", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        TO_CHAR(p.fechaelaboracionpedido, 'Mon') AS mes,
-        SUM(dp.subtotal) AS total
-      FROM pedido p
-      JOIN detallepedidoMM dp ON p.idpedido = dp.idpedido
-      GROUP BY mes
-      ORDER BY MIN(p.fechaelaboracionpedido);
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error al obtener ventas mensuales:", err);
-    res.status(500).json({ error: "Error al obtener ventas mensuales" });
-  }
-});
-
-// 🍰 Productos más vendidos
-router.get("/estadisticas/productos-mas-vendidos", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        pr.nombre,
-        SUM(dp.cantidad) AS ventas
-      FROM detallepedidoMM dp
-      JOIN producto pr ON dp.idproducto = pr.idproducto
-      GROUP BY pr.nombre
-      ORDER BY ventas DESC
-      LIMIT 5;
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error al obtener productos más vendidos:", err);
-    res.status(500).json({ error: "Error al obtener productos más vendidos" });
-  }
-});
-
-// 👥 Usuarios por tipo (rol)
-router.get("/estadisticas/usuarios", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        COALESCE(rol, 'sin rol') AS tipo,
-        COUNT(*) AS cantidad
-      FROM usuario
-      GROUP BY tipo;
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error al obtener usuarios:", err);
-    res.status(500).json({ error: "Error al obtener usuarios" });
-  }
-});
-
-router.get("/estadisticas/estados-pedidos", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        e.descripcion AS estado,
-        COUNT(p.idpedido) AS cantidad
-      FROM pedido p
-      JOIN estadopedido e ON p.idestadopedido = e.idestadopedido
-      GROUP BY e.descripcion
-      ORDER BY cantidad DESC;
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error al obtener estados de pedido:", err);
-    res.status(500).json({ error: "Error al obtener estados de pedido" });
-  }
-});
 
 
 export default router;

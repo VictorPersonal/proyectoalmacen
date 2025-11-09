@@ -25,6 +25,7 @@ const Login = () => {
     const response = await fetch("http://localhost:4000/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // ✅ Para manejar cookies
       body: JSON.stringify({ email, contrasena }),
     });
 
@@ -42,7 +43,7 @@ const Login = () => {
     // 🔹 Redirigir según el rol
     setTimeout(() => {
   // Guardar información del usuario en localStorage
-      localStorage.setItem('usuarioInfo', JSON.stringify(data.usuario));
+      localStorage.setItem('usuarioInfo', JSON.stringify(data.usuario));//Permite que el nombre y el icono de usuario se vean al iniciar sesión
       
       if (data.usuario.rol === "administrador") {
         navigate("/admin");
@@ -57,6 +58,7 @@ const Login = () => {
     setMensaje("Error al conectar con el servidor");
     setTipoMensaje("error");
   }
+
 };
 
     return (

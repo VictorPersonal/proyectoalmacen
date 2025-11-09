@@ -1,0 +1,78 @@
+.favoritos-container {
+  width: 90%;
+  max-width: 900px;
+  margin: 30px auto;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.titulo-favoritos {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.favorito-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+}
+
+.favorito-item:first-child {
+  border-top: none;
+}
+
+/* 📌 Imagen del producto */
+.favorito-imagen {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
+  background-color: #f0f0f0; /* fondo neutro */
+}
+
+/* Si no hay imagen disponible */
+.sin-imagen {
+  background-color: #f0f0f0;
+}
+
+.favorito-info {
+  flex: 1;
+}
+
+.nombre-producto {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  color: #222;
+}
+
+.precio {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.btn-eliminar {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btn-eliminar:hover {
+  color: #0056b3;
+}
+
+.mensaje-vacio {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+}

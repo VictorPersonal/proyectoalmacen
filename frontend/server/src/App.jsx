@@ -8,6 +8,8 @@ import PanelAdmin from "./pages/PanelAdmin";
 import ActualizarDatos from "./pages/ActualizarDatos";
 import FormaEntrega from "./pages/Checkout/FormaEntrega";
 import Pago from "./pages/Checkout/Pago";
+import Favoritos from "./pages/Favorito";
+
 
 
 function App() {
@@ -17,6 +19,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/favoritos" element={<Favoritos />} />
         <Route path="/login/recuperar-contrasena" element={<RecuperarContrasena />} />
         <Route path="/admin" element={<PanelAdmin />} />
         <Route path="/ajustes-de-cuenta" element={<ActualizarDatos />} />

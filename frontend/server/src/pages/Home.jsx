@@ -264,10 +264,7 @@ const Home = () => {
                   >
                     Ajustes de cuenta
                   </Link>
-                  <button
-                    className="perfil-item cerrar-sesion"
-                    onClick={handleCerrarSesion}
-                  >
+                  <button className="perfil-item cerrar-sesion" onClick={handleCerrarSesion}>
                     Cerrar sesión
                   </button>
                 </div>
@@ -283,7 +280,10 @@ const Home = () => {
               </Link>
             </>
           )}
-          <div className="cart-icon" onClick={toggleCarrito}>
+          <Link to="/favoritos" className="nav-link favoritos-link">
+            ❤️ Favoritos
+          </Link>
+          <div className="cart-icon">
             <FaShoppingCart />
           </div>
         </div>
