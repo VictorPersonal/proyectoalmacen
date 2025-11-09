@@ -101,8 +101,9 @@ router.post("/login", async (req, res) => {
     // ✅ Enviar cookie HTTP-only
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,       // true si usas HTTPS
-      sameSite: "strict", // previene ataques CSRF
+      secure: false,       // true si usas HTTPS
+      //sameSite: "strict",  previene ataques CSRF
+      sameSite: "lax",
       maxAge: 60 * 60 * 1000 // 1 hora
     });
 
@@ -446,6 +447,44 @@ router.delete("/carrito/vaciar/:cedula", async (req, res) => {
 // 💖 RUTAS DE FAVORITOS DE PRODUCTOS
 // ====================================================================
 
+
+// GET: Obtiene los favoritos del usuario autenticado
+router.get("/favoritos", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "No autenticado" });
+    }
+
+    const decoded = jwt.verify(token, "clave_secreta_segura");
+    const cedula = decoded.id;
+
+    const result = await pool.query(
+      `SELECT 
+          f.idfavorito, 
+          f.fechaagregado, 
+          p.idproducto, 
+          p.nombre, 
+          p.precio, 
+          p.descripcion, 
+          p.stock
+       FROM favoritoproducto f
+       INNER JOIN producto p ON f.idproducto = p.idproducto
+       WHERE f.cedula = $1
+       ORDER BY f.fechaagregado DESC;`,
+      [cedula]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("❌ Error al obtener favoritos del usuario autenticado:", error);
+    res.status(500).json({ message: "Error al obtener favoritos" });
+  }
+});
+
+
+
+
 // 📌 Agregar producto a favoritos
 router.post("/favoritos", async (req, res) => {
     const { cedula, idproducto } = req.body;
@@ -502,35 +541,6 @@ router.post("/favoritos", async (req, res) => {
     }
 });
 
-
-// 📌 Obtener todos los favoritos de un usuario
-router.get("/favoritos/:cedula", async (req, res) => {
-    const { cedula } = req.params;
-
-    try {
-        const result = await pool.query(
-            `SELECT 
-                f.idfavorito, 
-                f.fechaagregado, 
-                p.idproducto, 
-                p.nombre, 
-                p.precio, 
-                p.descripcion, 
-                p.stock
-             FROM favoritoproducto f
-             INNER JOIN producto p ON f.idproducto = p.idproducto
-             WHERE f.cedula = $1
-             ORDER BY f.fechaagregado DESC;`,
-            [cedula]
-        );
-
-        res.status(200).json(result.rows);
-
-    } catch (error) {
-        console.error("❌ Error al obtener favoritos:", error);
-        res.status(500).json({ message: "Error al obtener favoritos" });
-    }
-});
 
 
 // 📌 Eliminar un producto de favoritos

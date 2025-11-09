@@ -1,72 +1,55 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import "./FavoritoProducto.css";
 
-const FavoritoProducto = ({ cedula }) => {
+const FavoritoProducto = () => {
   const [favoritos, setFavoritos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // 🔹 Obtener productos favoritos desde el backend
-  const obtenerFavoritos = async () => {
-    try {
-      const response = await axios.get(`http://localhost:4000/api/favoritos/${cedula}`);
-      setFavoritos(response.data);
-    } catch (err) {
-      console.error("❌ Error al obtener favoritos:", err);
-      setError("No se pudieron cargar los productos favoritos.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 🔹 Eliminar producto de favoritos
-  const eliminarFavorito = async (idproducto) => {
-    try {
-      await axios.delete(`http://localhost:4000/api/favoritos/${cedula}/${idproducto}`);
-      setFavoritos(favoritos.filter((item) => item.idproducto !== idproducto));
-    } catch (err) {
-      console.error("❌ Error al eliminar favorito:", err);
-      alert("Error al eliminar el producto de favoritos.");
-    }
-  };
-
+  // 🔹 Cargar los productos favoritos del usuario autenticado
   useEffect(() => {
+    const obtenerFavoritos = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/favoritos", {
+          method: "GET",
+          credentials: "include", // ✅ Envía la cookie JWT, ayuda a identificar al usuario
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al obtener favoritos (status: ${response.status})`);
+        }
+
+        const data = await response.json();
+        setFavoritos(data);
+      } catch (error) {
+        console.error("❌ Error al cargar favoritos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     obtenerFavoritos();
   }, []);
 
-  if (loading) return <p>Cargando tus productos favoritos...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) {
+    return <p className="mensaje-vacio">Cargando favoritos...</p>;
+  }
 
   return (
     <div className="favoritos-container">
-      <h2 className="titulo-favoritos">Mis Favoritos</h2>
-
+      <h2 className="titulo-favoritos">Mis Productos Favoritos</h2>
       {favoritos.length === 0 ? (
         <p className="mensaje-vacio">No tienes productos en favoritos.</p>
       ) : (
-        favoritos.map((producto) => (
-          <div className="favorito-item" key={producto.idproducto}>
-            {/* 📌 Si tu backend incluye imagen, puedes mostrarla aquí */}
-            {producto.imagen ? (
-              <img
-                src={`http://localhost:4000/uploads/${producto.imagen}`}
-                alt={producto.nombre}
-                className="favorito-imagen"
-              />
-            ) : (
-              <div className="favorito-imagen sin-imagen"></div>
-            )}
-
+        favoritos.map((item) => (
+          <div key={item.idfavorito} className="favorito-item">
+            <img
+              src={item.imagen || "https://via.placeholder.com/100"} // 👈 opcional, si no tienes columna imagen
+              alt={item.nombre}
+              className="favorito-imagen"
+            />
             <div className="favorito-info">
-              <h3 className="nombre-producto">{producto.nombre}</h3>
-              <p className="precio">Precio: ${producto.precio}</p>
-              <button
-                className="btn-eliminar"
-                onClick={() => eliminarFavorito(producto.idproducto)}
-              >
-                Eliminar de favoritos
-              </button>
+              <p className="nombre-producto">{item.nombre}</p>
+              <p className="precio">Precio: ${item.precio}</p>
             </div>
           </div>
         ))

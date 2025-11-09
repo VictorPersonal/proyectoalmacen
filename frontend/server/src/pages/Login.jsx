@@ -25,6 +25,7 @@ const Login = () => {
     const response = await fetch("http://localhost:4000/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // ✅ Para manejar cookies
       body: JSON.stringify({ email, contrasena }),
     });
 
