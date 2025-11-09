@@ -8,5 +8,5 @@ const Favoritos = () => {
     </div>
   );
 };
-
+//hola
 export default Favoritos;
