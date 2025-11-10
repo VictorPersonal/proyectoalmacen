@@ -359,7 +359,7 @@ const Home = () => {
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminosycondiciones">Términos y Condiciones</Link>
         </div>
         <div className="footer-copyright">
           © 2025 FHO, todos los derechos reservados

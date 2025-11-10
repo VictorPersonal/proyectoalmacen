@@ -9,6 +9,7 @@ import ActualizarDatos from "./pages/ActualizarDatos";
 import FormaEntrega from "./pages/Checkout/FormaEntrega";
 import Pago from "./pages/Checkout/Pago";
 import Favoritos from "./pages/Favorito";
+import TerminosYCondiciones from "./pages/Terminosycondiciones";
 
 
 
@@ -26,6 +27,8 @@ function App() {
         <Route path="/reset-password/:token" element={<RestablecerContrasena />} />
         <Route path="/checkout/forma-entrega" element={<FormaEntrega />} />
         <Route path="/checkout/forma-entrega/pago" element={<Pago />} />
+        <Route path="/terminosycondiciones" element={<TerminosYCondiciones />} />
+        
       </Routes>
     </Router>
   );
