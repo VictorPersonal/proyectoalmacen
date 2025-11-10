@@ -4,7 +4,6 @@ import logo from "../assets/Logo dulce hogar.png";
 import { useNavigate } from "react-router-dom";
 
 function ActualizarPerfil() {
-  // Estados para los campos del formulario
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
@@ -15,63 +14,37 @@ function ActualizarPerfil() {
   const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
 
-  // Función para obtener el email desde la base de datos
-  const obtenerEmailDesdeBD = async (cedulaUsuario) => {
-    try {
-      const res = await fetch(`http://localhost:4000/api/usuario/perfil?cedula=${cedulaUsuario}`);
-      if (res.ok) {
-        const datos = await res.json();
-        return datos.email || "";
-      }
-    } catch (error) {
-      console.error("Error al obtener email:", error);
-    }
-    return "";
-  };
-
-  // Cargar datos del perfil al montar el componente
+  // 🔹 Cargar perfil desde backend (usando cookie con token)
   useEffect(() => {
     const cargarPerfil = async () => {
       setCargando(true);
       try {
-        // Obtener información del usuario del localStorage
-        const usuarioGuardado = localStorage.getItem('usuarioInfo');
-        
-        if (!usuarioGuardado) {
-          setMensaje("No hay usuario logueado. Redirigiendo al login...");
+        const res = await fetch("http://localhost:4000/api/usuario/perfil", {
+          method: "GET",
+          credentials: "include", // 👈 envía la cookie JWT
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          setMensaje("Sesión expirada o no autorizada. Redirigiendo al login...");
           setTimeout(() => navigate("/login"), 2000);
           return;
         }
 
-        const usuario = JSON.parse(usuarioGuardado);
-        
-        console.log("Usuario del localStorage:", usuario); // Para debug
-        
-        // Usar los datos del localStorage directamente
-        setNombre(usuario.nombre || "");
-        setApellido(usuario.apellido || "");
-        setCedula(usuario.cedula || "");
-        setDireccion(usuario.direccion || "");
-        setCiudad(usuario.ciudad || "");
-        
-        // Si no hay email en localStorage, obtenerlo de la BD
-        if (!usuario.email) {
-          const emailBD = await obtenerEmailDesdeBD(usuario.cedula);
-          setEmail(emailBD);
-          
-          // Actualizar localStorage con el email
-          if (emailBD) {
-            const usuarioActualizado = { ...usuario, email: emailBD };
-            localStorage.setItem('usuarioInfo', JSON.stringify(usuarioActualizado));
-          }
-        } else {
-          setEmail(usuario.email);
-        }
-        
-        setMensaje(""); // Limpiar mensajes anteriores
-        
+        if (!res.ok) throw new Error("Error al obtener datos del perfil");
+
+        const data = await res.json();
+
+        // 🔹 Llenar los campos del formulario con los datos del backend
+        setNombre(data.nombre || "");
+        setApellido(data.apellido || "");
+        setEmail(data.email || "");
+        setCedula(data.cedula || "");
+        setDireccion(data.direccion || "");
+        setCiudad(data.ciudad || "");
+
+        // ❌ Eliminado: No se guarda nada en localStorage
       } catch (error) {
-        console.error("Error al cargar el perfil:", error);
+        console.error("❌ Error al cargar el perfil:", error);
         setMensaje("Error al cargar los datos del perfil ❌");
       } finally {
         setCargando(false);
@@ -81,40 +54,32 @@ function ActualizarPerfil() {
     cargarPerfil();
   }, [navigate]);
 
-  // ... el resto del código permanece igual
+  // 🔹 Enviar datos actualizados al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setCargando(true);
-    setMensaje(""); // Limpiar mensaje anterior
-
-    // Obtener el usuario del localStorage para tener la cédula
-    const usuarioGuardado = localStorage.getItem('usuarioInfo');
-    if (!usuarioGuardado) {
-      setMensaje("Error: No se encontró la información del usuario");
-      setCargando(false);
-      return;
-    }
-
-    const usuario = JSON.parse(usuarioGuardado);
+    setMensaje("");
 
     const datosActualizados = {
-      cedula: usuario.cedula, // Usar la cédula del usuario logueado
       nombre: nombre.trim(),
       apellido: apellido.trim(),
       direccion: direccion.trim(),
-      ciudad: ciudad.trim()
+      ciudad: ciudad.trim(),
     };
-
-    console.log("Datos a enviar:", datosActualizados); // Para debug
 
     try {
       const res = await fetch("http://localhost:4000/api/usuario/perfil", {
         method: "PUT",
-        headers: { 
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // 👈 importante para enviar la cookie JWT
         body: JSON.stringify(datosActualizados),
       });
+
+      if (res.status === 401 || res.status === 403) {
+        setMensaje("Sesión expirada o no autorizada. Redirigiendo al login...");
+        setTimeout(() => navigate("/login"), 2000);
+        return;
+      }
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -122,23 +87,18 @@ function ActualizarPerfil() {
       }
 
       const data = await res.json();
-      
-      console.log("Respuesta del servidor:", data); // Para debug
-      
-      // Actualizar localStorage con los nuevos datos
-      const usuarioActualizado = {
-        ...usuario,
-        nombre: data.usuario.nombre,
-        apellido: data.usuario.apellido,
-        direccion: data.usuario.direccion,
-        ciudad: data.usuario.ciudad
-      };
-      localStorage.setItem('usuarioInfo', JSON.stringify(usuarioActualizado));
 
+      // ❌ Eliminado: no se actualiza localStorage
       setMensaje("✅ Perfil actualizado exitosamente");
-      
+
+      // ✅ Opcional: refrescar los campos con la nueva data
+      setNombre(data.usuario.nombre || "");
+      setApellido(data.usuario.apellido || "");
+      setDireccion(data.usuario.direccion || "");
+      setCiudad(data.usuario.ciudad || "");
+
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Error al actualizar:", error);
       setMensaje(`❌ ${error.message || "No se pudo actualizar el perfil"}`);
     } finally {
       setCargando(false);
@@ -174,11 +134,7 @@ function ActualizarPerfil() {
             </div>
           )}
 
-          {cargando && (
-            <div className="cargando">
-              Cargando datos del perfil...
-            </div>
-          )}
+          {cargando && <div className="cargando">Cargando datos del perfil...</div>}
 
           <form id="actualizar-form" onSubmit={handleSubmit}>
             <div className="campos-grid">
@@ -233,7 +189,7 @@ function ActualizarPerfil() {
                 />
               </div>
 
-              {/* Campos BLOQUEADOS (solo lectura) */}
+              {/* Campos BLOQUEADOS */}
               <div className="form-group">
                 <label htmlFor="email">Email:</label>
                 <input
@@ -244,7 +200,9 @@ function ActualizarPerfil() {
                   className="campo-bloqueado"
                   placeholder={cargando ? "Cargando..." : "Email no disponible"}
                 />
-                <small className="texto-ayuda">El email no se puede modificar</small>
+                <small className="texto-ayuda">
+                  El email no se puede modificar
+                </small>
               </div>
 
               <div className="form-group">
@@ -256,21 +214,19 @@ function ActualizarPerfil() {
                   readOnly
                   className="campo-bloqueado"
                 />
-                <small className="texto-ayuda">La cédula no se puede modificar</small>
+                <small className="texto-ayuda">
+                  La cédula no se puede modificar
+                </small>
               </div>
             </div>
 
             <div className="botones-accion">
-              <button 
-                type="submit" 
-                id="btn-actualizar"
-                disabled={cargando}
-              >
+              <button type="submit" id="btn-actualizar" disabled={cargando}>
                 {cargando ? "Actualizando..." : "Actualizar Perfil"}
               </button>
-              
-              <button 
-                type="button" 
+
+              <button
+                type="button"
                 id="btn-cancelar"
                 onClick={handleCancelar}
                 disabled={cargando}

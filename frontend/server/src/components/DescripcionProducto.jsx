@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import "./DescripcionProducto.css";
 import { FaStar } from "react-icons/fa";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // 👈 Importamos para redirigir
+import { useNavigate } from "react-router-dom";
 
-const DescripcionProducto = ({ producto, onVolver, cedula }) => {
+const DescripcionProducto = ({ producto, onVolver }) => {
   const [cantidad, setCantidad] = useState(1);
-  const navigate = useNavigate(); // 👈 Inicializamos el hook
+  const navigate = useNavigate();
 
   if (!producto || !producto.nombre) {
     return (
@@ -21,33 +21,43 @@ const DescripcionProducto = ({ producto, onVolver, cedula }) => {
     );
   }
 
-  // 👉 Función para agregar al carrito
+  // 👉 Función para agregar al carrito (con token vía cookies)
   const handleAgregarCarrito = async () => {
     try {
-      const usuario = JSON.parse(localStorage.getItem("usuarioInfo"));
-      if (!usuario?.cedula) {
-        alert("Para agregar productos. Inicia sesión primero.");
-        return;
-      }
+      // Ya no tomamos la cédula ni el token desde localStorage
+      // El backend leerá el usuario autenticado desde las cookies
 
       const productoData = {
-        cedula: usuario.cedula,
         idproducto: producto.id_producto || producto.id || producto.idproducto,
         cantidad: cantidad,
       };
 
-      const res = await axios.post("http://localhost:4000/api/carrito/agregar", productoData);
+      const res = await axios.post(
+        "http://localhost:4000/api/carrito/agregar",
+        productoData,
+        {
+          withCredentials: true, // 👈 Esto envía automáticamente las cookies al backend
+        }
+      );
+
       console.log("✅ Producto agregado:", res.data);
       alert("Producto agregado al carrito");
     } catch (error) {
       console.error("❌ Error al agregar producto:", error);
-      alert("Error al agregar producto al carrito");
+
+      // Si el token expiró o no hay sesión, redirigimos al login
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+        navigate("/login");
+      } else {
+        alert("Error al agregar producto al carrito");
+      }
     }
   };
 
   // 👉 Función para ir al checkout
   const handleComprarAhora = () => {
-    navigate("/checkout/forma-entrega"); // 👈 Redirige al componente FormaEntrega
+    navigate("/checkout/forma-entrega");
   };
 
   return (

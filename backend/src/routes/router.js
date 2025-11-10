@@ -6,6 +6,8 @@ import fs from 'fs';
 import productoRoutes from "../routes/productoRoutes.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { verificarToken } from "../controller/authMiddleware.js";
+
 
 
 // import bcrypt from "bcrypt"; // No se usa para mantener tu lógica original
@@ -123,45 +125,44 @@ router.post("/login", async (req, res) => {
 
 
 // ACTUALIZAR PERFIL DEL USUARIO (PUT)
-router.put("/usuario/perfil", async (req, res) => {
-    const { cedula, nombre, apellido, direccion, ciudad } = req.body;
+router.put("/usuario/perfil", verificarToken, async (req, res) => {
+  const cedula = req.usuario.id; // ✅ viene del token
+  const { nombre, apellido, direccion, ciudad } = req.body;
 
-    if (!cedula) {
-        return res.status(400).json({ message: "Cédula es requerida" });
+  if (!nombre || !apellido) {
+    return res.status(400).json({ message: "Nombre y apellido son obligatorios" });
+  }
+
+  try {
+    const usuarioExistente = await pool.query(
+      "SELECT cedula FROM usuario WHERE cedula = $1",
+      [cedula]
+    );
+
+    if (usuarioExistente.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    if (!nombre || !apellido) {
-        return res.status(400).json({ message: "Nombre y apellido son obligatorios" });
-    }
 
-    try {
-        const usuarioExistente = await pool.query(
-            "SELECT cedula FROM usuario WHERE cedula = $1",
-            [cedula]
-        );
+    const result = await pool.query(
+      `UPDATE usuario 
+       SET nombre = $1, apellido = $2, direccion = $3, ciudad = $4
+       WHERE cedula = $5
+       RETURNING cedula, nombre, apellido, email, direccion, ciudad, rol`,
+      [nombre, apellido, direccion, ciudad, cedula]
+    );
 
-        if (usuarioExistente.rows.length === 0) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
+    console.log("✅ Perfil actualizado para cédula:", cedula);
+    res.status(200).json({
+      message: "Perfil actualizado correctamente",
+      usuario: result.rows[0],
+    });
 
-        const result = await pool.query(
-            `UPDATE usuario 
-             SET nombre = $1, apellido = $2, direccion = $3, ciudad = $4
-             WHERE cedula = $5
-             RETURNING cedula, nombre, apellido, email, direccion, ciudad, rol`,
-            [nombre, apellido, direccion, ciudad, cedula]
-        );
-
-        console.log("✅ Perfil actualizado para cédula:", cedula);
-        res.status(200).json({
-            message: "Perfil actualizado correctamente",
-            usuario: result.rows[0]
-        });
-
-    } catch (error) {
-        console.error("❌ Error al actualizar perfil:", error);
-        res.status(500).json({ message: "Error al actualizar el perfil del usuario" });
-    }
+  } catch (error) {
+    console.error("❌ Error al actualizar perfil:", error);
+    res.status(500).json({ message: "Error al actualizar el perfil del usuario" });
+  }
 });
+
 
 
 // ====================================================================
@@ -350,88 +351,102 @@ router.delete("/productos/:id", async (req, res) => {
 
 
 // Obtener productos del carrito de un usuario
-router.get("/carrito/:cedula", async (req, res) => {
-  const { cedula } = req.params;
+router.use("/carrito", verificarToken);
+
+// 🔹 Obtener productos del carrito del usuario autenticado
+router.get("/carrito", async (req, res) => {
+  const cedula = req.usuario.id;
+
   try {
     const result = await pool.query(
       `SELECT 
          c.idproducto, 
          p.nombre, 
+         p.precio,
          c.cantidad, 
          (p.precio * c.cantidad) AS subtotal
-       FROM public.carrito c
-       JOIN public.producto p ON c.idproducto = p.idproducto
-       WHERE c.cedula = $1`,
+       FROM carrito c
+       INNER JOIN producto p ON c.idproducto = p.idproducto
+       WHERE c.cedula = $1
+       ORDER BY p.nombre ASC;`,
       [cedula]
     );
-    res.json(result.rows);
+
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("❌ Error al obtener carrito:", error);
-    res.status(500).json({ error: "Error al obtener el carrito" });
+    res.status(500).json({ message: "Error al obtener el carrito" });
   }
 });
 
-// Agregar al carrito
+// 🔹 Agregar o actualizar producto en el carrito
 router.post("/carrito/agregar", async (req, res) => {
-  const { cedula, idproducto, cantidad } = req.body;
+  const cedula = req.usuario.id;
+  const { idproducto, cantidad } = req.body;
+
+  if (!idproducto || !cantidad) {
+    return res.status(400).json({ message: "Faltan datos: idproducto o cantidad" });
+  }
+
   try {
-    // Verificar si ya existe
     const existe = await pool.query(
-      "SELECT * FROM public.carrito WHERE cedula = $1 AND idproducto = $2",
+      "SELECT cantidad FROM carrito WHERE cedula = $1 AND idproducto = $2",
       [cedula, idproducto]
     );
 
     if (existe.rows.length > 0) {
+      // ✅ Si ya existe, actualizar cantidad
       await pool.query(
-        "UPDATE public.carrito SET cantidad = cantidad + $1 WHERE cedula = $2 AND idproducto = $3",
+        "UPDATE carrito SET cantidad = cantidad + $1 WHERE cedula = $2 AND idproducto = $3",
         [cantidad, cedula, idproducto]
       );
     } else {
+      // ✅ Si no existe, insertar nuevo registro
       await pool.query(
-        "INSERT INTO public.carrito (cedula, idproducto, cantidad) VALUES ($1, $2, $3)",
+        "INSERT INTO carrito (cedula, idproducto, cantidad) VALUES ($1, $2, $3)",
         [cedula, idproducto, cantidad]
       );
     }
 
-    res.json({ message: "Producto agregado correctamente al carrito" });
+    res.status(200).json({ message: "Producto agregado correctamente al carrito" });
   } catch (error) {
-    console.error("❌ Error al agregar al carrito:", error);
-    res.status(500).json({ error: "Error al agregar producto al carrito" });
+    console.error("❌ Error al agregar producto al carrito:", error);
+    res.status(500).json({ message: "Error al agregar producto al carrito" });
   }
 });
 
-// 🗑️ Eliminar un solo producto del carrito
-router.delete("/carrito/eliminar/:cedula/:idproducto", async (req, res) => {
-  const { cedula, idproducto } = req.params;
+// 🔹 Eliminar un producto específico del carrito
+router.delete("/carrito/eliminar/:idproducto", async (req, res) => {
+  const cedula = req.usuario.id;
+  const { idproducto } = req.params;
+
   try {
     const result = await pool.query(
-      "DELETE FROM public.carrito WHERE cedula = $1 AND idproducto = $2",
+      "DELETE FROM carrito WHERE cedula = $1 AND idproducto = $2",
       [cedula, idproducto]
     );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ error: "Producto no encontrado en el carrito" });
+      return res.status(404).json({ message: "Producto no encontrado en el carrito" });
     }
 
-    res.json({ message: "Producto eliminado del carrito correctamente" });
+    res.status(200).json({ message: "Producto eliminado correctamente del carrito" });
   } catch (error) {
     console.error("❌ Error al eliminar producto del carrito:", error);
-    res.status(500).json({ error: "Error al eliminar producto del carrito" });
+    res.status(500).json({ message: "Error al eliminar producto del carrito" });
   }
 });
 
-    router.use("/productos", productoRoutes);
+// 🔹 Vaciar completamente el carrito del usuario autenticado
+router.delete("/carrito/vaciar", async (req, res) => {
+  const cedula = req.usuario.id;
 
-
-// 🧹 Vaciar todo el carrito de un usuario
-router.delete("/carrito/vaciar/:cedula", async (req, res) => {
-  const { cedula } = req.params;
   try {
-    await pool.query("DELETE FROM public.carrito WHERE cedula = $1", [cedula]);
-    res.json({ message: "Carrito vaciado con éxito" });
+    await pool.query("DELETE FROM carrito WHERE cedula = $1", [cedula]);
+    res.status(200).json({ message: "Carrito vaciado exitosamente" });
   } catch (error) {
     console.error("❌ Error al vaciar carrito:", error);
-    res.status(500).json({ error: "Error al vaciar carrito" });
+    res.status(500).json({ message: "Error al vaciar carrito" });
   }
 });
 
@@ -566,5 +581,26 @@ router.delete("/favoritos/:cedula/:idproducto", async (req, res) => {
 });
 
 
+
+
+router.get("/usuario/perfil", verificarToken, async (req, res) => {
+  const cedula = req.usuario.id; // 👈 viene del token JWT
+
+  try {
+    const result = await pool.query(
+      "SELECT cedula, nombre, apellido, direccion, ciudad, email, rol FROM usuario WHERE cedula = $1",
+      [cedula]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("❌ Error al obtener perfil:", error);
+    res.status(500).json({ message: "Error al obtener perfil" });
+  }
+});
 
 export default router;
