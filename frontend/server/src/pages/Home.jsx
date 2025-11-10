@@ -283,9 +283,10 @@ const Home = () => {
           <Link to="/favoritos" className="nav-link favoritos-link">
             ❤️ Favoritos
           </Link>
-          <div className="cart-icon">
+          <div className="cart-icon" onClick={toggleCarrito}>
             <FaShoppingCart />
           </div>
+
         </div>
       </header>
 

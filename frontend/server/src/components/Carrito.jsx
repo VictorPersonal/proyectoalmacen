@@ -3,15 +3,15 @@ import axios from "axios";
 import { FaTrash } from "react-icons/fa";
 import "./Carrito.css";
 
-const Carrito = ({ cedula, abierto, onCerrar }) => {
+const Carrito = ({ abierto, onCerrar }) => {
   const [productos, setProductos] = useState([]);
   const [total, setTotal] = useState(0);
 
-  // 🔄 Cargar carrito del usuario
+  // 🔄 Cargar carrito del usuario autenticado
   useEffect(() => {
-    if (abierto && cedula) {
+    if (abierto) {
       axios
-        .get(`http://localhost:4000/api/carrito/${cedula}`)
+        .get("http://localhost:4000/api/carrito", { withCredentials: true }) // 👈 importante
         .then((res) => {
           setProductos(res.data);
           const totalCalc = res.data.reduce(
@@ -20,9 +20,14 @@ const Carrito = ({ cedula, abierto, onCerrar }) => {
           );
           setTotal(totalCalc);
         })
-        .catch((err) => console.error("❌ Error al cargar carrito:", err));
+        .catch((err) => {
+          console.error("❌ Error al cargar carrito:", err);
+          if (err.response?.status === 401 || err.response?.status === 403) {
+            alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+          }
+        });
     }
-  }, [abierto, cedula]);
+  }, [abierto]);
 
   // 🗑️ Eliminar un solo producto del carrito
   const handleEliminarProducto = async (idproducto) => {
@@ -31,7 +36,8 @@ const Carrito = ({ cedula, abierto, onCerrar }) => {
 
     try {
       await axios.delete(
-        `http://localhost:4000/api/carrito/eliminar/${cedula}/${idproducto}`
+        `http://localhost:4000/api/carrito/eliminar/${idproducto}`,
+        { withCredentials: true } // 👈 para enviar cookie JWT
       );
 
       // Actualizar estado local
@@ -47,24 +53,33 @@ const Carrito = ({ cedula, abierto, onCerrar }) => {
       alert("🗑️ Producto eliminado del carrito");
     } catch (error) {
       console.error("❌ Error al eliminar producto:", error);
-      alert("❌ No se pudo eliminar el producto");
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+      } else {
+        alert("❌ No se pudo eliminar el producto");
+      }
     }
   };
 
   // 🧹 Vaciar todo el carrito
   const handleVaciarCarrito = async () => {
-    if (!cedula) return;
     const confirmar = window.confirm("¿Seguro que deseas vaciar el carrito?");
     if (!confirmar) return;
 
     try {
-      await axios.delete(`http://localhost:4000/api/carrito/vaciar/${cedula}`);
+      await axios.delete("http://localhost:4000/api/carrito/vaciar", {
+        withCredentials: true, // 👈 importante
+      });
       setProductos([]);
       setTotal(0);
       alert("🧹 Carrito vaciado con éxito");
     } catch (error) {
       console.error("❌ Error al vaciar carrito:", error);
-      alert("❌ No se pudo vaciar el carrito");
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+      } else {
+        alert("❌ No se pudo vaciar el carrito");
+      }
     }
   };
 
@@ -104,10 +119,7 @@ const Carrito = ({ cedula, abierto, onCerrar }) => {
             <h4>Total: ${total.toFixed(2)}</h4>
 
             <div className="botones-carrito">
-              {/* 🔘 Botón visible pero sin lógica */}
-              <button className="btn-comprar2">
-                💰 Finalizar compra
-              </button>
+              <button className="btn-comprar2">💰 Finalizar compra</button>
 
               <button
                 className="btn-vaciar"
