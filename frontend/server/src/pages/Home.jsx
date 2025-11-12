@@ -3,8 +3,8 @@ import "./Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate } from "react-router-dom";
 import { FaShoppingCart, FaChevronRight, FaUserCircle } from "react-icons/fa";
-import image1 from "../assets/images.jpg";
-import image2 from "../assets/soga.jpg";
+import image1 from "../assets/home1.png";
+import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
 import DescripcionProducto from "../components/DescripcionProducto";
 import Carrito from "../components/Carrito";
@@ -360,7 +360,7 @@ const Home = () => {
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminosycondiciones">Términos y Condiciones</Link>
         </div>
         <div className="footer-copyright">
           © 2025 FHO, todos los derechos reservados
