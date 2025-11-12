@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { supabase } from "../config/db.js";
 
 // Insertar producto con imagen de Cloudinary
 export const crearProducto = async (nombre, precio, stock, descripcion, idmarca, idcategoria, imagen_url) => {
