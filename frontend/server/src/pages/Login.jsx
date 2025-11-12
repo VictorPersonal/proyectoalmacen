@@ -22,7 +22,8 @@ const Login = () => {
   }
 
   try {
-    const response = await fetch("http://localhost:4000/api/login", {
+    const response = await fetch("http://localhost:4000/api/login",
+       {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include", // ✅ Para manejar cookies
@@ -47,10 +48,8 @@ const Login = () => {
       
       if (data.usuario.rol === "administrador") {
         navigate("/admin");
-        window.location.reload(); // Forzar recarga
       } else {
         navigate("/");
-        window.location.reload(); // Forzar recarga
       }
     }, 1000);
   } catch (error) {

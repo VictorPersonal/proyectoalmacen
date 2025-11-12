@@ -113,7 +113,8 @@ router.post("/login", async (req, res) => {
     res.status(200).json({
       message: "Inicio de sesión exitoso",
       usuario: {
-        nombre: usuario.nombre
+        nombre: usuario.nombre,
+        rol: usuario.rol
       }
     });
 
@@ -600,6 +601,79 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
   } catch (error) {
     console.error("❌ Error al obtener perfil:", error);
     res.status(500).json({ message: "Error al obtener perfil" });
+  }
+});
+
+router.get("/estadisticas/ventas-mensuales",verificarToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        TO_CHAR(p.fechaelaboracionpedido, 'Mon') AS mes,
+        SUM(dp.subtotal) AS total
+      FROM pedido p
+      JOIN detallepedidoMM dp ON p.idpedido = dp.idpedido
+      GROUP BY mes
+      ORDER BY MIN(p.fechaelaboracionpedido);
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error al obtener ventas mensuales:", err);
+    res.status(500).json({ error: "Error al obtener ventas mensuales" });
+  }
+});
+
+// 🍰 Productos más vendidos
+router.get("/estadisticas/productos-mas-vendidos",verificarToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        pr.nombre,
+        SUM(dp.cantidad) AS ventas
+      FROM detallepedidoMM dp
+      JOIN producto pr ON dp.idproducto = pr.idproducto
+      GROUP BY pr.nombre
+      ORDER BY ventas DESC
+      LIMIT 5;
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error al obtener productos más vendidos:", err);
+    res.status(500).json({ error: "Error al obtener productos más vendidos" });
+  }
+});
+
+// 👥 Usuarios por tipo (rol)
+router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        COALESCE(rol, 'sin rol') AS tipo,
+        COUNT(*)::int AS cantidad
+      FROM usuario
+      GROUP BY tipo;
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error al obtener usuarios:", err);
+    res.status(500).json({ error: "Error al obtener usuarios" });
+  }
+});
+
+router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        e.descripcion AS estado,
+        COUNT(p.idpedido)::int AS cantidad
+      FROM pedido p
+      JOIN estadopedido e ON p.idestadopedido = e.idestadopedido
+      GROUP BY e.descripcion
+      ORDER BY cantidad DESC;
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error al obtener estados de pedido:", err);
+    res.status(500).json({ error: "Error al obtener estados de pedido" });
   }
 });
 
