@@ -10,6 +10,7 @@ import FormaEntrega from "./pages/Checkout/FormaEntrega";
 import Pago from "./pages/Checkout/Pago";
 import Favoritos from "./pages/Favorito";
 import TerminosYCondiciones from "./pages/Terminosycondiciones";
+import PagoExitoso from "./pages/Checkout/PagoExitoso";
 
 
 
@@ -28,7 +29,7 @@ function App() {
         <Route path="/checkout/forma-entrega" element={<FormaEntrega />} />
         <Route path="/checkout/forma-entrega/pago" element={<Pago />} />
         <Route path="/terminosycondiciones" element={<TerminosYCondiciones />} />
-        
+        <Route path="/checkout/forma-entrega/pago/exitoso" element={<PagoExitoso />} />
       </Routes>
     </Router>
   );

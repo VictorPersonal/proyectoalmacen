@@ -5,7 +5,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import router from "../routes/router.js";
 import authRoutes from "../routes/authRoutes.js";
-import { supabase } from "./db.js"; // 🔹 Importas tu cliente de Supabase
+import { supabase } from "./db.js"; 
+import stripeRoutes from "../routes/stripeRoutes.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 // ✅ Rutas
 app.use("/api/auth", authRoutes);
 app.use("/api", router);
+app.use("/api/stripe", stripeRoutes);
 
 // ✅ Servidor
 const PORT = process.env.PORT || 4000;
