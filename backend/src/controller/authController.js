@@ -1,4 +1,4 @@
-import pkg from "pg";
+import { supabase } from "../config/db.js"; // ✅ Importamos Supabase
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import brevo from "@getbrevo/brevo";
@@ -6,21 +6,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { Pool } = pkg;
-
-// 🔹 Conexión a PostgreSQL
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 5432,
-});
-
 // 🔹 Configuración de Brevo (correo)
 const brevoClient = new brevo.TransactionalEmailsApi();
 brevoClient.authentications["apiKey"].apiKey = process.env.BREVO_API_KEY;
-
 
 /**
  * 📩 Enviar correo de recuperación de contraseña
@@ -29,16 +17,24 @@ export const enviarCorreoRecuperacion = async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Verificar si el usuario existe
-    const userResult = await pool.query("SELECT * FROM usuario WHERE email = $1", [email]);
-    if (userResult.rows.length === 0) {
+    // ✅ Buscar usuario por correo en Supabase
+    const { data: usuarios, error: userError } = await supabase
+      .from("usuario")
+      .select("*")
+      .eq("email", email)
+      .limit(1);
+
+    if (userError) throw userError;
+    if (!usuarios || usuarios.length === 0) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    const user = userResult.rows[0];
+    const user = usuarios[0];
 
-    // ✅ Generar token temporal (expira en 1 hora) — usando el email
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    // ✅ Generar token temporal (expira en 1 hora)
+    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     // Construir URL de recuperación (usa FRONTEND_URL del .env)
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
@@ -85,7 +81,7 @@ export const restablecerContrasena = async (req, res) => {
       return res.status(400).json({ message: "Faltan datos requeridos" });
     }
 
-    // ✅ Verificar y decodificar el token
+    // ✅ Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const email = decoded.email;
 
@@ -93,18 +89,16 @@ export const restablecerContrasena = async (req, res) => {
       return res.status(400).json({ message: "Token inválido o sin correo" });
     }
 
-    // ✅ Encriptar la nueva contraseña
+    // ✅ Encriptar nueva contraseña
     const hashedPassword = await bcrypt.hash(nuevaContrasena, 10);
 
-    // ✅ Actualizar la contraseña en la base de datos
-    const result = await pool.query(
-      "UPDATE usuario SET password = $1 WHERE email = $2",
-      [hashedPassword, email]
-    );
+    // ✅ Actualizar contraseña con Supabase
+    const { error: updateError } = await supabase
+      .from("usuario")
+      .update({ password: hashedPassword })
+      .eq("email", email);
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
+    if (updateError) throw updateError;
 
     res.json({ message: "Contraseña actualizada correctamente" });
   } catch (error) {

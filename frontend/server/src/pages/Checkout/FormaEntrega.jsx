@@ -8,8 +8,20 @@ const FormaEntrega = () => {
   const navigate = useNavigate();
 
   const handleContinuar = () => {
-    navigate("/checkout/forma-entrega/pago");
-  };
+  const precioProducto = 11196;
+  const costoEnvio = opcion === "domicilio" ? 15400 : 0;
+
+  const total = precioProducto + costoEnvio;
+
+  navigate("/checkout/forma-entrega/pago", {
+    state: {
+      producto: "Producto ejemplo",
+      precioProducto,
+      costoEnvio,
+      total,
+    },
+  });
+};
 
   return (
     <div className="page-wrapper">
