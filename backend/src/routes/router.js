@@ -146,8 +146,8 @@ router.post("/login", async (req, res) => {
       message: "Inicio de sesión exitoso",
       usuario: {
         nombre: usuario.nombre,
-        rol: usuario.rol,
-      },
+        rol: usuario.rol
+      }
     });
   } catch (error) {
     console.error("❌ Error en el login:", error.message);
@@ -726,131 +726,75 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
   }
 });
 
-// --------------------------------------------------------------------
-// 📊 ESTADÍSTICAS DE VENTAS MENSUALES
-// --------------------------------------------------------------------
-router.get("/estadisticas/ventas-mensuales", verificarToken, async (req, res) => {
+router.get("/estadisticas/ventas-mensuales",verificarToken, async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("pedido")
-      .select("fechaelaboracionpedido, idpedido");
-
-    if (error) throw error;
-
-    const { data: detalles, error: errorDetalles } = await supabase
-      .from("detallepedidomm")
-      .select("idpedido, subtotal");
-
-    if (errorDetalles) throw errorDetalles;
-
-    // Combinar pedidos y detalles
-    const ventasPorMes = {};
-
-    detalles.forEach((detalle) => {
-      const pedido = data.find((p) => p.idpedido === detalle.idpedido);
-      if (pedido) {
-        const fecha = new Date(pedido.fechaelaboracionpedido);
-        const mes = fecha.toLocaleString("es-ES", { month: "short", year: "numeric" });
-        ventasPorMes[mes] = (ventasPorMes[mes] || 0) + Number(detalle.subtotal);
-      }
-    });
-
-    const resultado = Object.entries(ventasPorMes).map(([mes, total]) => ({ mes, total }));
-
-    res.json(resultado);
+    const result = await pool.query(`
+      SELECT 
+        TO_CHAR(p.fechaelaboracionpedido, 'Mon') AS mes,
+        SUM(dp.subtotal) AS total
+      FROM pedido p
+      JOIN detallepedidoMM dp ON p.idpedido = dp.idpedido
+      GROUP BY mes
+      ORDER BY MIN(p.fechaelaboracionpedido);
+    `);
+    res.json(result.rows);
   } catch (err) {
-    console.error("❌ Error al obtener ventas mensuales:", err.message);
+    console.error("Error al obtener ventas mensuales:", err);
     res.status(500).json({ error: "Error al obtener ventas mensuales" });
   }
 });
 
-// --------------------------------------------------------------------
-// 🍰 PRODUCTOS MÁS VENDIDOS (TOP 5)
-// --------------------------------------------------------------------
-router.get("/estadisticas/productos-mas-vendidos", verificarToken, async (req, res) => {
+// 🍰 Productos más vendidos
+router.get("/estadisticas/productos-mas-vendidos",verificarToken, async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("detallepedidomm")
-      .select("cantidad, producto:producto(nombre)");
-
-    if (error) throw error;
-
-    const contador = {};
-    data.forEach((d) => {
-      const nombre = d.producto?.nombre || "Desconocido";
-      contador[nombre] = (contador[nombre] || 0) + d.cantidad;
-    });
-
-    const top = Object.entries(contador)
-      .map(([nombre, cantidad]) => ({ nombre, cantidad }))
-      .sort((a, b) => b.cantidad - a.cantidad)
-      .slice(0, 5);
-
-    res.json(top);
+    const result = await pool.query(`
+      SELECT 
+        pr.nombre,
+        SUM(dp.cantidad) AS ventas
+      FROM detallepedidoMM dp
+      JOIN producto pr ON dp.idproducto = pr.idproducto
+      GROUP BY pr.nombre
+      ORDER BY ventas DESC
+      LIMIT 5;
+    `);
+    res.json(result.rows);
   } catch (err) {
-    console.error("❌ Error al obtener productos más vendidos:", err.message);
+    console.error("Error al obtener productos más vendidos:", err);
     res.status(500).json({ error: "Error al obtener productos más vendidos" });
   }
 });
 
-// --------------------------------------------------------------------
-// 👥 USUARIOS POR TIPO (ROL)
-// --------------------------------------------------------------------
+// 👥 Usuarios por tipo (rol)
 router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("usuario")
-      .select("rol");
-
-    if (error) throw error;
-
-    // Agrupar por rol
-    const conteo = {};
-    data.forEach((u) => {
-      const tipo = u.rol || "sin rol";
-      conteo[tipo] = (conteo[tipo] || 0) + 1;
-    });
-
-    const result = Object.entries(conteo).map(([tipo, cantidad]) => ({
-      tipo,
-      cantidad,
-    }));
-
-    res.json(result);
+    const result = await pool.query(`
+      SELECT 
+        COALESCE(rol, 'sin rol') AS tipo,
+        COUNT(*)::int AS cantidad
+      FROM usuario
+      GROUP BY tipo;
+    `);
+    res.json(result.rows);
   } catch (err) {
-    console.error("Error al obtener usuarios:", err.message);
+    console.error("Error al obtener usuarios:", err);
     res.status(500).json({ error: "Error al obtener usuarios" });
   }
 });
 
-// --------------------------------------------------------------------
-// 📦 ESTADOS DE PEDIDOS
-// --------------------------------------------------------------------
 router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("pedido")
-      .select(`
-        idpedido,
-        estadopedido (descripcion)
-      `);
-
-    if (error) throw error;
-
-    // Contar por estado
-    const conteo = {};
-    data.forEach((p) => {
-      const estado = p.estadopedido?.descripcion || "Desconocido";
-      conteo[estado] = (conteo[estado] || 0) + 1;
-    });
-
-    const result = Object.entries(conteo)
-      .map(([estado, cantidad]) => ({ estado, cantidad }))
-      .sort((a, b) => b.cantidad - a.cantidad);
-
-    res.json(result);
+    const result = await pool.query(`
+      SELECT 
+        e.descripcion AS estado,
+        COUNT(p.idpedido)::int AS cantidad
+      FROM pedido p
+      JOIN estadopedido e ON p.idestadopedido = e.idestadopedido
+      GROUP BY e.descripcion
+      ORDER BY cantidad DESC;
+    `);
+    res.json(result.rows);
   } catch (err) {
-    console.error("Error al obtener estados de pedido:", err.message);
+    console.error("Error al obtener estados de pedido:", err);
     res.status(500).json({ error: "Error al obtener estados de pedido" });
   }
 });
