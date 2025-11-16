@@ -1,5 +1,5 @@
 import React from "react";
-import "./TerminosYCondiciones.css"; // opcional si tienes estilos
+import "./terminosycondiciones.css"; // opcional si tienes estilos
 
 const TerminosYCondiciones = () => {
   return (
