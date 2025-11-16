@@ -127,9 +127,61 @@
   font-size: 16px;
   cursor: pointer;
   text-decoration: underline;
+  display: block;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  top: -40px;   /* sube el botón */
+  left: -80px;   /* lo mueve hacia la derecha */
 }
 
 .descripcion-producto-error {
   text-align: center;
   margin-top: 100px;
+}
+
+/* Estilos para los iconos de tarjetas */
+.logos-pago {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.tarjeta-icono {
+  font-size: 32px;
+  transition: transform 0.3s ease;
+}
+
+/* Colores específicos para cada tarjeta */
+.tarjeta-icono:nth-child(1) { /* Visa */
+  color: #1a1f71;
+}
+
+.tarjeta-icono:nth-child(2) { /* Mastercard */
+  color: #eb001b;
+}
+
+.tarjeta-icono:nth-child(3) { /* American Express */
+  color: #2e77bc;
+}
+
+.tarjeta-icono:nth-child(4) { /* JCB */
+  color: #0c4c8c;
+}
+
+.tarjeta-icono:hover {
+  transform: scale(1.1);
+}
+
+.medios-pago {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.medios-pago p {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
 }

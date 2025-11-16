@@ -250,6 +250,7 @@ router.get("/productos", async (req, res) => {
       nombre: producto.nombre,
       precio: producto.precio,
       stock: producto.stock,
+      descripcion: producto.descripcion, // 👈 AGREGAR descripcion AQUÍ
       idcategoria: producto.idcategoria,
       imagen_url: producto.imagen_url || null,
     }));
@@ -269,7 +270,7 @@ router.get("/productos/:id", async (req, res) => {
 
     const { data, error } = await supabase
       .from("producto")
-      .select("idproducto, nombre, precio, stock, idcategoria")
+      .select("idproducto, nombre, precio, stock, descripcion, idcategoria, imagen_url") // 👈 AGREGAR descripcion AQUÍ
       .eq("idproducto", id)
       .single();
 
@@ -285,7 +286,8 @@ router.get("/productos/:id", async (req, res) => {
       nombre: data.nombre,
       precio: data.precio,
       stock: data.stock,
-      categoria: data.idcategoria, // Aquí podrías reemplazar por el nombre real de la categoría si tienes otra tabla
+      descripcion: data.descripcion, // 👈 AGREGAR descripcion AQUÍ
+      categoria: data.idcategoria,
       imagen_url: data.imagen_url || null,
     };
 

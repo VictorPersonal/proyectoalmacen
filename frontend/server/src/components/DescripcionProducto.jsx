@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import "./DescripcionProducto.css";
 import { FaStar } from "react-icons/fa";
+import { 
+  SiVisa, 
+  SiMastercard, 
+  SiAmericanexpress, 
+  SiJcb 
+} from "react-icons/si";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -134,7 +140,12 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
           <div className="medios-pago">
             <p>Medios de pago</p>
-            <div className="logos-pago">{/* Aquí irán los logos más adelante */}</div>
+            <div className="logos-pago">
+              <SiVisa className="tarjeta-icono" title="Visa" />
+              <SiMastercard className="tarjeta-icono" title="Mastercard" />
+              <SiAmericanexpress className="tarjeta-icono" title="American Express" />
+              <SiJcb className="tarjeta-icono" title="JCB" />
+            </div>
           </div>
 
           <div className="botones-compra">
@@ -151,6 +162,7 @@ const DescripcionProducto = ({ producto, onVolver }) => {
               ← Volver
             </button>
           )}
+
         </div>
       </div>
     </div>
