@@ -1,16 +1,15 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import multer from "multer";
-import cloudinary from "cloudinary";
 import { supabase } from "../config/db.js";
 import { verificarToken } from "../controller/authMiddleware.js";
+import { supabase as supabaseDB } from "../config/supabase.js";
+import busboy from "busboy";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const router = express.Router();
-
 
 /*router.post("/upload", upload.single("image"), async (req, res) => {
   try {
@@ -234,7 +233,7 @@ router.get("/productos", async (req, res) => {
   try {
     let query = supabase
       .from("producto")
-      .select("idproducto, nombre, precio, stock, idcategoria");
+      .select("idproducto, nombre, descripcion, precio, stock, idcategoria, idmarca, imagen_url")
 
     // Si hay búsqueda, filtrar por nombre
     if (search) {
@@ -247,11 +246,11 @@ router.get("/productos", async (req, res) => {
 
     // Formatear los datos para el frontend
     const productosFormateados = data.map(producto => ({
-      id: producto.idproducto,
+      idproducto: producto.idproducto,
       nombre: producto.nombre,
       precio: producto.precio,
       stock: producto.stock,
-      categoria: producto.idcategoria,
+      idcategoria: producto.idcategoria,
       imagen_url: producto.imagen_url || null,
     }));
 
@@ -726,77 +725,304 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
   }
 });
 
-router.get("/estadisticas/ventas-mensuales",verificarToken, async (req, res) => {
+router.get("/estadisticas/productos-mas-vendidos", verificarToken, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        TO_CHAR(p.fechaelaboracionpedido, 'Mon') AS mes,
-        SUM(dp.subtotal) AS total
-      FROM pedido p
-      JOIN detallepedidoMM dp ON p.idpedido = dp.idpedido
-      GROUP BY mes
-      ORDER BY MIN(p.fechaelaboracionpedido);
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error al obtener ventas mensuales:", err);
-    res.status(500).json({ error: "Error al obtener ventas mensuales" });
-  }
-});
+    const { data, error } = await supabase
+      .from("detallepedidomm")
+      .select("cantidad, producto:producto(nombre)");
 
-// 🍰 Productos más vendidos
-router.get("/estadisticas/productos-mas-vendidos",verificarToken, async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        pr.nombre,
-        SUM(dp.cantidad) AS ventas
-      FROM detallepedidoMM dp
-      JOIN producto pr ON dp.idproducto = pr.idproducto
-      GROUP BY pr.nombre
-      ORDER BY ventas DESC
-      LIMIT 5;
-    `);
-    res.json(result.rows);
+    if (error) throw error;
+
+    const contador = {};
+    data.forEach((d) => {
+      const nombre = d.producto?.nombre || "Desconocido";
+      contador[nombre] = (contador[nombre] || 0) + d.cantidad;
+    });
+
+    const top = Object.entries(contador)
+      .map(([nombre, cantidad]) => ({ nombre, cantidad }))
+      .sort((a, b) => b.cantidad - a.cantidad)
+      .slice(0, 5);
+
+    res.json(top);
   } catch (err) {
-    console.error("Error al obtener productos más vendidos:", err);
+    console.error("❌ Error al obtener productos más vendidos:", err.message);
     res.status(500).json({ error: "Error al obtener productos más vendidos" });
   }
 });
 
+
+router.get("/estadisticas/ventas-mensuales", verificarToken, async (req, res) => {
+  try {
+    // Traer todos los detalles con el id del pedido y subtotal
+    const { data: detalles, error: errorDetalles } = await supabase
+      .from("detallepedidomm")
+      .select("idpedido, subtotal");
+
+    if (errorDetalles) throw errorDetalles;
+
+    // Traer todos los pedidos con fecha
+    const { data: pedidos, error: errorPedidos } = await supabase
+      .from("pedido")
+      .select("idpedido, fechaelaboracionpedido");
+
+    if (errorPedidos) throw errorPedidos;
+
+    // Combinar pedidos y detalles
+    const ventasPorMes = {};
+
+    detalles.forEach(detalle => {
+      const pedido = pedidos.find(p => p.idpedido === detalle.idpedido);
+      if (pedido) {
+        const fecha = new Date(pedido.fechaelaboracionpedido);
+        const mes = fecha.toLocaleString("es-ES", { month: "short", year: "numeric" });
+        ventasPorMes[mes] = (ventasPorMes[mes] || 0) + Number(detalle.subtotal);
+      }
+    });
+
+    const resultado = Object.entries(ventasPorMes).map(([mes, total]) => ({ mes, total }));
+
+    res.json(resultado);
+  } catch (err) {
+    console.error("❌ Error al obtener ventas mensuales:", err);
+    res.status(500).json({ error: "Error al obtener ventas mensuales" });
+  }
+});
+
+// ====================================================================
 // 👥 Usuarios por tipo (rol)
+// ====================================================================
 router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        COALESCE(rol, 'sin rol') AS tipo,
-        COUNT(*)::int AS cantidad
-      FROM usuario
-      GROUP BY tipo;
-    `);
-    res.json(result.rows);
+    const { data: usuarios, error } = await supabase
+      .from("usuario")
+      .select("rol");
+
+    if (error) throw error;
+
+    const conteo = usuarios.reduce((acc, u) => {
+      const rol = u.rol || "sin rol";
+      acc[rol] = (acc[rol] || 0) + 1;
+      return acc;
+    }, {});
+
+    const resultado = Object.entries(conteo).map(([tipo, cantidad]) => ({ tipo, cantidad }));
+
+    res.json(resultado);
   } catch (err) {
     console.error("Error al obtener usuarios:", err);
     res.status(500).json({ error: "Error al obtener usuarios" });
   }
 });
 
+// ====================================================================
+// 📦 Estados de pedido
+// ====================================================================
 router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        e.descripcion AS estado,
-        COUNT(p.idpedido)::int AS cantidad
-      FROM pedido p
-      JOIN estadopedido e ON p.idestadopedido = e.idestadopedido
-      GROUP BY e.descripcion
-      ORDER BY cantidad DESC;
-    `);
-    res.json(result.rows);
+    const { data: pedidos, error: errorPedidos } = await supabase
+      .from("pedido")
+      .select("idestadopedido");
+
+    if (errorPedidos) throw errorPedidos;
+
+    const { data: estados, error: errorEstados } = await supabase
+      .from("estadopedido")
+      .select("idestadopedido, descripcion");
+
+    if (errorEstados) throw errorEstados;
+
+    const conteo = estados.map(e => ({
+      estado: e.descripcion,
+      cantidad: pedidos.filter(p => p.idestadopedido === e.idestadopedido).length,
+    }));
+
+    res.json(conteo);
   } catch (err) {
     console.error("Error al obtener estados de pedido:", err);
     res.status(500).json({ error: "Error al obtener estados de pedido" });
   }
 });
+
+
+router.post("/productos/con-imagen", (req, res) => {
+  const bb = busboy({ headers: req.headers });
+  const campos = {};
+  let fileBuffer = null;
+  let filename = "";
+  let mimeType = "";
+
+  // Manejar archivo
+  bb.on("file", (name, file, info) => {
+    filename = info.filename;
+    mimeType = info.mimeType;
+
+    const chunks = [];
+    file.on("data", (chunk) => chunks.push(chunk));
+    file.on("end", () => {
+      fileBuffer = Buffer.concat(chunks);
+      console.log("Archivo recibido:", filename, "tamaño:", fileBuffer.length);
+    });
+  });
+
+  // Manejar campos
+  bb.on("field", (name, val) => {
+    campos[name] = val;
+  });
+
+  // Cuando termina de procesar el formulario
+  bb.on("close", async () => {
+    try {
+      if (!fileBuffer) {
+        return res.status(400).json({ message: "No se subió ningún archivo" });
+      }
+
+      // Subir archivo a Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabaseDB.storage
+        .from("productos") // Cambia por tu contenedor
+        .upload(`productos/${filename}`, fileBuffer, { contentType: mimeType, upsert: true });
+
+      if (uploadError) {
+        console.error("Error al subir a Supabase:", uploadError);
+        throw uploadError;
+      }
+
+      const publicURL = supabaseDB.storage
+        .from("productos") // Cambia por tu contenedor
+        .getPublicUrl(`productos/${filename}`).data.publicUrl;
+
+      console.log("Archivo subido a Supabase, URL pública:", publicURL);
+
+      // Insertar producto en la DB
+      const { data: productoCreado, error: errorInsert } = await supabaseDB
+        .from("producto")
+        .insert([{
+          nombre: campos.nombre,
+          descripcion: campos.descripcion || "",
+          precio: Number(campos.precio),
+          stock: Number(campos.stock),
+          idcategoria: Number(campos.idcategoria),
+          idmarca: campos.idmarca ? Number(campos.idmarca) : null,
+          imagen_url: publicURL,
+        }])
+        .select()
+        .single();
+
+      if (errorInsert) {
+        console.error("Error al insertar en DB:", errorInsert);
+        throw errorInsert;
+      }
+
+      res.status(201).json({ producto: productoCreado });
+    } catch (err) {
+      console.error("❌ Error al crear producto:", err);
+      res.status(500).json({ message: err.message || "Error desconocido al crear producto", stack: err.stack });
+    }
+  });
+
+  req.pipe(bb);
+});
+
+router.delete("/productos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Opcional: eliminar imagen del Storage si existe
+    const { data: producto } = await supabaseDB
+      .from("producto")
+      .select("imagen_url")
+      .eq("idproducto", id)
+      .single();
+
+    if (producto?.imagen_url) {
+      const filePath = producto.imagen_url.split("/").pop(); // Ajusta según tu estructura
+      await supabaseDB.storage
+        .from("nombre-de-tu-contenedor")
+        .remove([`productos/${filePath}`]);
+    }
+
+    // Eliminar producto de la tabla
+    const { error: deleteError } = await supabaseDB
+      .from("producto")
+      .delete()
+      .eq("idproducto", id);
+
+    if (deleteError) throw deleteError;
+
+    res.status(200).json({ message: "Producto eliminado correctamente" });
+  } catch (err) {
+    console.error("❌ Error al eliminar producto:", err);
+    res.status(500).json({ message: "Error al eliminar producto" });
+  }
+});
+
+router.put("/productos/:id/con-imagen", (req, res) => {
+  const { id } = req.params;
+  const bb = busboy({ headers: req.headers });
+  const campos = {};
+  let fileBuffer = null;
+  let filename = "";
+  let mimeType = "";
+
+  bb.on("file", (name, file, info) => {
+    filename = info.filename;
+    mimeType = info.mimeType;
+
+    const chunks = [];
+    file.on("data", (chunk) => chunks.push(chunk));
+    file.on("end", () => {
+      fileBuffer = Buffer.concat(chunks);
+    });
+  });
+
+  bb.on("field", (name, val) => {
+    campos[name] = val;
+  });
+
+  bb.on("close", async () => {
+    try {
+      let publicURL;
+
+      if (fileBuffer) {
+        // Subir nueva imagen a Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabaseDB.storage
+          .from("productos") // Cambia por tu contenedor
+          .upload(`productos/${filename}`, fileBuffer, { contentType: mimeType, upsert: true });
+        if (uploadError) throw uploadError;
+
+        publicURL = supabaseDB.storage
+          .from("productos") // Cambia por tu contenedor
+          .getPublicUrl(`productos/${filename}`).data.publicUrl;
+      }
+
+      // Actualizar producto en DB
+      const { data: productoActualizado, error: errorUpdate } = await supabaseDB
+        .from("producto")
+        .update({
+          nombre: campos.nombre,
+          descripcion: campos.descripcion,
+          precio: Number(campos.precio),
+          stock: Number(campos.stock),
+          idcategoria: Number(campos.idcategoria),
+          idmarca: campos.idmarca ? Number(campos.idmarca) : null,
+          ...(publicURL && { imagen_url: publicURL }),
+        })
+        .eq("idproducto", id)
+        .select()
+        .single();
+
+      if (errorUpdate) throw errorUpdate;
+
+      res.status(200).json({ producto: productoActualizado });
+    } catch (err) {
+      console.error("❌ Error al editar producto:", err);
+      res.status(500).json({ message: "Error al editar producto" });
+    }
+  });
+
+  req.pipe(bb);
+});
+
+
 
 export default router;

@@ -1,203 +1,170 @@
 import React, { useState, useEffect } from "react";
 import "./PanelAdmin.css";
-import axios from "axios";
 import Dashboard from "../components/dashboard";
-
-const API_URL = "http://localhost:4000/api/productos";
+import axios from "axios";
 
 const PanelAdmin = () => {
+  const [currentSection, setCurrentSection] = useState("productos");
+  const [modalVisible, setModalVisible] = useState(false);
   const [products, setProducts] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [currentSection, setCurrentSection] = useState("productos"); // 🆕 nueva vista
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 5;
+  const [editingProduct, setEditingProduct] = useState(null);
 
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
     stock: "",
-    categoria: "",
+    descripcion: "",
+    idcategoria: "",
+    idmarca: "",
     imagen: null,
   });
 
-  const [currentId, setCurrentId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const fetchProducts = () => {
-    setCargando(true);
-    axios
-      .get(API_URL)
-      .then((res) => {
-        setProducts(res.data);
-        setError(null);
-      })
-      .catch((err) => {
-        console.error("Error al cargar productos:", err);
-        setError(
-          `Error de conexión. Asegúrate de que el backend esté activo en ${API_URL}`
-        );
-        setProducts([]);
-      })
-      .finally(() => {
-        setCargando(false);
-      });
-  };
-
+  // Traer productos al cargar el componente
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/productos");
+        setProducts(res.data);
+      } catch (err) {
+        console.error("Error al obtener productos:", err.response?.data || err.message);
+      }
+    };
     fetchProducts();
   }, []);
 
-  const filteredProducts = products.filter((p) =>
-    p.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setFormData({
-      nombre: "",
-      precio: "",
-      stock: "",
-      categoria: "",
-      imagen: null,
-    });
-    setCurrentId(null);
+  // Manejar cambios de input
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (files) {
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
-  const handleShowModal = (product = null) => {
-    setCurrentId(product?.id || null);
-    const initialFormData = product
-      ? {
-          ...product,
-          precio: String(product.precio || ""),
-          stock: String(product.stock || ""),
-          categoria: String(product.categoria || ""),
-          imagen: null,
-        }
-      : { nombre: "", precio: "", stock: "", categoria: "", imagen: null };
-    setFormData(initialFormData);
-    setShowModal(true);
-  };
-
-  const handleSave = async () => {
-    if (!formData.nombre || !formData.precio || !formData.stock || !formData.categoria) {
-      alert("Por favor completa todos los campos obligatorios.");
-      return;
+  // Guardar producto (crear o editar)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    for (const key in formData) {
+      if (formData[key]) data.append(key, formData[key]);
     }
 
     try {
-      let imageUrl = null;
-      if (formData.imagen) {
-        const imageData = new FormData();
-        imageData.append("imagen", formData.imagen);
-
-        const uploadRes = await axios.post(
-          "http://localhost:4000/api/productos/upload",
-          imageData,
+      if (editingProduct) {
+        // Editar producto
+        const res = await axios.put(
+          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
+          data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
-
-        imageUrl = uploadRes.data.secure_url;
-      }
-
-      const payload = {
-        nombre: formData.nombre,
-        precio: parseFloat(formData.precio),
-        stock: parseInt(formData.stock),
-        categoria: parseInt(formData.categoria),
-        imagen_url: imageUrl || formData.imagen_url || null,
-      };
-
-      if (currentId) {
-        await axios.put(`${API_URL}/${currentId}`, payload);
+        setProducts(products.map(p => p.idproducto === editingProduct.idproducto ? res.data.producto : p));
+        setEditingProduct(null);
       } else {
-        await axios.post(API_URL, payload);
+        // Crear producto
+        const res = await axios.post(
+          "http://localhost:4000/api/productos/con-imagen",
+          data,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        setProducts([...products, res.data.producto]);
       }
-
-      fetchProducts();
-      handleCloseModal();
+      setModalVisible(false);
+      setFormData({
+        nombre: "",
+        precio: "",
+        stock: "",
+        descripcion: "",
+        idcategoria: "",
+        idmarca: "",
+        imagen: null,
+      });
     } catch (err) {
-      console.error("Error al guardar producto:", err);
-      alert("Error al guardar producto. Revisa la consola.");
+      console.error("Error al guardar producto:", err.response?.data || err.message);
+      alert("Error al guardar producto");
     }
   };
 
-  const handleDelete = (id) => {
-    if (!id) return;
-    if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
-      axios
-        .delete(`${API_URL}/${id}`)
-        .then(() => fetchProducts())
-        .catch((err) => console.error("Error al eliminar:", err));
+  // Eliminar producto
+  const handleDelete = async (id) => {
+    if (!window.confirm("¿Estás seguro de eliminar este producto?")) return;
+    try {
+      await axios.delete(`http://localhost:4000/api/productos/${id}`);
+      setProducts(products.filter(p => p.idproducto !== id));
+    } catch (err) {
+      console.error("Error al eliminar producto:", err.response?.data || err.message);
+      alert("Error al eliminar producto");
     }
+  };
+
+  // Preparar formulario para editar
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setFormData({
+      nombre: product.nombre,
+      precio: product.precio,
+      stock: product.stock,
+      descripcion: product.descripcion || "",
+      idcategoria: product.idcategoria,
+      idmarca: product.idmarca || "",
+      imagen: null,
+    });
+    setModalVisible(true);
+  };
+
+  // Paginación
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(products.length / productsPerPage);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   return (
     <div className="admin-panel">
-      {/* 🧭 Sidebar */}
       <aside className="sidebar">
         <div className="admin-profile">
           <div className="admin-avatar">👤</div>
           <span className="admin-name">Admin Enrique</span>
         </div>
-
         <nav className="sidebar-nav">
           <a
             href="#"
             className={`nav-item ${currentSection === "productos" ? "active" : ""}`}
             onClick={() => setCurrentSection("productos")}
           >
-            <span className="nav-icon">📦</span> Productos
+            📦 Productos
           </a>
-
           <a
             href="#"
             className={`nav-item ${currentSection === "dashboard" ? "active" : ""}`}
             onClick={() => setCurrentSection("dashboard")}
           >
-            <span className="nav-icon">📊</span> Dashboard
+            📊 Dashboard
           </a>
         </nav>
       </aside>
 
-      {/* 🧩 Contenido principal */}
       <main className="main-content">
         {currentSection === "productos" && (
           <>
-            <div className="search-wrapper">
-              <div className="search-container">
-                <span className="search-icon">🔍</span>
-                <input
-                  type="text"
-                  placeholder="Buscar productos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-
             <div className="form-wrapper">
-              <button className="btn btn--add" onClick={() => handleShowModal()}>
-                ➕ Agregar
-              </button>
+              <button className="btn btn--add" onClick={() => setModalVisible(true)}>➕ Agregar</button>
             </div>
-
-            {error && (
-              <div className="error-message" style={{ color: "red", margin: "10px 0" }}>
-                {error}
-              </div>
-            )}
 
             <div className="table-wrapper">
               <table className="products-table">
                 <thead>
                   <tr>
-                    <th>Id</th>
+                    <th>ID</th>
                     <th>Imagen</th>
                     <th>Nombre</th>
                     <th>Precio</th>
@@ -207,142 +174,64 @@ const PanelAdmin = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {cargando ? (
-                    <tr>
-                      <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
-                        Cargando datos...
-                      </td>
-                    </tr>
-                  ) : currentItems.length > 0 ? (
-                    currentItems.map((product) => (
-                      <tr key={product.id}>
-                        <td>{product.id}</td>
+                  {currentProducts.length === 0 ? (
+                    <tr><td colSpan="7">No hay productos</td></tr>
+                  ) : (
+                    currentProducts.map(prod => (
+                      <tr key={prod.idproducto}>
+                        <td>{prod.idproducto}</td>
+                        <td>{prod.imagen_url && <img src={prod.imagen_url} alt={prod.nombre} width="50" />}</td>
+                        <td>{prod.nombre}</td>
+                        <td>${prod.precio}</td>
+                        <td>{prod.stock}</td>
+                        <td>{prod.idcategoria}</td>
                         <td>
-                          {product.imagen_url ? (
-                            <img
-                              src={product.imagen_url}
-                              alt={product.nombre}
-                              style={{
-                                width: "60px",
-                                height: "60px",
-                                objectFit: "cover",
-                                borderRadius: "6px",
-                              }}
-                            />
-                          ) : (
-                            "Sin imagen"
-                          )}
-                        </td>
-                        <td>{product.nombre}</td>
-                        <td>${parseFloat(product.precio || 0).toFixed(2)}</td>
-                        <td>{product.stock}</td>
-                        <td>{product.categoria || "N/A"}</td>
-                        <td className="actions-cell">
-                          <button
-                            className="btn btn--edit"
-                            onClick={() => handleShowModal(product)}
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            className="btn btn--delete"
-                            onClick={() => handleDelete(product.id)}
-                          >
-                            🗑
-                          </button>
+                          <button className="btn btn--edit" onClick={() => handleEdit(prod)}>✏️ Editar</button>
+                          <button className="btn btn--delete" onClick={() => handleDelete(prod.idproducto)}>🗑️ Eliminar</button>
                         </td>
                       </tr>
                     ))
-                  ) : (
-                    <tr>
-                      <td colSpan="7" style={{ textAlign: "center", padding: "10px" }}>
-                        No se encontraron productos.
-                      </td>
-                    </tr>
                   )}
                 </tbody>
               </table>
             </div>
 
             <div className="pagination">
-              <button
-                className="page-btn"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                ‹
-              </button>
-              {[...Array(totalPages)].map((_, index) => (
-                <span
-                  key={index + 1}
-                  className={`page-number ${currentPage === index + 1 ? "active" : ""}`}
-                  onClick={() => setCurrentPage(index + 1)}
+              <button className="page-btn" onClick={handlePrevPage} disabled={currentPage === 1}>‹</button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  className={`page-number ${currentPage === i + 1 ? "active" : ""}`}
+                  onClick={() => setCurrentPage(i + 1)}
                 >
-                  {index + 1}
-                </span>
+                  {i + 1}
+                </button>
               ))}
-              <button
-                className="page-btn"
-                onClick={() =>
-                  setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))
-                }
-                disabled={currentPage === totalPages}
-              >
-                ›
-              </button>
+              <button className="page-btn" onClick={handleNextPage} disabled={currentPage === totalPages}>›</button>
             </div>
           </>
         )}
 
-        {/* 🆕 Dashboard integrado */}
         {currentSection === "dashboard" && <Dashboard />}
       </main>
 
-      {/* Modal */}
-      {showModal && (
+      {modalVisible && (
         <div className="modal">
           <div className="modal-content">
-            <h3>{currentId ? "Editar Producto" : "Agregar Producto"}</h3>
-            <input
-              type="text"
-              placeholder="Nombre"
-              value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="Precio"
-              value={formData.precio}
-              onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="Stock"
-              value={formData.stock}
-              onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="ID Categoría (Ej: 1)"
-              value={formData.categoria}
-              onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setFormData({ ...formData, imagen: e.target.files[0] })
-              }
-            />
-
-            <div className="modal-actions">
-              <button className="btn btn--add" onClick={handleSave}>
-                💾 Guardar
-              </button>
-              <button className="btn btn--delete" onClick={handleCloseModal}>
-                ❌ Cancelar
-              </button>
-            </div>
+            <h3>{editingProduct ? "Editar Producto" : "Agregar Producto"}</h3>
+            <form onSubmit={handleSubmit}>
+              <input type="text" name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} required />
+              <input type="number" name="precio" placeholder="Precio" value={formData.precio} onChange={handleChange} required />
+              <input type="number" name="stock" placeholder="Stock" value={formData.stock} onChange={handleChange} required />
+              <input type="text" name="descripcion" placeholder="Descripción" value={formData.descripcion} onChange={handleChange} />
+              <input type="number" name="idcategoria" placeholder="ID Categoría" value={formData.idcategoria} onChange={handleChange} required />
+              <input type="number" name="idmarca" placeholder="ID Marca" value={formData.idmarca} onChange={handleChange} />
+              <input type="file" name="imagen" accept="image/*" onChange={handleChange} />
+              <div className="modal-actions">
+                <button type="submit" className="btn btn--add">💾 Guardar</button>
+                <button type="button" className="btn btn--delete" onClick={() => {setModalVisible(false); setEditingProduct(null);}}>❌ Cancelar</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

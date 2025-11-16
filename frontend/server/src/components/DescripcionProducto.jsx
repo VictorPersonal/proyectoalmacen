@@ -7,6 +7,11 @@ import { useNavigate } from "react-router-dom";
 const DescripcionProducto = ({ producto, onVolver }) => {
   const [cantidad, setCantidad] = useState(1);
   const navigate = useNavigate();
+  
+  // 👇 DEBUG DETALLADO - Agrega esto para verificar
+  console.log("Producto completo:", producto);
+  console.log("Descripción:", producto?.descripcion);
+  console.log("Todas las propiedades:", Object.keys(producto || {}));
 
   if (!producto || !producto.nombre) {
     return (
@@ -24,19 +29,16 @@ const DescripcionProducto = ({ producto, onVolver }) => {
   // 👉 Función para agregar al carrito (con token vía cookies)
   const handleAgregarCarrito = async () => {
     try {
-      // Ya no tomamos la cédula ni el token desde localStorage
-      // El backend leerá el usuario autenticado desde las cookies
-
       const productoData = {
         idproducto: producto.id_producto || producto.id || producto.idproducto,
-        cantidad: cantidad,
+        cantidad: cantidad, 
       };
 
       const res = await axios.post(
         "http://localhost:4000/api/carrito/agregar",
         productoData,
         {
-          withCredentials: true, // 👈 Esto envía automáticamente las cookies al backend
+          withCredentials: true,
         }
       );
 
@@ -45,7 +47,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
     } catch (error) {
       console.error("❌ Error al agregar producto:", error);
 
-      // Si el token expiró o no hay sesión, redirigimos al login
       if (error.response?.status === 401 || error.response?.status === 403) {
         alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
         navigate("/login");
@@ -66,7 +67,21 @@ const DescripcionProducto = ({ producto, onVolver }) => {
         {/* 📦 Imagen */}
         <div className="producto-imagen-placeholder">
           <div className="imagen-cuadro">
-            <p>Imagen del producto</p>
+            {producto.imagen_url ? (
+              <img 
+                src={producto.imagen_url} 
+                alt={producto.nombre}
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'contain',
+                  borderRadius: '8px',
+                  background: '#f5f5f5'
+                }}
+              />
+            ) : (
+              <p>Imagen del producto</p>
+            )}
           </div>
           <div className="imagen-circulos">
             {[...Array(4)].map((_, i) => (
@@ -78,7 +93,19 @@ const DescripcionProducto = ({ producto, onVolver }) => {
         {/* 📋 Información */}
         <div className="producto-info">
           <h2>{producto.nombre}</h2>
-          <p>{producto.descripcion}</p>
+          
+          {/* 👇 DESCRIPCIÓN CON VALIDACIÓN MEJORADA */}
+          {producto.descripcion ? (
+            <p className="producto-descripcion">{producto.descripcion}</p>
+          ) : producto.descripcion_producto ? (
+            <p className="producto-descripcion">{producto.descripcion_producto}</p>
+          ) : producto.descripcion_text ? (
+            <p className="producto-descripcion">{producto.descripcion_text}</p>
+          ) : (
+            <p className="producto-descripcion sin-descripcion">
+              Este producto no tiene descripción disponible.
+            </p>
+          )}
 
           <div className="producto-calificacion">
             {[...Array(5)].map((_, i) => (
@@ -97,6 +124,7 @@ const DescripcionProducto = ({ producto, onVolver }) => {
               <option value={1}>1 unidad</option>
               <option value={2}>2 unidades</option>
               <option value={3}>3 unidades</option>
+              <option value={4}>4 unidades</option>
             </select>
 
             <div className="producto-stock">

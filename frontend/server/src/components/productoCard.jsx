@@ -6,11 +6,17 @@ const ProductoCard = ({ producto }) => {
 
   return (
     <div className="producto-card">
-      <div className="imagen-placeholder">Imagen</div>
-      <h3>{producto.nombre}</h3>
-      <p className="precio">
-        ${isNaN(precio) ? "0.00" : precio.toFixed(2)}
-      </p>
+      {producto.imagen_url ? (
+        <div className="imagen-placeholder">
+          <img src={producto.imagen_url} alt={producto.nombre} />
+        </div>
+      ) : (
+        <div className="imagen-placeholder">Sin imagen</div>
+      )}
+      <div className="producto-info">
+        <h3 className="producto-nombre">{producto.nombre}</h3>
+        <p className="precio">${Number(producto.precio).toFixed(2)}</p>
+      </div>
     </div>
   );
 };
