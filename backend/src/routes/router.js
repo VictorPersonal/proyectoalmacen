@@ -725,78 +725,125 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
   }
 });
 
-router.get("/estadisticas/ventas-mensuales",verificarToken, async (req, res) => {
+router.get("/estadisticas/productos-mas-vendidos", verificarToken, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        TO_CHAR(p.fechaelaboracionpedido, 'Mon') AS mes,
-        SUM(dp.subtotal) AS total
-      FROM pedido p
-      JOIN detallepedidoMM dp ON p.idpedido = dp.idpedido
-      GROUP BY mes
-      ORDER BY MIN(p.fechaelaboracionpedido);
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error al obtener ventas mensuales:", err);
-    res.status(500).json({ error: "Error al obtener ventas mensuales" });
-  }
-});
+    const { data, error } = await supabase
+      .from("detallepedidomm")
+      .select("cantidad, producto:producto(nombre)");
 
-// 🍰 Productos más vendidos
-router.get("/estadisticas/productos-mas-vendidos",verificarToken, async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        pr.nombre,
-        SUM(dp.cantidad) AS ventas
-      FROM detallepedidoMM dp
-      JOIN producto pr ON dp.idproducto = pr.idproducto
-      GROUP BY pr.nombre
-      ORDER BY ventas DESC
-      LIMIT 5;
-    `);
-    res.json(result.rows);
+    if (error) throw error;
+
+    const contador = {};
+    data.forEach((d) => {
+      const nombre = d.producto?.nombre || "Desconocido";
+      contador[nombre] = (contador[nombre] || 0) + d.cantidad;
+    });
+
+    const top = Object.entries(contador)
+      .map(([nombre, cantidad]) => ({ nombre, cantidad }))
+      .sort((a, b) => b.cantidad - a.cantidad)
+      .slice(0, 5);
+
+    res.json(top);
   } catch (err) {
-    console.error("Error al obtener productos más vendidos:", err);
+    console.error("❌ Error al obtener productos más vendidos:", err.message);
     res.status(500).json({ error: "Error al obtener productos más vendidos" });
   }
 });
 
+
+router.get("/estadisticas/ventas-mensuales", verificarToken, async (req, res) => {
+  try {
+    // Traer todos los detalles con el id del pedido y subtotal
+    const { data: detalles, error: errorDetalles } = await supabase
+      .from("detallepedidomm")
+      .select("idpedido, subtotal");
+
+    if (errorDetalles) throw errorDetalles;
+
+    // Traer todos los pedidos con fecha
+    const { data: pedidos, error: errorPedidos } = await supabase
+      .from("pedido")
+      .select("idpedido, fechaelaboracionpedido");
+
+    if (errorPedidos) throw errorPedidos;
+
+    // Combinar pedidos y detalles
+    const ventasPorMes = {};
+
+    detalles.forEach(detalle => {
+      const pedido = pedidos.find(p => p.idpedido === detalle.idpedido);
+      if (pedido) {
+        const fecha = new Date(pedido.fechaelaboracionpedido);
+        const mes = fecha.toLocaleString("es-ES", { month: "short", year: "numeric" });
+        ventasPorMes[mes] = (ventasPorMes[mes] || 0) + Number(detalle.subtotal);
+      }
+    });
+
+    const resultado = Object.entries(ventasPorMes).map(([mes, total]) => ({ mes, total }));
+
+    res.json(resultado);
+  } catch (err) {
+    console.error("❌ Error al obtener ventas mensuales:", err);
+    res.status(500).json({ error: "Error al obtener ventas mensuales" });
+  }
+});
+
+// ====================================================================
 // 👥 Usuarios por tipo (rol)
+// ====================================================================
 router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        COALESCE(rol, 'sin rol') AS tipo,
-        COUNT(*)::int AS cantidad
-      FROM usuario
-      GROUP BY tipo;
-    `);
-    res.json(result.rows);
+    const { data: usuarios, error } = await supabase
+      .from("usuario")
+      .select("rol");
+
+    if (error) throw error;
+
+    const conteo = usuarios.reduce((acc, u) => {
+      const rol = u.rol || "sin rol";
+      acc[rol] = (acc[rol] || 0) + 1;
+      return acc;
+    }, {});
+
+    const resultado = Object.entries(conteo).map(([tipo, cantidad]) => ({ tipo, cantidad }));
+
+    res.json(resultado);
   } catch (err) {
     console.error("Error al obtener usuarios:", err);
     res.status(500).json({ error: "Error al obtener usuarios" });
   }
 });
 
+// ====================================================================
+// 📦 Estados de pedido
+// ====================================================================
 router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        e.descripcion AS estado,
-        COUNT(p.idpedido)::int AS cantidad
-      FROM pedido p
-      JOIN estadopedido e ON p.idestadopedido = e.idestadopedido
-      GROUP BY e.descripcion
-      ORDER BY cantidad DESC;
-    `);
-    res.json(result.rows);
+    const { data: pedidos, error: errorPedidos } = await supabase
+      .from("pedido")
+      .select("idestadopedido");
+
+    if (errorPedidos) throw errorPedidos;
+
+    const { data: estados, error: errorEstados } = await supabase
+      .from("estadopedido")
+      .select("idestadopedido, descripcion");
+
+    if (errorEstados) throw errorEstados;
+
+    const conteo = estados.map(e => ({
+      estado: e.descripcion,
+      cantidad: pedidos.filter(p => p.idestadopedido === e.idestadopedido).length,
+    }));
+
+    res.json(conteo);
   } catch (err) {
     console.error("Error al obtener estados de pedido:", err);
     res.status(500).json({ error: "Error al obtener estados de pedido" });
   }
 });
+
 
 router.post("/productos/con-imagen", (req, res) => {
   const bb = busboy({ headers: req.headers });
