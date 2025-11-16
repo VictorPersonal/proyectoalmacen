@@ -12,26 +12,23 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Middlewares
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173", // tu frontend
+  origin: "http://localhost:5173",
   credentials: true,
 }));
-app.use(express.json());
 
-// 🔹 Inyectar supabase en cada request (opcional pero útil)
+// 🔹 Inyectar supabase en cada request
 app.use((req, res, next) => {
   req.supabase = supabase;
   next();
 });
 
-// ✅ Rutas
-app.use("/api/auth", authRoutes);
-app.use("/api", router);
-app.use("/api/stripe", stripeRoutes);
+// ✅ Rutas - aplicar express.json() SOLO donde sea necesario
+app.use("/api/auth", express.json(), authRoutes);
+app.use("/api", router); // Esta ruta usa busboy para FormData
+app.use("/api/stripe", express.json(), stripeRoutes);
 
-// ✅ Servidor
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);

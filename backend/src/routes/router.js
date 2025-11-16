@@ -1,16 +1,15 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import multer from "multer";
-import cloudinary from "cloudinary";
 import { supabase } from "../config/db.js";
 import { verificarToken } from "../controller/authMiddleware.js";
+import { supabase as supabaseDB } from "../config/supabase.js";
+import busboy from "busboy";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const router = express.Router();
-
 
 /*router.post("/upload", upload.single("image"), async (req, res) => {
   try {
@@ -234,7 +233,7 @@ router.get("/productos", async (req, res) => {
   try {
     let query = supabase
       .from("producto")
-      .select("idproducto, nombre, precio, stock, idcategoria");
+      .select("idproducto, nombre, descripcion, precio, stock, idcategoria, idmarca, imagen_url")
 
     // Si hay búsqueda, filtrar por nombre
     if (search) {
@@ -247,11 +246,11 @@ router.get("/productos", async (req, res) => {
 
     // Formatear los datos para el frontend
     const productosFormateados = data.map(producto => ({
-      id: producto.idproducto,
+      idproducto: producto.idproducto,
       nombre: producto.nombre,
       precio: producto.precio,
       stock: producto.stock,
-      categoria: producto.idcategoria,
+      idcategoria: producto.idcategoria,
       imagen_url: producto.imagen_url || null,
     }));
 
@@ -854,5 +853,185 @@ router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => 
     res.status(500).json({ error: "Error al obtener estados de pedido" });
   }
 });
+
+router.post("/productos/con-imagen", (req, res) => {
+  const bb = busboy({ headers: req.headers });
+  const campos = {};
+  let fileBuffer = null;
+  let filename = "";
+  let mimeType = "";
+
+  // Manejar archivo
+  bb.on("file", (name, file, info) => {
+    filename = info.filename;
+    mimeType = info.mimeType;
+
+    const chunks = [];
+    file.on("data", (chunk) => chunks.push(chunk));
+    file.on("end", () => {
+      fileBuffer = Buffer.concat(chunks);
+      console.log("Archivo recibido:", filename, "tamaño:", fileBuffer.length);
+    });
+  });
+
+  // Manejar campos
+  bb.on("field", (name, val) => {
+    campos[name] = val;
+  });
+
+  // Cuando termina de procesar el formulario
+  bb.on("close", async () => {
+    try {
+      if (!fileBuffer) {
+        return res.status(400).json({ message: "No se subió ningún archivo" });
+      }
+
+      // Subir archivo a Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabaseDB.storage
+        .from("productos") // Cambia por tu contenedor
+        .upload(`productos/${filename}`, fileBuffer, { contentType: mimeType, upsert: true });
+
+      if (uploadError) {
+        console.error("Error al subir a Supabase:", uploadError);
+        throw uploadError;
+      }
+
+      const publicURL = supabaseDB.storage
+        .from("productos") // Cambia por tu contenedor
+        .getPublicUrl(`productos/${filename}`).data.publicUrl;
+
+      console.log("Archivo subido a Supabase, URL pública:", publicURL);
+
+      // Insertar producto en la DB
+      const { data: productoCreado, error: errorInsert } = await supabaseDB
+        .from("producto")
+        .insert([{
+          nombre: campos.nombre,
+          descripcion: campos.descripcion || "",
+          precio: Number(campos.precio),
+          stock: Number(campos.stock),
+          idcategoria: Number(campos.idcategoria),
+          idmarca: campos.idmarca ? Number(campos.idmarca) : null,
+          imagen_url: publicURL,
+        }])
+        .select()
+        .single();
+
+      if (errorInsert) {
+        console.error("Error al insertar en DB:", errorInsert);
+        throw errorInsert;
+      }
+
+      res.status(201).json({ producto: productoCreado });
+    } catch (err) {
+      console.error("❌ Error al crear producto:", err);
+      res.status(500).json({ message: err.message || "Error desconocido al crear producto", stack: err.stack });
+    }
+  });
+
+  req.pipe(bb);
+});
+
+router.delete("/productos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Opcional: eliminar imagen del Storage si existe
+    const { data: producto } = await supabaseDB
+      .from("producto")
+      .select("imagen_url")
+      .eq("idproducto", id)
+      .single();
+
+    if (producto?.imagen_url) {
+      const filePath = producto.imagen_url.split("/").pop(); // Ajusta según tu estructura
+      await supabaseDB.storage
+        .from("nombre-de-tu-contenedor")
+        .remove([`productos/${filePath}`]);
+    }
+
+    // Eliminar producto de la tabla
+    const { error: deleteError } = await supabaseDB
+      .from("producto")
+      .delete()
+      .eq("idproducto", id);
+
+    if (deleteError) throw deleteError;
+
+    res.status(200).json({ message: "Producto eliminado correctamente" });
+  } catch (err) {
+    console.error("❌ Error al eliminar producto:", err);
+    res.status(500).json({ message: "Error al eliminar producto" });
+  }
+});
+
+router.put("/productos/:id/con-imagen", (req, res) => {
+  const { id } = req.params;
+  const bb = busboy({ headers: req.headers });
+  const campos = {};
+  let fileBuffer = null;
+  let filename = "";
+  let mimeType = "";
+
+  bb.on("file", (name, file, info) => {
+    filename = info.filename;
+    mimeType = info.mimeType;
+
+    const chunks = [];
+    file.on("data", (chunk) => chunks.push(chunk));
+    file.on("end", () => {
+      fileBuffer = Buffer.concat(chunks);
+    });
+  });
+
+  bb.on("field", (name, val) => {
+    campos[name] = val;
+  });
+
+  bb.on("close", async () => {
+    try {
+      let publicURL;
+
+      if (fileBuffer) {
+        // Subir nueva imagen a Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabaseDB.storage
+          .from("productos") // Cambia por tu contenedor
+          .upload(`productos/${filename}`, fileBuffer, { contentType: mimeType, upsert: true });
+        if (uploadError) throw uploadError;
+
+        publicURL = supabaseDB.storage
+          .from("productos") // Cambia por tu contenedor
+          .getPublicUrl(`productos/${filename}`).data.publicUrl;
+      }
+
+      // Actualizar producto en DB
+      const { data: productoActualizado, error: errorUpdate } = await supabaseDB
+        .from("producto")
+        .update({
+          nombre: campos.nombre,
+          descripcion: campos.descripcion,
+          precio: Number(campos.precio),
+          stock: Number(campos.stock),
+          idcategoria: Number(campos.idcategoria),
+          idmarca: campos.idmarca ? Number(campos.idmarca) : null,
+          ...(publicURL && { imagen_url: publicURL }),
+        })
+        .eq("idproducto", id)
+        .select()
+        .single();
+
+      if (errorUpdate) throw errorUpdate;
+
+      res.status(200).json({ producto: productoActualizado });
+    } catch (err) {
+      console.error("❌ Error al editar producto:", err);
+      res.status(500).json({ message: "Error al editar producto" });
+    }
+  });
+
+  req.pipe(bb);
+});
+
+
 
 export default router;
