@@ -320,7 +320,7 @@ const Home = () => {
             </button>
           </section>
 
-          {/* MAS INFORMACIÓN — SOLO SI NO SE HA ESCRITO NADA */}
+          {/* MAS INFORMACIÓN */}
           {busqueda.trim().length === 0 && (
             <div className="info-toggle-wrapper">
               <button
@@ -332,17 +332,41 @@ const Home = () => {
 
               {menuMasInfo && (
                 <div className="info-panel">
+
                   <div className="info-column">
                     <h4>Acerca de</h4>
-                    <a href="#">Dulce Hogar</a>
+                    <Link to="/Acerca-de/Dulce-Hogar">Dulce Hogar</Link>
                   </div>
 
                   <div className="info-column">
                     <h4>Redes sociales</h4>
-                    <a href="#">Facebook</a>
-                    <a href="#">Instagram</a>
-                    <a href="#">WhatsApp</a>
+
+                    <a
+                      href="https://www.facebook.com/dulce.hogar.3192479"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Facebook
+                    </a>
+
+                    <a
+                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Instagram
+                    </a>
+
+                    {/* CORREGIDO */}
+                    <a
+                      href="https://wa.me/573103749429?text=Hola,+quiero+más+información"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      WhatsApp
+                    </a>
                   </div>
+
                 </div>
               )}
             </div>
@@ -375,7 +399,7 @@ const Home = () => {
             <p className="no-result">No se encontraron productos.</p>
           )}
 
-          {/* MAS INFORMACIÓN — SOLO SI NO SE HA ESCRITO NADA Y NO HAY PRODUCTOS */}
+          {/* MAS INFORMACIÓN - BUSQUEDA VACÍA */}
           {busqueda.trim().length === 0 && productos.length === 0 && (
             <div className="info-toggle-wrapper">
               <button
@@ -387,17 +411,35 @@ const Home = () => {
 
               {menuMasInfo && (
                 <div className="info-panel">
-                  <div className="info-column">
-                    <h4>Acerca de</h4>
-                    <a href="#">Dulce Hogar</a>
-                  </div>
 
                   <div className="info-column">
                     <h4>Redes sociales</h4>
-                    <a href="#">Facebook</a>
-                    <a href="#">Instagram</a>
-                    <a href="#">WhatsApp</a>
+
+                    <a
+                      href="https://www.facebook.com/dulce.hogar.3192479"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Facebook
+                    </a>
+
+                    <a
+                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Instagram
+                    </a>
+                    <a
+                      href="https://api.whatsapp.com/send?phone=573103749429&text=Hola,%20quiero%20más%20información"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      WhatsApp
+                    </a>
+
                   </div>
+
                 </div>
               )}
             </div>

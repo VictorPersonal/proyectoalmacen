@@ -1,0 +1,80 @@
+/* ============================================
+   FONDO GENERAL SOLO PARA ESTA PÁGINA
+=============================================== */
+.historia-page {
+  background: #d6d5d5 !important; /* elimina gris/blanco del layout */
+  min-height: 100vh;
+  padding: 50px 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* ============================================
+   TARJETA CENTRAL
+=============================================== */
+.historia-container {
+  max-width: 900px;
+  width: 90%;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.7;
+  color: #333;
+}
+
+/* ============================================
+   TÍTULOS
+=============================================== */
+.historia-container h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #d64550;
+  margin-bottom: 25px;
+  font-weight: 700;
+}
+
+.historia-container h2 {
+  margin-top: 30px;
+  font-size: 1.7rem;
+  color: #b22e39;
+  border-left: 6px solid #d64550;
+  padding-left: 10px;
+  font-weight: 600;
+}
+
+/* ============================================
+   PÁRRAFOS & LISTA
+=============================================== */
+.historia-container p {
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+  color: #444;
+}
+
+.historia-container ul {
+  margin: 15px 0 25px 25px;
+}
+
+.historia-container li {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   RESPONSIVE
+=============================================== */
+@media (max-width: 700px) {
+  .historia-container {
+    padding: 25px;
+  }
+
+  .historia-container h1 {
+    font-size: 2rem;
+  }
+
+  .historia-container h2 {
+    font-size: 1.4rem;
+  }
+}
