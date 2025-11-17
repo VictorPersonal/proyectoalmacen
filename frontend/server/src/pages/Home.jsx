@@ -10,6 +10,7 @@ import DescripcionProducto from "../components/DescripcionProducto";
 import Carrito from "../components/Carrito";
 
 const Home = () => {
+  const [menuMasInfo, setMenuMasInfo] = useState(false);
   const images = [image1, image2];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -352,6 +353,30 @@ const Home = () => {
           )}
         </main>
       )}
+      {/* MENÚ DESPLEGABLE*/}
+      <div className="info-toggle-wrapper">
+        <button
+          className="info-toggle-btn"
+          onClick={() => setMenuMasInfo(!menuMasInfo)}
+        >
+          Más información ▾
+        </button>
+
+        {menuMasInfo && (
+          <div className="info-panel">
+            <div className="info-column">
+              <h4>Acerca de</h4>
+              <a href="#">Dulce Hogar</a>
+            </div>
+            <div className="info-column">
+              <h4>Redes sociales</h4>
+              <a href="#">Facebook</a>
+              <a href="#">Instagram</a>
+              <a href="#">WhatsApp</a>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* PIE DE PÁGINA */}
       <footer id="footer">
