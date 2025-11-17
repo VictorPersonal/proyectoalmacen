@@ -22,12 +22,10 @@ const Home = () => {
   const [cargando, setCargando] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
-  // Estado para la autenticación
   const [usuarioLogueado, setUsuarioLogueado] = useState(false);
   const [usuarioInfo, setUsuarioInfo] = useState(null);
   const navigate = useNavigate();
 
-  // 🛒 Estado para el carrito
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
 
   const categorias = ["Muebles", "Electrodomésticos", "Tecnología"];
@@ -37,7 +35,6 @@ const Home = () => {
     electrodomésticos: ["Neveras", "Lavadoras"],
   };
 
-  // Verificar autenticación al cargar el componente
   useEffect(() => {
     verificarAutenticacion();
   }, []);
@@ -50,7 +47,7 @@ const Home = () => {
         setUsuarioLogueado(true);
         setUsuarioInfo(usuario);
       } catch (error) {
-        console.error("Error al parsear información del usuario:", error);
+        console.error("Error al parsear usuario:", error);
         localStorage.removeItem("usuarioInfo");
       }
     }
@@ -70,11 +67,7 @@ const Home = () => {
   };
 
   const toggleSubmenu = (categoria) => {
-    if (submenuAbierto === categoria) {
-      setSubmenuAbierto(null);
-    } else {
-      setSubmenuAbierto(categoria);
-    }
+    setSubmenuAbierto(submenuAbierto === categoria ? null : categoria);
   };
 
   const togglePerfilMenu = () => {
@@ -90,11 +83,9 @@ const Home = () => {
     window.location.reload();
   };
 
-  // 🔍 Normalizar texto para ignorar tildes y mayúsculas
   const normalizar = (texto) =>
     texto ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
 
-  // 🔍 Ordenar resultados por relevancia
   const ordenarPorRelevancia = (lista, query) => {
     const q = normalizar(query);
     return lista.sort((a, b) => {
@@ -106,7 +97,6 @@ const Home = () => {
     });
   };
 
-  // 🔍 Buscar productos
   const handleBuscar = async () => {
     const query = busqueda.trim();
     if (query === "") {
@@ -122,11 +112,11 @@ const Home = () => {
       if (!res.ok) throw new Error("Error en la búsqueda");
       const data = await res.json();
 
-      // Normaliza y ordena resultados por relevancia
       const productosOrdenados = ordenarPorRelevancia(
         Array.isArray(data) ? data : [],
         query
       );
+
       setProductos(productosOrdenados);
     } catch (error) {
       console.error("Error al buscar productos:", error);
@@ -136,24 +126,19 @@ const Home = () => {
     }
   };
 
-  // ⏳ Búsqueda reactiva (debounce de 500ms)
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (busqueda.trim() !== "") {
-        handleBuscar();
-      } else {
-        setProductos([]);
-      }
+    const delay = setTimeout(() => {
+      if (busqueda.trim() !== "") handleBuscar();
+      else setProductos([]);
     }, 500);
 
-    return () => clearTimeout(delayDebounce);
+    return () => clearTimeout(delay);
   }, [busqueda]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleBuscar();
   };
 
-  // 🛒 Alternar el carrito
   const toggleCarrito = () => {
     setMostrarCarrito(!mostrarCarrito);
   };
@@ -196,8 +181,8 @@ const Home = () => {
                   <div className="categorias-lista">
                     {categorias.map((categoria, index) => (
                       <div key={index} className="categoria-item-container">
-                        {categoria === "Tecnología" ||
-                        categoria === "Electrodomésticos" ? (
+                        {(categoria === "Tecnología" ||
+                          categoria === "Electrodomésticos") ? (
                           <div
                             className="categoria-item con-submenu"
                             onMouseEnter={() =>
@@ -207,22 +192,17 @@ const Home = () => {
                           >
                             <span>{categoria}</span>
                             <FaChevronRight className="submenu-icon" />
-                            {submenuAbierto === categoria.toLowerCase() &&
-                              subcategorias[categoria.toLowerCase()] && (
-                                <div className="submenu">
-                                  {subcategorias[
-                                    categoria.toLowerCase()
-                                  ].map((subitem, subIndex) => (
-                                    <a
-                                      key={subIndex}
-                                      href="#"
-                                      className="submenu-item"
-                                    >
+                            {submenuAbierto === categoria.toLowerCase() && (
+                              <div className="submenu">
+                                {subcategorias[categoria.toLowerCase()].map(
+                                  (subitem, subIndex) => (
+                                    <a key={subIndex} href="#" className="submenu-item">
                                       {subitem}
                                     </a>
-                                  ))}
-                                </div>
-                              )}
+                                  )
+                                )}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <a href="#" className="categoria-item">
@@ -235,15 +215,10 @@ const Home = () => {
                 </div>
               )}
             </div>
-            <a href="#" className="nav-link">
-              Promociones
-            </a>
-            <a href="#" className="nav-link">
-              Contacto
-            </a>
-            <a href="#" className="nav-link">
-              Ayuda
-            </a>
+
+            <a href="#" className="nav-link">Promociones</a>
+            <a href="#" className="nav-link">Contacto</a>
+            <a href="#" className="nav-link">Ayuda</a>
           </div>
         </nav>
 
@@ -265,7 +240,10 @@ const Home = () => {
                   >
                     Ajustes de cuenta
                   </Link>
-                  <button className="perfil-item cerrar-sesion" onClick={handleCerrarSesion}>
+                  <button
+                    className="perfil-item cerrar-sesion"
+                    onClick={handleCerrarSesion}
+                  >
                     Cerrar sesión
                   </button>
                 </div>
@@ -273,25 +251,22 @@ const Home = () => {
             </div>
           ) : (
             <>
-              <Link to="/registro" id="link-registrarse">
-                Registrarse
-              </Link>
-              <Link to="/login" id="link-login">
-                Iniciar sesión
-              </Link>
+              <Link to="/registro" id="link-registrarse">Registrarse</Link>
+              <Link to="/login" id="link-login">Iniciar sesión</Link>
             </>
           )}
+
           <Link to="/favoritos" className="nav-link favoritos-link">
             ❤️ Favoritos
           </Link>
+
           <div className="cart-icon" onClick={toggleCarrito}>
             <FaShoppingCart />
           </div>
-
         </div>
       </header>
 
-      {/* 🛒 Mostrar carrito si está activo */}
+      {/* CARRITO */}
       {mostrarCarrito && (
         <Carrito
           abierto={mostrarCarrito}
@@ -300,19 +275,47 @@ const Home = () => {
         />
       )}
 
-      {/* CONTENIDO PRINCIPAL */}
+      {/* CONTENIDO */}
       {productoSeleccionado ? (
-        <DescripcionProducto
-          producto={productoSeleccionado}
-          onVolver={() => setProductoSeleccionado(null)}
-          cedula={usuarioInfo?.cedula}
-        />
+        <main id="main">
+          <DescripcionProducto
+            producto={productoSeleccionado}
+            onVolver={() => setProductoSeleccionado(null)}
+            cedula={usuarioInfo?.cedula}
+          />
+
+          {/* MAS INFORMACIÓN */}
+          <div className="info-toggle-wrapper">
+            <button
+              className="info-toggle-btn"
+              onClick={() => setMenuMasInfo(!menuMasInfo)}
+            >
+              Más información ▾
+            </button>
+
+            {menuMasInfo && (
+              <div className="info-panel">
+                <div className="info-column">
+                  <h4>Acerca de</h4>
+                  <a href="#">Dulce Hogar</a>
+                </div>
+                <div className="info-column">
+                  <h4>Redes sociales</h4>
+                  <a href="#">Facebook</a>
+                  <a href="#">Instagram</a>
+                  <a href="#">WhatsApp</a>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>
       ) : busqueda.trim() === "" ? (
         <main id="main">
           <section className="hero-section" id="hero-section">
             <button className="carousel-btn prev" onClick={prevSlide}>
               ‹
             </button>
+
             <div className="carousel-container">
               <img
                 src={images[currentIndex]}
@@ -320,10 +323,36 @@ const Home = () => {
                 className="carousel-image"
               />
             </div>
+
             <button className="carousel-btn next" onClick={nextSlide}>
               ›
             </button>
           </section>
+
+          {/* MAS INFORMACIÓN */}
+          <div className="info-toggle-wrapper">
+            <button
+              className="info-toggle-btn"
+              onClick={() => setMenuMasInfo(!menuMasInfo)}
+            >
+              Más información ▾
+            </button>
+
+            {menuMasInfo && (
+              <div className="info-panel">
+                <div className="info-column">
+                  <h4>Acerca de</h4>
+                  <a href="#">Dulce Hogar</a>
+                </div>
+                <div className="info-column">
+                  <h4>Redes sociales</h4>
+                  <a href="#">Facebook</a>
+                  <a href="#">Instagram</a>
+                  <a href="#">WhatsApp</a>
+                </div>
+              </div>
+            )}
+          </div>
         </main>
       ) : (
         <main className="resultados">
@@ -351,34 +380,35 @@ const Home = () => {
           ) : (
             <p className="no-result">No se encontraron productos.</p>
           )}
+
+          {/* MAS INFORMACIÓN */}
+          <div className="info-toggle-wrapper">
+            <button
+              className="info-toggle-btn"
+              onClick={() => setMenuMasInfo(!menuMasInfo)}
+            >
+              Más información ▾
+            </button>
+
+            {menuMasInfo && (
+              <div className="info-panel">
+                <div className="info-column">
+                  <h4>Acerca de</h4>
+                  <a href="#">Dulce Hogar</a>
+                </div>
+                <div className="info-column">
+                  <h4>Redes sociales</h4>
+                  <a href="#">Facebook</a>
+                  <a href="#">Instagram</a>
+                  <a href="#">WhatsApp</a>
+                </div>
+              </div>
+            )}
+          </div>
         </main>
       )}
-      {/* MENÚ DESPLEGABLE*/}
-      <div className="info-toggle-wrapper">
-        <button
-          className="info-toggle-btn"
-          onClick={() => setMenuMasInfo(!menuMasInfo)}
-        >
-          Más información ▾
-        </button>
 
-        {menuMasInfo && (
-          <div className="info-panel">
-            <div className="info-column">
-              <h4>Acerca de</h4>
-              <a href="#">Dulce Hogar</a>
-            </div>
-            <div className="info-column">
-              <h4>Redes sociales</h4>
-              <a href="#">Facebook</a>
-              <a href="#">Instagram</a>
-              <a href="#">WhatsApp</a>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* PIE DE PÁGINA */}
+      {/* FOOTER */}
       <footer id="footer">
         <div className="footer-links">
           <a href="#">Preguntas frecuentes</a>

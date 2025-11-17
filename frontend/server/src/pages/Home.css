@@ -8,6 +8,8 @@
 html, body, #root {
   height: 100%;
   width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -16,6 +18,8 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 /* ========== HEADER ========== */
@@ -23,7 +27,7 @@ header {
   background-color: #c8c4c1;
   padding: 10px 20px;
   width: 100%;
-  flex-shrink: 0; /* Evita que el header se encoja */
+  flex-shrink: 0;
 }
 
 .navbar {
@@ -55,7 +59,7 @@ header {
   font-size: 10px;
   letter-spacing: 0.5px;
   color: #000;
-  margin-top: 4px; /* ← Aumenta este valor si quieres más separación */
+  margin-top: 4px;
 }
 
 /* --- BUSCADOR --- */
@@ -384,28 +388,29 @@ header {
 
 /* ========== MAIN ========== */
 main {
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   background-color: #edeae8;
-  min-height: auto; /* CAMBIO IMPORTANTE: evita espacios blancos */
+  width: 100%;
   margin: 0;
   padding: 0;
-  width: 100%;
+  min-height: calc(100vh - 60px - 140px); /* Ajusta según tu header */
 }
 
 /* --- SECCIÓN PRINCIPAL / CARRUSEL --- */
 .hero-section {
   position: relative;
   width: 100%;
-  height: 70vh; /* REDUCIDO: de 100vh a 70vh para evitar espacio blanco */
+  height: 450px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background-color: #f2f2f2;
   margin: 0;
-  flex-shrink: 0; /* Evita que se encoja */
+  flex-shrink: 0;
+  z-index: 1;
 }
 
 .carousel-container {
@@ -500,19 +505,17 @@ main {
 /* ========== FOOTER ========== */
 footer {
   background-color: #b8b4b1;
-  padding: 35px 40px;
-  min-height: px;
+  padding: 15px 50px; /* Padding normal y consistente */
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
   color: #333;
   width: 100%;
+  flex-shrink: 0;
+  margin-top: auto; /* Esto empuja el footer hacia abajo */
+  height: 60px; /* Altura adecuada */
   position: relative;
-  bottom: 0;
-  left: 0;
-  margin-top: auto;
-  flex-shrink: 0; /* Evita que el footer se encoja */
 }
 
 .footer-links {
@@ -533,17 +536,16 @@ footer {
 .footer-copyright {
   color: #333;
 }
-
-/* ==== SECCIÓN DE MÁS INFORMACIÓN - SIN FONDO BLANCO EN LOS LADOS ==== */
-.hero-section {
-  position: relative;
-  overflow: hidden; /* Cambiado de visible a hidden */
-  z-index: 1;
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ==== SECCIÓN DE MÁS INFORMACIÓN ==== */
 .info-section {
   position: relative;
-  margin-top: -120px; /* AUMENTADO: de -40px a -80px para subir más */
+  margin-top: 0;
   padding-top: 0;
   z-index: 5;
   background: transparent;
@@ -555,15 +557,15 @@ footer {
   justify-content: center;
   position: relative;
   margin: 0;
-  padding-top:-50px; /* REDUCIDO: de 50px a 30px para subir el botón */
+  padding-top:-50px;
   background: transparent;
 }
 
 .info-toggle-btn {
   padding: 12px 30px;
   border-radius: 8px 8px 0 0;
-  background-color: rgba(255, 255, 255, 0.35); /* ← Blanco translúcido ideal */
-  border: 1px solid rgba(213, 211, 211, 0.4);  /* ← Borde suave para que parezca botón */
+  background-color: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(213, 211, 211, 0.4);
   font-weight: 600;
   position: absolute;
   cursor: pointer;
@@ -571,14 +573,13 @@ footer {
   top: -49px;
   left: 50%;
   transform: translateX(-50%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);    /* ← Sombra suave opcional */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   color: #000;
   z-index: 10;
 }
 
-
 .info-toggle-btn:hover {
-  background-color: #ffffff; /* Fondo sólido al hover */
+  background-color: #ffffff;
   box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -587,12 +588,12 @@ footer {
   width: 100%;
   display: flex;
   justify-content: space-evenly;
-  padding: 40px 0 30px 0; /* REDUCIDO: de 50px a 40px arriba */
+  padding: 40px 0 30px 0;
   background-color: rgba(247, 247, 247, 0.98);
   border-top: none;
   box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
   z-index: 6;
-  margin-top: -25px; /* REDUCIDO: de -40px a -25px */
+  margin-top: -25px;
 }
 
 @keyframes fadeDown {
@@ -641,9 +642,3 @@ footer {
   display: flex;
 }
 
-/* Asegurar que no hay fondos blancos en el contenedor principal */
-body > *:not(header):not(main):not(footer):not(.info-section) {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-}
