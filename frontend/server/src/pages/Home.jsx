@@ -53,13 +53,11 @@ const Home = () => {
     }
   };
 
-  const prevSlide = () => {
+  const prevSlide = () =>
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
 
-  const nextSlide = () => {
+  const nextSlide = () =>
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
 
   const toggleMenu = () => {
     setMenuAbierto(!menuAbierto);
@@ -70,9 +68,7 @@ const Home = () => {
     setSubmenuAbierto(submenuAbierto === categoria ? null : categoria);
   };
 
-  const togglePerfilMenu = () => {
-    setPerfilMenuAbierto(!perfilMenuAbierto);
-  };
+  const togglePerfilMenu = () => setPerfilMenuAbierto(!perfilMenuAbierto);
 
   const handleCerrarSesion = () => {
     localStorage.removeItem("usuarioInfo");
@@ -84,7 +80,9 @@ const Home = () => {
   };
 
   const normalizar = (texto) =>
-    texto ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+    texto
+      ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+      : "";
 
   const ordenarPorRelevancia = (lista, query) => {
     const q = normalizar(query);
@@ -107,17 +105,16 @@ const Home = () => {
     setCargando(true);
     try {
       const res = await fetch(
-        `http://localhost:4000/api/productos?search=${encodeURIComponent(query)}`
+        `http://localhost:4000/api/productos?search=${encodeURIComponent(
+          query
+        )}`
       );
       if (!res.ok) throw new Error("Error en la búsqueda");
+
       const data = await res.json();
-
-      const productosOrdenados = ordenarPorRelevancia(
-        Array.isArray(data) ? data : [],
-        query
+      setProductos(
+        ordenarPorRelevancia(Array.isArray(data) ? data : [], query)
       );
-
-      setProductos(productosOrdenados);
     } catch (error) {
       console.error("Error al buscar productos:", error);
       setProductos([]);
@@ -139,9 +136,7 @@ const Home = () => {
     if (e.key === "Enter") handleBuscar();
   };
 
-  const toggleCarrito = () => {
-    setMostrarCarrito(!mostrarCarrito);
-  };
+  const toggleCarrito = () => setMostrarCarrito(!mostrarCarrito);
 
   return (
     <div>
@@ -166,7 +161,11 @@ const Home = () => {
               onChange={(e) => setBusqueda(e.target.value)}
               onKeyDown={handleKeyPress}
             />
-            <button className="search-btn" id="search-btn" onClick={handleBuscar}>
+            <button
+              className="search-btn"
+              id="search-btn"
+              onClick={handleBuscar}
+            >
               🔍
             </button>
           </div>
@@ -176,6 +175,7 @@ const Home = () => {
               <button className="nav-link categorias-btn" onClick={toggleMenu}>
                 Categorías ∨
               </button>
+
               {menuAbierto && (
                 <div className="menu-desplegable">
                   <div className="categorias-lista">
@@ -196,7 +196,11 @@ const Home = () => {
                               <div className="submenu">
                                 {subcategorias[categoria.toLowerCase()].map(
                                   (subitem, subIndex) => (
-                                    <a key={subIndex} href="#" className="submenu-item">
+                                    <a
+                                      key={subIndex}
+                                      href="#"
+                                      className="submenu-item"
+                                    >
                                       {subitem}
                                     </a>
                                   )
@@ -216,9 +220,15 @@ const Home = () => {
               )}
             </div>
 
-            <a href="#" className="nav-link">Promociones</a>
-            <a href="#" className="nav-link">Contacto</a>
-            <a href="#" className="nav-link">Ayuda</a>
+            <a href="#" className="nav-link">
+              Promociones
+            </a>
+            <a href="#" className="nav-link">
+              Contacto
+            </a>
+            <a href="#" className="nav-link">
+              Ayuda
+            </a>
           </div>
         </nav>
 
@@ -231,6 +241,7 @@ const Home = () => {
                   {usuarioInfo?.nombre || usuarioInfo?.cedula}
                 </span>
               </button>
+
               {perfilMenuAbierto && (
                 <div className="perfil-desplegable">
                   <Link
@@ -240,6 +251,7 @@ const Home = () => {
                   >
                     Ajustes de cuenta
                   </Link>
+
                   <button
                     className="perfil-item cerrar-sesion"
                     onClick={handleCerrarSesion}
@@ -251,8 +263,12 @@ const Home = () => {
             </div>
           ) : (
             <>
-              <Link to="/registro" id="link-registrarse">Registrarse</Link>
-              <Link to="/login" id="link-login">Iniciar sesión</Link>
+              <Link to="/registro" id="link-registrarse">
+                Registrarse
+              </Link>
+              <Link to="/login" id="link-login">
+                Iniciar sesión
+              </Link>
             </>
           )}
 
@@ -283,31 +299,6 @@ const Home = () => {
             onVolver={() => setProductoSeleccionado(null)}
             cedula={usuarioInfo?.cedula}
           />
-
-          {/* MAS INFORMACIÓN */}
-          <div className="info-toggle-wrapper">
-            <button
-              className="info-toggle-btn"
-              onClick={() => setMenuMasInfo(!menuMasInfo)}
-            >
-              Más información ▾
-            </button>
-
-            {menuMasInfo && (
-              <div className="info-panel">
-                <div className="info-column">
-                  <h4>Acerca de</h4>
-                  <a href="#">Dulce Hogar</a>
-                </div>
-                <div className="info-column">
-                  <h4>Redes sociales</h4>
-                  <a href="#">Facebook</a>
-                  <a href="#">Instagram</a>
-                  <a href="#">WhatsApp</a>
-                </div>
-              </div>
-            )}
-          </div>
         </main>
       ) : busqueda.trim() === "" ? (
         <main id="main">
@@ -344,6 +335,7 @@ const Home = () => {
                   <h4>Acerca de</h4>
                   <a href="#">Dulce Hogar</a>
                 </div>
+
                 <div className="info-column">
                   <h4>Redes sociales</h4>
                   <a href="#">Facebook</a>
@@ -381,30 +373,33 @@ const Home = () => {
             <p className="no-result">No se encontraron productos.</p>
           )}
 
-          {/* MAS INFORMACIÓN */}
-          <div className="info-toggle-wrapper">
-            <button
-              className="info-toggle-btn"
-              onClick={() => setMenuMasInfo(!menuMasInfo)}
-            >
-              Más información ▾
-            </button>
+          {/* MAS INFORMACIÓN — AHORA SOLO SI NO HAY PRODUCTOS */}
+          {productos.length === 0 && (
+            <div className="info-toggle-wrapper">
+              <button
+                className="info-toggle-btn"
+                onClick={() => setMenuMasInfo(!menuMasInfo)}
+              >
+                Más información ▾
+              </button>
 
-            {menuMasInfo && (
-              <div className="info-panel">
-                <div className="info-column">
-                  <h4>Acerca de</h4>
-                  <a href="#">Dulce Hogar</a>
+              {menuMasInfo && (
+                <div className="info-panel">
+                  <div className="info-column">
+                    <h4>Acerca de</h4>
+                    <a href="#">Dulce Hogar</a>
+                  </div>
+
+                  <div className="info-column">
+                    <h4>Redes sociales</h4>
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">WhatsApp</a>
+                  </div>
                 </div>
-                <div className="info-column">
-                  <h4>Redes sociales</h4>
-                  <a href="#">Facebook</a>
-                  <a href="#">Instagram</a>
-                  <a href="#">WhatsApp</a>
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </main>
       )}
 
@@ -417,6 +412,7 @@ const Home = () => {
           <span>/</span>
           <Link to="/terminosycondiciones">Términos y Condiciones</Link>
         </div>
+
         <div className="footer-copyright">
           © 2025 FHO, todos los derechos reservados
         </div>
