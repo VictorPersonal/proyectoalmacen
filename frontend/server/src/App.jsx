@@ -11,8 +11,7 @@ import Pago from "./pages/Checkout/Pago";
 import Favoritos from "./pages/Favorito";
 import TerminosYCondiciones from "./pages/Terminosycondiciones";
 import PagoExitoso from "./pages/Checkout/PagoExitoso";
-
-
+import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";
 
 function App() {
   return (
@@ -30,6 +29,7 @@ function App() {
         <Route path="/checkout/forma-entrega/pago" element={<Pago />} />
         <Route path="/terminosycondiciones" element={<TerminosYCondiciones />} />
         <Route path="/checkout/forma-entrega/pago/exitoso" element={<PagoExitoso />} />
+        <Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />
       </Routes>
     </Router>
   );
