@@ -320,31 +320,33 @@ const Home = () => {
             </button>
           </section>
 
-          {/* MAS INFORMACIÓN */}
-          <div className="info-toggle-wrapper">
-            <button
-              className="info-toggle-btn"
-              onClick={() => setMenuMasInfo(!menuMasInfo)}
-            >
-              Más información ▾
-            </button>
+          {/* MAS INFORMACIÓN — SOLO SI NO SE HA ESCRITO NADA */}
+          {busqueda.trim().length === 0 && (
+            <div className="info-toggle-wrapper">
+              <button
+                className="info-toggle-btn"
+                onClick={() => setMenuMasInfo(!menuMasInfo)}
+              >
+                Más información ▾
+              </button>
 
-            {menuMasInfo && (
-              <div className="info-panel">
-                <div className="info-column">
-                  <h4>Acerca de</h4>
-                  <a href="#">Dulce Hogar</a>
-                </div>
+              {menuMasInfo && (
+                <div className="info-panel">
+                  <div className="info-column">
+                    <h4>Acerca de</h4>
+                    <a href="#">Dulce Hogar</a>
+                  </div>
 
-                <div className="info-column">
-                  <h4>Redes sociales</h4>
-                  <a href="#">Facebook</a>
-                  <a href="#">Instagram</a>
-                  <a href="#">WhatsApp</a>
+                  <div className="info-column">
+                    <h4>Redes sociales</h4>
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">WhatsApp</a>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </main>
       ) : (
         <main className="resultados">
@@ -373,8 +375,8 @@ const Home = () => {
             <p className="no-result">No se encontraron productos.</p>
           )}
 
-          {/* MAS INFORMACIÓN — AHORA SOLO SI NO HAY PRODUCTOS */}
-          {productos.length === 0 && (
+          {/* MAS INFORMACIÓN — SOLO SI NO SE HA ESCRITO NADA Y NO HAY PRODUCTOS */}
+          {busqueda.trim().length === 0 && productos.length === 0 && (
             <div className="info-toggle-wrapper">
               <button
                 className="info-toggle-btn"
