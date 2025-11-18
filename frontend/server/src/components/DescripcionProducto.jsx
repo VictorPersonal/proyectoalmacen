@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import "./DescripcionProducto.css";
+import Swal from "sweetalert2";
 import { FaStar } from "react-icons/fa";
-import { 
-  SiVisa, 
-  SiMastercard, 
-  SiAmericanexpress, 
-  SiJcb 
-} from "react-icons/si";
+import { SiVisa, SiMastercard, SiAmericanexpress, SiJcb } 
+from "react-icons/si";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -34,33 +31,67 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
   // 👉 Función para agregar al carrito (con token vía cookies)
   const handleAgregarCarrito = async () => {
+    const userInfo = localStorage.getItem("usuarioInfo");
+
+    // ❌ No redirige
+    if (!userInfo) {
+      Swal.fire({
+        icon: "warning",
+        title: "Inicia sesión",
+        text: "Debes iniciar sesión para agregar productos al carrito.",
+        confirmButtonText: "Entendido",
+        padding: "1.5rem",
+      });
+      return;
+    }
+
     try {
       const productoData = {
         idproducto: producto.id_producto || producto.id || producto.idproducto,
-        cantidad: cantidad, 
+        cantidad: cantidad,
       };
 
       const res = await axios.post(
         "http://localhost:4000/api/carrito/agregar",
         productoData,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
 
       console.log("✅ Producto agregado:", res.data);
-      alert("Producto agregado al carrito");
+
+      Swal.fire({
+        icon: "success",
+        title: "Producto agregado",
+        text: "El producto fue añadido al carrito correctamente.",
+        confirmButtonText: "Genial",
+        padding: "1.5rem",
+      });
+
     } catch (error) {
       console.error("❌ Error al agregar producto:", error);
 
       if (error.response?.status === 401 || error.response?.status === 403) {
-        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
-        navigate("/login");
+        Swal.fire({
+          icon: "error",
+          title: "Sesión expirada",
+          text: "Debes iniciar sesión nuevamente.",
+          confirmButtonText: "Ok",
+          padding: "1.5rem",
+        });
+        return;
       } else {
-        alert("Error al agregar producto al carrito");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un problema al agregar el producto al carrito.",
+          confirmButtonText: "Cerrar",
+          padding: "1.5rem",
+        });
       }
     }
   };
+
+
 
   // 👉 Función para ir al checkout
   const handleComprarAhora = () => {

@@ -102,7 +102,7 @@ html, body, #root {
 }
 
 /* === BUSCADOR === */
-.search-wrapper {
+.admin-search-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -110,24 +110,24 @@ html, body, #root {
   margin-bottom: 8px;
 }
 
-.search-container {
+.admin-search-container {
   display: flex;
   align-items: center;
   background-color: #ffffff;
   border: 1px solid #9b9b9b;
-  border-radius: 2px;
+  border-radius: 5px;
   padding: 4px 6px;
-  max-width: 450px;
+  max-width: 1200px;
   width: 100%;
 }
 
-.search-icon {
+.admin-search-icon {
   font-size: 14px;
   margin-right: 4px;
   color: #666666;
 }
 
-.search-container input {
+.admin-search-input {
   border: none;
   outline: none;
   background: none;
@@ -135,7 +135,7 @@ html, body, #root {
   width: 100%;
 }
 
-.search-container input::placeholder {
+.admin-search-input::placeholder {
   color: #a3a3a3;
 }
 
@@ -143,6 +143,7 @@ html, body, #root {
 .btn--add-secondary {
   background-color: #b3b3b3;
   color: #000;
+  height: 32px;
   padding: 6px 12px;
   border-radius: 2px;
   font-size: 13px;
