@@ -399,53 +399,51 @@ const Home = () => {
             <p className="no-result">No se encontraron productos.</p>
           )}
 
-          {/* MÁS INFORMACIÓN EN RESULTADOS */}
-          <div className="info-toggle-wrapper">
-            <button
-              className="info-toggle-btn"
-              onClick={() => setMenuMasInfo(!menuMasInfo)}
+          {/* MAS INFORMACIÓN - BUSQUEDA VACÍA */}
+          {busqueda.trim().length === 0 && productos.length === 0 && (
+            <div className="info-toggle-wrapper">
+              <button
+                className="info-toggle-btn"
+                onClick={() => setMenuMasInfo(!menuMasInfo)}
               >
-              Más información ▾
-            </button>
+                Más información ▾
+              </button>
 
-            {menuMasInfo && (
-              <div className="info-panel">
-                <div className="info-column">
-                  <h4>Acerca de</h4>
-                  <Link to="/Acerca-de/Dulce-Hogar">Dulce Hogar</Link>
-              </div>
+              {menuMasInfo && (
+                <div className="info-panel">
 
-              <div className="info-column">
-                <h4>Redes sociales</h4>
+                  <div className="info-column">
+                    <h4>Redes sociales</h4>
 
-                <a
-                  href="https://www.facebook.com/dulce.hogar.3192479"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >
-                  Facebook
-                </a>
+                    <a
+                      href="https://www.facebook.com/dulce.hogar.3192479"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Facebook
+                    </a>
 
-                <a
-                  href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >
-                  Instagram
-                </a>
+                    <a
+                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Instagram
+                    </a>
+                    <a
+                      href="https://api.whatsapp.com/send?phone=573103749429&text=Hola,%20quiero%20más%20información"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      WhatsApp
+                    </a>
 
-                <a
-                  href="https://wa.me/573103749429?text=Hola,+quiero+más+información"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >
-                  WhatsApp
-                </a>
-              </div>
+                  </div>
+
+                </div>
+              )}
             </div>
           )}
-        </div>
-
         </main>
       )}
 

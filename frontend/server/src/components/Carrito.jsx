@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 import "./Carrito.css";
 
 const Carrito = ({ abierto, onCerrar }) => {
@@ -11,9 +12,10 @@ const Carrito = ({ abierto, onCerrar }) => {
   useEffect(() => {
     if (abierto) {
       axios
-        .get("http://localhost:4000/api/carrito", { withCredentials: true }) // 👈 importante
+        .get("http://localhost:4000/api/carrito", { withCredentials: true })
         .then((res) => {
           setProductos(res.data);
+
           const totalCalc = res.data.reduce(
             (acc, prod) => acc + parseFloat(prod.subtotal),
             0
@@ -22,8 +24,13 @@ const Carrito = ({ abierto, onCerrar }) => {
         })
         .catch((err) => {
           console.error("❌ Error al cargar carrito:", err);
+
           if (err.response?.status === 401 || err.response?.status === 403) {
-            alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+            Swal.fire({
+              icon: "warning",
+              title: "Sesión expirada",
+              text: "Tu sesión ha expirado. Inicia sesión nuevamente.",
+            });
           }
         });
     }
@@ -31,16 +38,24 @@ const Carrito = ({ abierto, onCerrar }) => {
 
   // 🗑️ Eliminar un solo producto del carrito
   const handleEliminarProducto = async (idproducto) => {
-    const confirmar = window.confirm("¿Deseas eliminar este producto del carrito?");
-    if (!confirmar) return;
+    const confirmar = await Swal.fire({
+      icon: "question",
+      title: "¿Eliminar producto?",
+      text: "¿Deseas eliminar este producto del carrito?",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirmar.isConfirmed) return;
 
     try {
       await axios.delete(
         `http://localhost:4000/api/carrito/eliminar/${idproducto}`,
-        { withCredentials: true } // 👈 para enviar cookie JWT
+        { withCredentials: true }
       );
 
-      // Actualizar estado local
+      // Actualizar estado
       const nuevoCarrito = productos.filter((p) => p.idproducto !== idproducto);
       setProductos(nuevoCarrito);
 
@@ -50,35 +65,71 @@ const Carrito = ({ abierto, onCerrar }) => {
       );
       setTotal(nuevoTotal);
 
-      alert("🗑️ Producto eliminado del carrito");
+      Swal.fire({
+        icon: "success",
+        title: "Producto eliminado",
+      });
+
     } catch (error) {
       console.error("❌ Error al eliminar producto:", error);
+
       if (error.response?.status === 401 || error.response?.status === 403) {
-        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+        Swal.fire({
+          icon: "warning",
+          title: "Sesión expirada",
+          text: "Tu sesión ha expirado. Inicia sesión nuevamente.",
+        });
       } else {
-        alert("❌ No se pudo eliminar el producto");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo eliminar el producto.",
+        });
       }
     }
   };
 
   // 🧹 Vaciar todo el carrito
   const handleVaciarCarrito = async () => {
-    const confirmar = window.confirm("¿Seguro que deseas vaciar el carrito?");
-    if (!confirmar) return;
+    const confirmar = await Swal.fire({
+      icon: "warning",
+      title: "Vaciar carrito",
+      text: "¿Seguro que deseas vaciar todo el carrito?",
+      showCancelButton: true,
+      confirmButtonText: "Sí, vaciar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirmar.isConfirmed) return;
 
     try {
       await axios.delete("http://localhost:4000/api/carrito/vaciar", {
-        withCredentials: true, // 👈 importante
+        withCredentials: true,
       });
+
       setProductos([]);
       setTotal(0);
-      alert("🧹 Carrito vaciado con éxito");
+
+      Swal.fire({
+        icon: "success",
+        title: "Carrito vaciado",
+      });
+
     } catch (error) {
       console.error("❌ Error al vaciar carrito:", error);
+
       if (error.response?.status === 401 || error.response?.status === 403) {
-        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+        Swal.fire({
+          icon: "warning",
+          title: "Sesión expirada",
+          text: "Tu sesión ha expirado. Inicia sesión nuevamente.",
+        });
       } else {
-        alert("❌ No se pudo vaciar el carrito");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo vaciar el carrito.",
+        });
       }
     }
   };
@@ -104,6 +155,7 @@ const Carrito = ({ abierto, onCerrar }) => {
                     </span>
                     <span className="precio">${p.subtotal}</span>
                   </div>
+
                   <button
                     className="btn-eliminar"
                     onClick={() => handleEliminarProducto(p.idproducto)}

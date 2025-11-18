@@ -232,6 +232,20 @@ const PanelAdmin = () => {
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
+// 🔥 Cambiar de página con las flechas del teclado
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowRight") {
+      handleNextPage();
+    } else if (e.key === "ArrowLeft") {
+      handlePrevPage();
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
+}, [currentPage, totalPages]);
+
 
   return (
     <div className="admin-panel">
@@ -307,11 +321,12 @@ const PanelAdmin = () => {
         {currentSection === "productos" && (
           <>
             {/* 🔍 Barra de búsqueda + botón agregar (estilo como tu imagen) */}
-            <div className="search-wrapper">
-              <div className="search-container">
-                <span className="search-icon">🔍</span>
+            <div className="admin-search-wrapper">
+              <div className="admin-search-container">
+                <span className="admin-search-icon">🔍</span>
                 <input
                   type="text"
+                  className="admin-search-input"
                   placeholder="Buscar producto"
                   value={searchTerm}
                   onChange={handleSearchChange}
