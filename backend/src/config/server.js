@@ -15,8 +15,11 @@ app.use(express.json());
 
 app.use(cookieParser());
 app.use(cors({
-  origin: "https://dulchehogar.netlify.app",
-  credentials: true,
+  origin: [
+    "https://dulchehogar.netlify.app",   // producción
+    "http://localhost:5173"              // desarrollo
+  ],
+  credentials: true
 }));
 
 // 🔹 Inyectar supabase en cada request
