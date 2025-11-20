@@ -298,6 +298,23 @@ router.get("/productos/:id", async (req, res) => {
   }
 });
 
+// ✅ Obtener todas las categorías
+router.get("/categorias", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("categoria")                    // 👈 nombre de la tabla
+      .select("idcategoria, descripcion");  // 👈 campos reales
+
+    if (error) throw error;
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("❌ Error al obtener categorías:", error.message);
+    res.status(500).json({ message: "Error al obtener categorías" });
+  }
+});
+
+
 
 // ====================================================================
 // 🛒 AGREGAR PRODUCTO AL CARRITO

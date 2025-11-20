@@ -16,6 +16,8 @@ const PanelAdmin = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigate = useNavigate();
   const [adminInfo, setAdminInfo] = useState(null);
+  const [categorias, setCategorias] = useState([]);
+
 
   useEffect(() => {
   const stored = localStorage.getItem("usuarioInfo");
@@ -89,6 +91,32 @@ const PanelAdmin = () => {
     };
     fetchProducts();
   }, []);
+
+  // Traer categorías al cargar el componente
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/categorias");
+        setCategorias(res.data);
+      } catch (err) {
+        console.error(
+          "Error al obtener categorías:",
+          err.response?.data || err.message
+        );
+      }
+    };
+
+    fetchCategorias();
+  }, []);
+
+  const getNombreCategoria = (id) => {
+  const cat = categorias.find(
+    (c) => String(c.idcategoria) === String(id)
+  );
+  return cat ? cat.descripcion : id;
+  };
+
+
 
   const handleLogout = () => {
   // 🔴 lo importante es borrar este:
@@ -375,7 +403,7 @@ useEffect(() => {
                         <td>{prod.nombre}</td>
                         <td>${prod.precio}</td>
                         <td>{prod.stock}</td>
-                        <td>{prod.idcategoria}</td>
+                        <td>{getNombreCategoria(prod.idcategoria)}</td>
                         <td>
                           <button
                             className="btn btn--edit"
