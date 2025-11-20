@@ -96,7 +96,7 @@ const PanelAdmin = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/categorias");
+        const res = await axios.get("https://backend-tpeu.onrender.com/api/categorias");
         setCategorias(res.data);
       } catch (err) {
         console.error(
