@@ -78,7 +78,7 @@ const PanelAdmin = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/productos");
+        const res = await axios.get("https://backend-tpeu.onrender.com/api/productos");
         setProducts(res.data);
       } catch (err) {
         console.error(
@@ -140,7 +140,7 @@ const PanelAdmin = () => {
       if (editingProduct) {
         // Editar producto
         const res = await axios.put(
-          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
+          `https://backend-tpeu.onrender.com/api/productos/${editingProduct.idproducto}/con-imagen`,
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -153,7 +153,7 @@ const PanelAdmin = () => {
       } else {
         // Crear producto
         const res = await axios.post(
-          "http://localhost:4000/api/productos/con-imagen",
+          "https://backend-tpeu.onrender.com/api/productos/con-imagen",
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -182,7 +182,7 @@ const PanelAdmin = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("¿Estás seguro de eliminar este producto?")) return;
     try {
-      await axios.delete(`http://localhost:4000/api/productos/${id}`);
+      await axios.delete(`https://backend-tpeu.onrender.com/api/productos/${id}`);
       setProducts(products.filter((p) => p.idproducto !== id));
     } catch (err) {
       console.error(

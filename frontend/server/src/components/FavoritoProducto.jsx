@@ -9,7 +9,7 @@ const FavoritoProducto = () => {
   useEffect(() => {
     const obtenerFavoritos = async () => {
       try {
-        const response = await fetch("http://localhost:4000/api/favoritos", {
+        const response = await fetch("https://backend-tpeu.onrender.com/api/favoritos", {
           method: "GET",
           credentials: "include", // ✅ Envía la cookie JWT, ayuda a identificar al usuario
         });

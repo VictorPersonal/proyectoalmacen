@@ -19,7 +19,7 @@ function ActualizarPerfil() {
     const cargarPerfil = async () => {
       setCargando(true);
       try {
-        const res = await fetch("http://localhost:4000/api/usuario/perfil", {
+        const res = await fetch("https://backend-tpeu.onrender.com/api/usuario/perfil", {
           method: "GET",
           credentials: "include", // 👈 envía la cookie JWT
         });
@@ -68,7 +68,7 @@ function ActualizarPerfil() {
     };
 
     try {
-      const res = await fetch("http://localhost:4000/api/usuario/perfil", {
+      const res = await fetch("https://backend-tpeu.onrender.com/api/usuario/perfil", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // 👈 importante para enviar la cookie JWT
