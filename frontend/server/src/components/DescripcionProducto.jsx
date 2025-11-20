@@ -52,7 +52,7 @@ const DescripcionProducto = ({ producto, onVolver }) => {
       };
 
       const res = await axios.post(
-        "http://localhost:4000/api/carrito/agregar",
+        "https://backend-tpeu.onrender.com/api/carrito/agregar",
         productoData,
         { withCredentials: true }
       );

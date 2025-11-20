@@ -105,7 +105,7 @@ const Home = () => {
     setCargando(true);
     try {
       const res = await fetch(
-        `http://localhost:4000/api/productos?search=${encodeURIComponent(
+        `https://backend-tpeu.onrender.com/api/productos?search=${encodeURIComponent(
           query
         )}`
       );

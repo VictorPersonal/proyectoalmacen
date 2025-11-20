@@ -12,7 +12,7 @@ const Carrito = ({ abierto, onCerrar }) => {
   useEffect(() => {
     if (abierto) {
       axios
-        .get("http://localhost:4000/api/carrito", { withCredentials: true })
+        .get("https://backend-tpeu.onrender.com/api/carrito", { withCredentials: true })
         .then((res) => {
           setProductos(res.data);
 
@@ -51,7 +51,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
     try {
       await axios.delete(
-        `http://localhost:4000/api/carrito/eliminar/${idproducto}`,
+        `https://backend-tpeu.onrender.com/api/carrito/eliminar/${idproducto}`,
         { withCredentials: true }
       );
 
@@ -103,7 +103,7 @@ const Carrito = ({ abierto, onCerrar }) => {
     if (!confirmar.isConfirmed) return;
 
     try {
-      await axios.delete("http://localhost:4000/api/carrito/vaciar", {
+      await axios.delete("https://backend-tpeu.onrender.com/api/carrito/vaciar", {
         withCredentials: true,
       });
 

@@ -1025,6 +1025,76 @@ router.put("/productos/:id/con-imagen", (req, res) => {
   req.pipe(bb);
 });
 
+// ================================================================
+// 📦 RUTAS DE CATEGORÍAS Y PRODUCTOS POR CATEGORÍA
+// ================================================================
+
+// ✅ Obtener todas las categorías
+router.get("/categorias", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("categoria")
+      .select("idcategoria, descripcion")
+      .order("descripcion", { ascending: true });
+
+    if (error) {
+      console.error("❌ Error Supabase:", error);
+      return res.status(500).json({ message: "Error al obtener categorías" });
+    }
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("❌ Error servidor:", error);
+    res.status(500).json({ message: "Error al obtener categorías" });
+  }
+});
+
+// ✅ Obtener productos de una categoría específica
+router.get("/categorias/:idcategoria/productos", async (req, res) => {
+  try {
+    const { idcategoria } = req.params;
+
+    const { data, error } = await supabase
+      .from("producto")
+      .select(`
+        idproducto,
+        nombre,
+        precio,
+        stock,
+        descripcion,
+        categoria:categoria (
+          descripcion
+        )
+      `)
+      .eq("idcategoria", idcategoria)
+      .order("nombre", { ascending: true });
+
+    if (error) {
+      console.error("❌ Error Supabase:", error);
+      return res.status(500).json({ message: "Error al obtener productos por categoría" });
+    }
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: "No hay productos en esta categoría" });
+    }
+
+    // Normalizamos la respuesta para que coincida con tu formato original
+    const productos = data.map((p) => ({
+      id: p.idproducto,
+      nombre: p.nombre,
+      precio: p.precio,
+      stock: p.stock,
+      descripcion: p.descripcion,
+      categoria: p.categoria?.descripcion || null
+    }));
+
+    res.status(200).json(productos);
+  } catch (error) {
+    console.error("❌ Error servidor:", error);
+    res.status(500).json({ message: "Error al obtener productos por categoría" });
+  }
+});
+
 
 
 export default router;
