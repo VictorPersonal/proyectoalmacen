@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://dulchehogar.netlify.app",
   credentials: true,
 }));
 
@@ -29,8 +29,9 @@ app.use((req, res, next) => {
 app.use("/api/auth", express.json(), authRoutes);
 app.use("/api", router); // Esta ruta usa busboy para FormData
 app.use("/api/stripe", express.json(), stripeRoutes);
+app.use("/api/categorias", router);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`✅ Servidor corriendo en https://backend-tpeu.onrender.com/${PORT}`);
 });

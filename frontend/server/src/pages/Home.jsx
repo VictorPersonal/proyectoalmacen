@@ -105,7 +105,7 @@ const Home = () => {
     setCargando(true);
     try {
       const res = await fetch(
-        `http://localhost:4000/api/productos?search=${encodeURIComponent(
+        `https://backend-tpeu.onrender.com/api/productos?search=${encodeURIComponent(
           query
         )}`
       );
@@ -321,30 +321,56 @@ const Home = () => {
           </section>
 
           {/* MAS INFORMACIÓN */}
-          <div className="info-toggle-wrapper">
-            <button
-              className="info-toggle-btn"
-              onClick={() => setMenuMasInfo(!menuMasInfo)}
-            >
-              Más información ▾
-            </button>
+          {busqueda.trim().length === 0 && (
+            <div className="info-toggle-wrapper">
+              <button
+                className="info-toggle-btn"
+                onClick={() => setMenuMasInfo(!menuMasInfo)}
+              >
+                Más información ▾
+              </button>
 
-            {menuMasInfo && (
-              <div className="info-panel">
-                <div className="info-column">
-                  <h4>Acerca de</h4>
-                  <a href="#">Dulce Hogar</a>
-                </div>
+              {menuMasInfo && (
+                <div className="info-panel">
 
-                <div className="info-column">
-                  <h4>Redes sociales</h4>
-                  <a href="#">Facebook</a>
-                  <a href="#">Instagram</a>
-                  <a href="#">WhatsApp</a>
+                  <div className="info-column">
+                    <h4>Acerca de</h4>
+                    <Link to="/Acerca-de/Dulce-Hogar">Dulce Hogar</Link>
+                  </div>
+
+                  <div className="info-column">
+                    <h4>Redes sociales</h4>
+
+                    <a
+                      href="https://www.facebook.com/dulce.hogar.3192479"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Facebook
+                    </a>
+
+                    <a
+                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Instagram
+                    </a>
+
+                    {/* CORREGIDO */}
+                    <a
+                      href="https://wa.me/573103749429?text=Hola,+quiero+más+información"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      WhatsApp
+                    </a>
+                  </div>
+
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </main>
       ) : (
         <main className="resultados">
@@ -373,8 +399,8 @@ const Home = () => {
             <p className="no-result">No se encontraron productos.</p>
           )}
 
-          {/* MAS INFORMACIÓN — AHORA SOLO SI NO HAY PRODUCTOS */}
-          {productos.length === 0 && (
+          {/* MAS INFORMACIÓN - BUSQUEDA VACÍA */}
+          {busqueda.trim().length === 0 && productos.length === 0 && (
             <div className="info-toggle-wrapper">
               <button
                 className="info-toggle-btn"
@@ -385,17 +411,35 @@ const Home = () => {
 
               {menuMasInfo && (
                 <div className="info-panel">
-                  <div className="info-column">
-                    <h4>Acerca de</h4>
-                    <a href="#">Dulce Hogar</a>
-                  </div>
 
                   <div className="info-column">
                     <h4>Redes sociales</h4>
-                    <a href="#">Facebook</a>
-                    <a href="#">Instagram</a>
-                    <a href="#">WhatsApp</a>
+
+                    <a
+                      href="https://www.facebook.com/dulce.hogar.3192479"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Facebook
+                    </a>
+
+                    <a
+                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Instagram
+                    </a>
+                    <a
+                      href="https://api.whatsapp.com/send?phone=573103749429&text=Hola,%20quiero%20más%20información"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      WhatsApp
+                    </a>
+
                   </div>
+
                 </div>
               )}
             </div>

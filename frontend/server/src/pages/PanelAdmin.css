@@ -9,7 +9,7 @@ html, body, #root {
   height: 100%;
   width: 100%;
   font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-  background-color: #f5f6fa;
+  background-color: #d9d9d9; /* gris claro del fondo general */
 }
 
 /* === LAYOUT PRINCIPAL === */
@@ -17,19 +17,19 @@ html, body, #root {
   display: flex;
   width: 100%;
   min-height: 100vh;
-  color: #333;
+  color: #222; /* texto principal oscuro */
 }
 
 /* === SIDEBAR === */
 .sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #374151, #1f2937);
-  color: #fff;
+  background-color: #c4c4c4; /* gris medio */
+  color: #000;
   display: flex;
   flex-direction: column;
   padding: 20px 0;
   gap: 25px;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+  border-right: 1px solid #9b9b9b;
 }
 
 .admin-profile {
@@ -42,13 +42,14 @@ html, body, #root {
 .admin-avatar {
   width: 45px;
   height: 45px;
-  background-color: #60a5fa;
+  background-color: #ffffff;
   border-radius: 50%;
+  border: 2px solid #7a7a7a;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  color: white;
+  font-size: 20px;
+  color: #000;
   font-weight: bold;
 }
 
@@ -60,117 +61,148 @@ html, body, #root {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  padding: 0 20px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  color: #cbd5e1;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  color: #000;
   text-decoration: none;
   font-size: 14px;
-  transition: background-color 0.3s, color 0.3s;
+  border-radius: 4px;
+  background-color: #b3b3b3; /* botón gris */
+  border: 1px solid #8b8b8b;
+  transition: background-color 0.15s, border-color 0.15s;
 }
 
 .nav-item:hover {
-  background-color: #475569;
-  color: #fff;
+  background-color: #a6a6a6;
+  border-color: #757575;
 }
 
 .nav-item.active {
-  background-color: #2563eb;
-  color: #fff;
-  font-weight: bold;
+  background-color: #999999;
+  border-color: #707070;
+  font-weight: 600;
 }
 
 /* === CONTENIDO PRINCIPAL === */
 .main-content {
   flex: 1;
-  padding: 30px;
-  background-color: #f9fafb;
+  padding: 20px;
+  background-color: #e5e5e5; /* gris claro del panel principal */
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 15px;
 }
 
 /* === BUSCADOR === */
-.search-wrapper {
+.admin-search-wrapper {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.search-container {
+.admin-search-container {
   display: flex;
   align-items: center;
-  background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 8px 12px;
-  width: 300px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.search-icon {
-  font-size: 18px;
-  margin-right: 8px;
-  color: #6b7280;
-}
-
-.search-container input {
-  border: none;
-  outline: none;
-  background: none;
-  font-size: 15px;
+  background-color: #ffffff;
+  border: 1px solid #9b9b9b;
+  border-radius: 5px;
+  padding: 4px 6px;
+  max-width: 1200px;
   width: 100%;
 }
 
-/* === BOTONES === */
-.btn {
+.admin-search-icon {
+  font-size: 14px;
+  margin-right: 4px;
+  color: #666666;
+}
+
+.admin-search-input {
   border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
+  outline: none;
+  background: none;
+  font-size: 14px;
+  width: 100%;
+}
+
+.admin-search-input::placeholder {
+  color: #a3a3a3;
+}
+
+/* Botón gris para "Agregar producto" en la barra de búsqueda */
+.btn--add-secondary {
+  background-color: #b3b3b3;
+  color: #000;
+  height: 32px;
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-size: 13px;
+  border: 1px solid #7a7a7a;
+}
+
+.btn--add-secondary:hover {
+  background-color: #a0a0a0;
+}
+
+/* === BOTONES GENERALES === */
+.btn {
+  border: 1px solid #7a7a7a;
+  padding: 8px 14px;
+  border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.15s, border-color 0.15s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
+  background-color: #c7c7c7;
+  color: #000;
 }
 
+/* botón verde original (solo se usa en modal) lo pasamos a gris oscuro */
 .btn--add {
-  background-color: #22c55e;
-  color: white;
+  background-color: #7d7d7d;
+  color: #ffffff;
 }
 .btn--add:hover {
-  background-color: #16a34a;
+  background-color: #5f5f5f;
 }
 
+/* editar / eliminar también en escala de grises */
 .btn--edit {
-  background-color: #3b82f6;
-  color: white;
+  background-color: #808080;
+  color: #ffffff;
 }
 .btn--edit:hover {
-  background-color: #2563eb;
+  background-color: #5f5f5f;
 }
 
 .btn--delete {
-  background-color: #ef4444;
-  color: white;
+  background-color: #696969;
+  color: #ffffff;
 }
 .btn--delete:hover {
-  background-color: #dc2626;
+  background-color: #4b4b4b;
 }
 
 /* === TABLA === */
 .table-wrapper {
-  background-color: white;
-  border-radius: 10px;
+  background-color: #ffffff;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px solid #9b9b9b; /* contorno de la tabla */
+  box-shadow: none;          /* sin sombra, como en el wireframe */
 }
 
 .products-table {
@@ -179,28 +211,28 @@ html, body, #root {
 }
 
 .products-table thead {
-  background-color: #f3f4f6;
+  background-color: #d9d9d9;
   text-align: left;
 }
 
-.products-table th, .products-table td {
-  padding: 14px 18px;
+.products-table th,
+.products-table td {
+  padding: 8px 10px;
   font-size: 14px;
+  border-bottom: 1px solid #bfbfbf;
 }
 
 .products-table th {
-  color: #111827;
+  color: #000;
   font-weight: 600;
-  border-bottom: 2px solid #e5e7eb;
 }
 
 .products-table td {
-  color: #374151;
-  border-bottom: 1px solid #e5e7eb;
+  color: #222222;
 }
 
 .products-table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: #f2f2f2;
 }
 
 /* === PAGINACIÓN === */
@@ -208,39 +240,55 @@ html, body, #root {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  margin-top: 15px;
+  gap: 6px;
+  margin-top: 12px;
 }
 
-.page-btn, .page-number {
-  width: 35px;
-  height: 35px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background-color: white;
+.page-btn,
+.page-number {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid #7a7a7a;
+  border-radius: 3px;
+  background-color: #ffffff;
+  color: #222222;
+  font-size: 14px;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.page-btn:hover, .page-number:hover {
-  background-color: #e5e7eb;
+/* hover general */
+.page-btn:hover,
+.page-number:hover {
+  background-color: #e0e0e0;
 }
 
+/* página actual */
 .page-number.active {
-  background-color: #2563eb;
-  color: white;
-  font-weight: bold;
-  border-color: #2563eb;
+  background-color: #777777;
+  color: #ffffff;
+  border-color: #555555;
 }
+
+/* flechas deshabilitadas (cuando estás en la primera o última página) */
+.page-btn:disabled {
+  background-color: #f5f5f5;
+  color: #bbbbbb;
+  border-color: #cccccc;
+  cursor: default;
+}
+
 
 /* === MODAL === */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,41 +296,42 @@ html, body, #root {
 }
 
 .modal-content {
-  background: white;
-  border-radius: 12px;
-  padding: 25px 30px;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 20px 24px;
   width: 380px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  gap: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
   animation: slideDown 0.3s ease;
+  border: 1px solid #9b9b9b;
 }
 
 .modal-content h3 {
-  margin-bottom: 8px;
-  color: #111827;
+  margin-bottom: 4px;
+  color: #000;
   text-align: center;
 }
 
 .modal-content input {
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  padding: 8px 10px;
+  border: 1px solid #b3b3b3;
+  border-radius: 3px;
   outline: none;
   font-size: 14px;
-  transition: all 0.2s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .modal-content input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 4px rgba(37,99,235,0.3);
+  border-color: #7a7a7a;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
 }
 
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 @keyframes slideDown {
@@ -295,16 +344,111 @@ html, body, #root {
   .admin-panel {
     flex-direction: column;
   }
+
   .sidebar {
     width: 100%;
     flex-direction: row;
     justify-content: space-around;
-    padding: 15px;
+    padding: 10px;
   }
+
   .main-content {
-    padding: 15px;
+    padding: 10px;
   }
+
   .modal-content {
     width: 90%;
   }
+
+  .search-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* === BOTONES SUPERIORES === */
+.top-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.top-btn {
+  background-color: #b3b3b3;
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-size: 13px;
+  border: 1px solid #7a7a7a;
+  cursor: pointer;
+}
+
+.top-btn:hover {
+  background-color: #a0a0a0;
+}
+
+/* Botón de ayuda (círculo con ?) */
+.help-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #7a7a7a;
+  border-radius: 50%;
+  background-color: #dddddd;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-btn:hover {
+  background-color: #c8c8c8;
+}
+
+/* === MODAL DE AYUDA === */
+.help-modal {
+  width: 420px;
+  text-align: center;
+  padding: 25px;
+}
+
+.help-modal p {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.4;
+}
+/* === MENÚ DE PERFIL === */
+.profile-clickable {
+  position: relative;
+  cursor: pointer;
+}
+
+.profile-menu {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  background-color: #ffffff;
+  border: 1px solid #9b9b9b;
+  border-radius: 4px;
+  padding: 8px 0;
+  width: 150px;
+  z-index: 999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.profile-menu button {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.profile-menu button:hover {
+  background-color: #ececec;
 }
