@@ -9,6 +9,7 @@ import ActualizarDatos from "./pages/ActualizarDatos";
 import FormaEntrega from "./pages/Checkout/FormaEntrega";
 import Pago from "./pages/Checkout/Pago";
 import Favoritos from "./pages/Favorito";
+import Categorias from "./pages/Categoriaspages";
 import TerminosYCondiciones from "./pages/Terminosycondiciones";
 import PagoExitoso from "./pages/Checkout/PagoExitoso";
 import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/terminosycondiciones" element={<TerminosYCondiciones />} />
         <Route path="/checkout/forma-entrega/pago/exitoso" element={<PagoExitoso />} />
         <Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />
+        <Route path="/categorias" element={<Categorias />} />
       </Routes>
     </Router>
   );
