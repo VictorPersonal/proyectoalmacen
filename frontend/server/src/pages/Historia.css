@@ -1,80 +1,274 @@
-/* ============================================
-   FONDO GENERAL SOLO PARA ESTA PÁGINA
-=============================================== */
-.historia-page {
-  background: #d6d5d5 !important; /* elimina gris/blanco del layout */
-  min-height: 100vh;
-  padding: 50px 0;
-  display: flex;
-  justify-content: center;
-}
-
-/* ============================================
-   TARJETA CENTRAL
-=============================================== */
-.historia-container {
-  max-width: 900px;
-  width: 90%;
-  padding: 40px;
-  background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+/* =========================================================
+CONTENEDOR GENERAL
+========================================================= */
+.historia-wrapper {
   font-family: "Segoe UI", Arial, sans-serif;
-  line-height: 1.7;
   color: #333;
+  background: #f6f6f6;
+  line-height: 1.6;
 }
 
-/* ============================================
-   TÍTULOS
-=============================================== */
-.historia-container h1 {
-  font-size: 2.5rem;
+/* =========================================================
+HERO (PRIMERA SECCIÓN)
+========================================================= */
+.hero-historia {
+  position: relative;
+  width: 100%;
+  max-height: 350px;
+  overflow: hidden;
+}
+
+.hero-historia img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  filter: brightness(0.7);
+}
+
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
   text-align: center;
-  color: #d64550;
+  width: 90%;
+  max-width: 800px;
+}
+
+.hero-text h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  font-weight: 800;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-text p {
+  background: #ffdd00;
+  color: #000;
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+/* =========================================================
+HISTORIA CON FOTO
+========================================================= */
+.historia-bloque {
+  display: flex;
+  padding: 80px 6%;
+  gap: 50px;
+  align-items: center;
+  background: #fff;
+}
+
+.bloque-imagen {
+  flex: 1;
+}
+
+.bloque-imagen img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.bloque-texto {
+  flex: 1;
+}
+
+.bloque-texto h2 {
+  font-size: 2.2rem;
+  color: #b22e39;
   margin-bottom: 25px;
   font-weight: 700;
 }
 
-.historia-container h2 {
-  margin-top: 30px;
+.bloque-texto p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+/* =========================================================
+MISIÓN Y VISIÓN DOS COLUMNAS
+========================================================= */
+.mision-vision {
+  padding: 80px 6%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  background: #f8f9fa;
+}
+
+.mv-card {
+  background: #fff;
+  padding: 35px 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mv-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.mv-card img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.mv-card h3 {
   font-size: 1.7rem;
+  margin-bottom: 15px;
   color: #b22e39;
-  border-left: 6px solid #d64550;
-  padding-left: 10px;
   font-weight: 600;
 }
 
-/* ============================================
-   PÁRRAFOS & LISTA
-=============================================== */
-.historia-container p {
+.mv-card p {
+  font-size: 1.05rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* =========================================================
+VALORES
+========================================================= */
+.valores-seccion {
+  padding: 80px 6%;
+  background: #fff;
+}
+
+.valores-seccion h2 {
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  color: #b22e39;
+  text-align: center;
+  font-weight: 700;
+}
+
+.valores-seccion ul {
+  list-style: none;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.valores-seccion li {
   font-size: 1.1rem;
-  margin-bottom: 18px;
-  color: #444;
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #ffdd00;
+  transition: background-color 0.3s ease;
 }
 
-.historia-container ul {
-  margin: 15px 0 25px 25px;
+.valores-seccion li:hover {
+  background: #fff9e6;
 }
 
-.historia-container li {
-  margin-bottom: 10px;
-  font-size: 1.1rem;
+.valores-seccion b {
+  color: #b22e39;
+  font-weight: 600;
 }
 
-/* ============================================
-   RESPONSIVE
-=============================================== */
-@media (max-width: 700px) {
-  .historia-container {
-    padding: 25px;
+/* =========================================================
+CIERRE DETALLADO
+========================================================= */
+.historia-cierre {
+  padding: 80px 6%;
+  background: linear-gradient(135deg, #b22e39 0%, #8a2230 100%);
+  color: #fff;
+  text-align: center;
+}
+
+.historia-cierre p {
+  font-size: 1.3rem;
+  line-height: 1.8;
+  max-width: 900px;
+  margin: 0 auto;
+  font-weight: 400;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+@media (max-width: 900px) {
+  .hero-text h1 {
+    font-size: 2.2rem;
   }
-
-  .historia-container h1 {
-    font-size: 2rem;
+  
+  .hero-text p {
+    font-size: 1rem;
+    padding: 6px 15px;
   }
+  
+  .historia-bloque {
+    flex-direction: column;
+    text-align: center;
+    padding: 60px 5%;
+    gap: 30px;
+  }
+  
+  .bloque-texto h2 {
+    font-size: 1.8rem;
+  }
+  
+  .mision-vision {
+    grid-template-columns: 1fr;
+    padding: 60px 5%;
+    gap: 25px;
+  }
+  
+  .valores-seccion {
+    padding: 60px 5%;
+  }
+  
+  .valores-seccion h2 {
+    font-size: 1.8rem;
+  }
+  
+  .valores-seccion li {
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+  
+  .historia-cierre {
+    padding: 60px 5%;
+  }
+  
+  .historia-cierre p {
+    font-size: 1.1rem;
+  }
+}
 
-  .historia-container h2 {
-    font-size: 1.4rem;
+@media (max-width: 480px) {
+  .hero-text h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero-text p {
+    font-size: 0.9rem;
+  }
+  
+  .bloque-texto h2,
+  .valores-seccion h2 {
+    font-size: 1.6rem;
+  }
+  
+  .mv-card {
+    padding: 25px 20px;
+  }
+  
+  .historia-cierre p {
+    font-size: 1rem;
   }
 }
