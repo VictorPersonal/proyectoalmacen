@@ -86,7 +86,7 @@ const PanelAdmin = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/productos");
+        const res = await axios.get("https://backend-tpeu.onrender.com//api/productos");
         setProducts(res.data);
       } catch (err) {
         console.error(
@@ -102,7 +102,7 @@ const PanelAdmin = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/categorias");
+        const res = await axios.get("https://backend-tpeu.onrender.com//api/categorias");
         setCategorias(res.data);
       } catch (err) {
         console.error(
@@ -146,7 +146,7 @@ const PanelAdmin = () => {
       if (editingProduct) {
         // Editar producto
         const res = await axios.put(
-          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
+          `https://backend-tpeu.onrender.com//api/productos/${editingProduct.idproducto}/con-imagen`,
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -162,7 +162,7 @@ const PanelAdmin = () => {
       } else {
         // Crear producto (activo por defecto en la BD)
         const res = await axios.post(
-          "http://localhost:4000/api/productos/con-imagen",
+          "https://backend-tpeu.onrender.com//api/productos/con-imagen",
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -216,7 +216,7 @@ const PanelAdmin = () => {
 
     try {
       const res = await axios.patch(
-        `http://localhost:4000/api/productos/${product.idproducto}/estado`,
+        `https://backend-tpeu.onrender.com//api/productos/${product.idproducto}/estado`,
         { activo: nuevoEstado }
       );
       const actualizado = res.data.producto || res.data;
@@ -268,6 +268,31 @@ const PanelAdmin = () => {
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
+
+    // ====== PAGINACIÓN CON TECLADO (← →) ======
+  useEffect(() => {
+    if (currentSection !== "productos") return;
+
+    const handleKeyDown = (e) => {
+      const tag = e.target.tagName.toLowerCase();
+
+      // Si el usuario está escribiendo en un input/textarea/select → NO paginar
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+      if (e.key === "ArrowRight") {
+        handleNextPage();
+      } else if (e.key === "ArrowLeft") {
+        handlePrevPage();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentPage, totalPages, currentSection]);
+
 
   return (
     <div className="admin-panel">
