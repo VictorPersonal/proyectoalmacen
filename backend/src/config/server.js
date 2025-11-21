@@ -32,7 +32,6 @@ app.use((req, res, next) => {
 app.use("/api/auth", express.json(), authRoutes);
 app.use("/api", router); // Esta ruta usa busboy para FormData
 app.use("/api/stripe", express.json(), stripeRoutes);
-app.use("/api/categorias", router);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

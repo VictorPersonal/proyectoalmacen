@@ -4,7 +4,6 @@ import Dashboard from "../components/dashboard";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 const PanelAdmin = () => {
   const [currentSection, setCurrentSection] = useState("productos");
   const [modalVisible, setModalVisible] = useState(false);
@@ -14,57 +13,11 @@ const PanelAdmin = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
   const [adminInfo, setAdminInfo] = useState(null);
   const [categorias, setCategorias] = useState([]);
 
-
-  useEffect(() => {
-  const stored = localStorage.getItem("usuarioInfo");
-  if (stored) {
-    try {
-      setAdminInfo(JSON.parse(stored));
-    } catch (e) {
-      console.error("Error leyendo admin:", e);
-    }
-  }
-  }, []);
-
-
-  // BLOQUEAR BOTÓN ATRÁS DEL NAVEGADOR
-  useEffect(() => {
-    const bloquearNavegacion = () => {
-      navigate(0); // evita volver atrás recargando el panel
-    };
-
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", bloquearNavegacion);
-
-    return () => {
-      window.removeEventListener("popstate", bloquearNavegacion);
-    };
-  }, []);
-
-
-  // Cerrar menú de perfil al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        showProfileMenu &&
-        !e.target.closest(".profile-clickable") &&
-        !e.target.closest(".profile-menu")
-      ) {
-        setShowProfileMenu(false);
-      }
-  };
-
-  document.addEventListener("click", handleClickOutside);
-  return () => document.removeEventListener("click", handleClickOutside);
-}, [showProfileMenu]);
-
-
-  // 🔍 nuevo: texto del buscador
-  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -76,11 +29,45 @@ const PanelAdmin = () => {
     imagen: null,
   });
 
-  // Traer productos al cargar el componente
+  // ====== BLOQUEAR ATRÁS DEL NAVEGADOR SOLO EN ADMIN ======
+  useEffect(() => {
+    const bloquearNavegacion = () => {
+      navigate(0);
+    };
+
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", bloquearNavegacion);
+
+    return () => {
+      window.removeEventListener("popstate", bloquearNavegacion);
+    };
+  }, [navigate]);
+
+  // ====== CARGAR INFO ADMIN DESDE localStorage ======
+  useEffect(() => {
+    const stored = localStorage.getItem("usuarioInfo");
+    if (stored) {
+      try {
+        setAdminInfo(JSON.parse(stored));
+      } catch (e) {
+        console.error("Error leyendo admin:", e);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("usuarioInfo");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setShowProfileMenu(false);
+    window.location.href = "/";
+  };
+
+  // ====== TRAER PRODUCTOS ======
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("https://backend-tpeu.onrender.com/api/productos");
+        const res = await axios.get("http://localhost:4000/api/productos");
         setProducts(res.data);
       } catch (err) {
         console.error(
@@ -92,7 +79,7 @@ const PanelAdmin = () => {
     fetchProducts();
   }, []);
 
-  // Traer categorías al cargar el componente
+  // ====== TRAER CATEGORÍAS ======
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
@@ -105,43 +92,15 @@ const PanelAdmin = () => {
         );
       }
     };
-
     fetchCategorias();
   }, []);
 
-  const getNombreCategoria = (id) => {
-  const cat = categorias.find(
-    (c) => String(c.idcategoria) === String(id)
-  );
-  return cat ? cat.descripcion : id;
-  };
-
-
-
-  const handleLogout = () => {
-  // 🔴 lo importante es borrar este:
-  localStorage.removeItem("usuarioInfo");
-
-  // si usas otros para el backend, los dejamos también
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  // limpiar estado local del admin (opcional pero prolijo)
-  setShowProfileMenu(false);
-  // si tienes adminInfo como estado:
-  // setAdminInfo(null);
-
-  // Redirigir al home y forzar que se recargue el header
-  window.location.href = "/";
-  };
-
-
-  // 🔍 cuando cambie el término de búsqueda, volvemos a la página 1
+  // cuando cambie el término de búsqueda, volver a página 1
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  // Manejar cambios de input
+  // Manejar cambios de input del modal
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
@@ -151,12 +110,12 @@ const PanelAdmin = () => {
     }
   };
 
-  // 🔍 manejar cambio en el input de búsqueda
+  // Búsqueda
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Guardar producto (crear o editar)
+  // ====== CREAR / EDITAR PRODUCTO ======
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -168,25 +127,30 @@ const PanelAdmin = () => {
       if (editingProduct) {
         // Editar producto
         const res = await axios.put(
-          `https://backend-tpeu.onrender.com/api/productos/${editingProduct.idproducto}/con-imagen`,
+          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
-        setProducts(
-          products.map((p) =>
-            p.idproducto === editingProduct.idproducto ? res.data.producto : p
+        const actualizado = res.data.producto || res.data;
+        setProducts((prev) =>
+          prev.map((p) =>
+            p.idproducto === editingProduct.idproducto
+              ? { ...p, ...actualizado }
+              : p
           )
         );
         setEditingProduct(null);
       } else {
-        // Crear producto
+        // Crear producto (nuevo → activo por defecto en la BD)
         const res = await axios.post(
-          "https://backend-tpeu.onrender.com/api/productos/con-imagen",
+          "http://localhost:4000/api/productos/con-imagen",
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
-        setProducts([...products, res.data.producto]);
+        const nuevo = res.data.producto || res.data;
+        setProducts((prev) => [...prev, nuevo]);
       }
+
       setModalVisible(false);
       setFormData({
         nombre: "",
@@ -206,22 +170,7 @@ const PanelAdmin = () => {
     }
   };
 
-  // Eliminar producto
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Estás seguro de eliminar este producto?")) return;
-    try {
-      await axios.delete(`https://backend-tpeu.onrender.com/api/productos/${id}`);
-      setProducts(products.filter((p) => p.idproducto !== id));
-    } catch (err) {
-      console.error(
-        "Error al eliminar producto:",
-        err.response?.data || err.message
-      );
-      alert("Error al eliminar producto");
-    }
-  };
-
-  // Preparar formulario para editar
+  // ====== PREPARAR EDICIÓN ======
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData({
@@ -236,12 +185,52 @@ const PanelAdmin = () => {
     setModalVisible(true);
   };
 
-  // 🔍 filtrar productos por nombre (puedes ampliar a descripción, categoría, etc.)
+  // ====== ACTIVAR / DESACTIVAR PRODUCTO ======
+  const handleToggleActive = async (product) => {
+    // si stock es 0 y ya está inactivo → no permitir activar
+    if (product.stock === 0 && !product.activo) {
+      alert("Este producto no se puede activar porque su stock es 0.");
+      return;
+    }
+
+    const nuevoEstado = !product.activo;
+
+    try {
+      const res = await axios.patch(
+        `http://localhost:4000/api/productos/${product.idproducto}/estado`,
+        { activo: nuevoEstado }
+      );
+      const actualizado = res.data.producto || res.data;
+
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.idproducto === product.idproducto
+            ? { ...p, activo: actualizado.activo }
+            : p
+        )
+      );
+    } catch (err) {
+      console.error(
+        "Error al cambiar estado del producto:",
+        err.response?.data || err.message
+      );
+      alert("Error al cambiar estado del producto");
+    }
+  };
+
+  // ====== helpers ======
+  const getNombreCategoria = (id) => {
+    const cat = categorias.find(
+      (c) => String(c.idcategoria) === String(id)
+    );
+    return cat ? cat.descripcion : id;
+  };
+
   const filteredProducts = products.filter((prod) =>
     prod.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Paginación (sobre la lista filtrada)
+  // Paginación
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -260,20 +249,6 @@ const PanelAdmin = () => {
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
-// 🔥 Cambiar de página con las flechas del teclado
-useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (e.key === "ArrowRight") {
-      handleNextPage();
-    } else if (e.key === "ArrowLeft") {
-      handlePrevPage();
-    }
-  };
-
-  window.addEventListener("keydown", handleKeyDown);
-  return () => window.removeEventListener("keydown", handleKeyDown);
-}, [currentPage, totalPages]);
-
 
   return (
     <div className="admin-panel">
@@ -296,40 +271,36 @@ useEffect(() => {
         </div>
 
         <nav className="sidebar-nav">
-          <a
-            href="#"
-            className={`nav-item ${currentSection === "productos" ? "active" : ""}`}
-            onClick={(e) => {
-              e.preventDefault();
-              setCurrentSection("productos");
-            }}
+          <button
+            type="button"
+            className={`nav-item ${
+              currentSection === "productos" ? "active" : ""
+            }`}
+            onClick={() => setCurrentSection("productos")}
           >
             📦 Productos
-          </a>
-          <a
-            href="#"
-            className={`nav-item ${currentSection === "dashboard" ? "active" : ""}`}
-            onClick={(e) => {
-              e.preventDefault();
-              setCurrentSection("dashboard");
-            }}
+          </button>
+          <button
+            type="button"
+            className={`nav-item ${
+              currentSection === "dashboard" ? "active" : ""
+            }`}
+            onClick={() => setCurrentSection("dashboard")}
           >
             📊 Dashboard
-          </a>
+          </button>
         </nav>
-
       </aside>
 
-      {/* MODAL DE AYUDA */}
+      {/* MODAL AYUDA */}
       {showHelp && (
         <div className="modal">
           <div className="modal-content help-modal">
             <h3>Ayuda del Administrador</h3>
             <p>
-              Aquí puedes gestionar todos los productos del sistema. Usa el
-              buscador para encontrar productos rápidamente, agrega nuevos
-              productos con el botón de la derecha y usa las acciones Editar /
-              Eliminar dentro de la tabla.
+              Desde aquí puedes gestionar todos los productos del sistema.
+              Usa el buscador, edita los datos y activa o desactiva los
+              productos según la disponibilidad de stock.
             </p>
             <button className="btn btn--add" onClick={() => setShowHelp(false)}>
               Cerrar
@@ -339,7 +310,6 @@ useEffect(() => {
       )}
 
       <main className="main-content">
-        {/* === BOTONES SUPERIORES === */}
         <div className="top-buttons">
           <button className="help-btn" onClick={() => setShowHelp(true)}>
             ❓
@@ -348,13 +318,12 @@ useEffect(() => {
 
         {currentSection === "productos" && (
           <>
-            {/* 🔍 Barra de búsqueda + botón agregar (estilo como tu imagen) */}
-            <div className="admin-search-wrapper">
-              <div className="admin-search-container">
-                <span className="admin-search-icon">🔍</span>
+            {/* Buscador + agregar */}
+            <div className="search-wrapper">
+              <div className="search-container">
+                <span className="search-icon">🔍</span>
                 <input
                   type="text"
-                  className="admin-search-input"
                   placeholder="Buscar producto"
                   value={searchTerm}
                   onChange={handleSearchChange}
@@ -369,6 +338,7 @@ useEffect(() => {
               </button>
             </div>
 
+            {/* Tabla de productos */}
             <div className="table-wrapper">
               <table className="products-table">
                 <thead>
@@ -379,13 +349,14 @@ useEffect(() => {
                     <th>Precio</th>
                     <th>Stock</th>
                     <th>Categoría</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentProducts.length === 0 ? (
                     <tr>
-                      <td colSpan="7">No hay productos</td>
+                      <td colSpan="8">No hay productos</td>
                     </tr>
                   ) : (
                     currentProducts.map((prod) => (
@@ -404,6 +375,17 @@ useEffect(() => {
                         <td>${prod.precio}</td>
                         <td>{prod.stock}</td>
                         <td>{getNombreCategoria(prod.idcategoria)}</td>
+
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              prod.activo ? "status-active" : "status-inactive"
+                            }`}
+                          >
+                            {prod.activo ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+
                         <td>
                           <button
                             className="btn btn--edit"
@@ -411,11 +393,19 @@ useEffect(() => {
                           >
                             ✏️ Editar
                           </button>
+
                           <button
-                            className="btn btn--delete"
-                            onClick={() => handleDelete(prod.idproducto)}
+                            className={`btn btn--status ${
+                              prod.activo ? "btn--inactive" : "btn--add"
+                            }`}
+                            onClick={() => handleToggleActive(prod)}
+                            disabled={prod.stock === 0 && !prod.activo}
                           >
-                            🗑️ Eliminar
+                            {prod.stock === 0 && !prod.activo
+                              ? "Sin stock"
+                              : prod.activo
+                              ? "Desactivar"
+                              : "Activar"}
                           </button>
                         </td>
                       </tr>
@@ -425,6 +415,7 @@ useEffect(() => {
               </table>
             </div>
 
+            {/* Paginación */}
             <div className="pagination">
               <button
                 className="page-btn"
@@ -458,6 +449,7 @@ useEffect(() => {
         {currentSection === "dashboard" && <Dashboard />}
       </main>
 
+      {/* MODAL CREAR / EDITAR */}
       {modalVisible && (
         <div className="modal">
           <div className="modal-content">
