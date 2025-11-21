@@ -107,7 +107,7 @@ const Home = () => {
       const res = await fetch(
         `https://backend-tpeu.onrender.com/api/productos?search=${encodeURIComponent(
           query
-        )}`
+        )}&soloActivos=true`
       );
       if (!res.ok) throw new Error("Error en la búsqueda");
 
@@ -153,7 +153,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="search-container" id="search-container">
+          <div className="search-container-home" id="search-container">
             <input
               type="text"
               placeholder="Buscar productos..."
