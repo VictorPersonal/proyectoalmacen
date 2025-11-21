@@ -258,6 +258,17 @@ const Home = () => {
                   >
                     Cerrar sesión
                   </button>
+                  {/* 👉 SOLO ADMIN: acceso al panel admin */}
+                  {usuarioInfo?.rol === "administrador" && (
+                  <button
+                    className="nav-link admin-panel-btn"
+                    onClick={() => navigate("/admin")}
+                    style={{ marginRight: "10px" }}
+                  >
+                    Panel Admin
+                  </button>
+)}
+
                 </div>
               )}
             </div>

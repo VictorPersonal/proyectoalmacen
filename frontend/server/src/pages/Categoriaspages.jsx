@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ProductoCard from "./components/ProductoCard"; // <── Importas tu propio componente
+import ProductoCard from "../components/productoCard"; // <── Importas tu propio componente
 
 const CategoriaPage = () => {
   const { id } = useParams();

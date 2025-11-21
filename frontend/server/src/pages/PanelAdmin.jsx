@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./PanelAdmin.css";
 import Dashboard from "../components/dashboard";
 import axios from "axios";
@@ -18,6 +18,7 @@ const PanelAdmin = () => {
   const [categorias, setCategorias] = useState([]);
 
   const navigate = useNavigate();
+  const profileRef = useRef(null);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -29,7 +30,7 @@ const PanelAdmin = () => {
     imagen: null,
   });
 
-  // ====== BLOQUEAR ATRÁS DEL NAVEGADOR SOLO EN ADMIN ======
+  // ====== BLOQUEAR BOTÓN ATRÁS SOLO EN ADMIN ======
   useEffect(() => {
     const bloquearNavegacion = () => {
       navigate(0);
@@ -55,13 +56,31 @@ const PanelAdmin = () => {
     }
   }, []);
 
+  // ====== CERRAR SESIÓN ======
   const handleLogout = () => {
     localStorage.removeItem("usuarioInfo");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setShowProfileMenu(false);
-    window.location.href = "/";
+    window.location.href = "/"; // redirigir al home
   };
+
+  // ✅ Ir al menú / home SIN cerrar sesión
+  const handleGoHome = () => {
+    setShowProfileMenu(false);
+    navigate("/"); // solo navega, mantiene la sesión
+  };
+
+  // ====== CERRAR MENÚ DE PERFIL AL HACER CLICK AFUERA ======
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // ====== TRAER PRODUCTOS ======
   useEffect(() => {
@@ -83,7 +102,7 @@ const PanelAdmin = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const res = await axios.get("https://backend-tpeu.onrender.com/api/categorias");
+        const res = await axios.get("http://localhost:4000/api/categorias");
         setCategorias(res.data);
       } catch (err) {
         console.error(
@@ -141,7 +160,7 @@ const PanelAdmin = () => {
         );
         setEditingProduct(null);
       } else {
-        // Crear producto (nuevo → activo por defecto en la BD)
+        // Crear producto (activo por defecto en la BD)
         const res = await axios.post(
           "http://localhost:4000/api/productos/con-imagen",
           data,
@@ -187,7 +206,7 @@ const PanelAdmin = () => {
 
   // ====== ACTIVAR / DESACTIVAR PRODUCTO ======
   const handleToggleActive = async (product) => {
-    // si stock es 0 y ya está inactivo → no permitir activar
+    // si stock es 0 y está inactivo, no permitir activar
     if (product.stock === 0 && !product.activo) {
       alert("Este producto no se puede activar porque su stock es 0.");
       return;
@@ -253,10 +272,11 @@ const PanelAdmin = () => {
   return (
     <div className="admin-panel">
       <aside className="sidebar">
-        {/* Perfil con menú de cerrar sesión */}
+        {/* Perfil con menú de opciones */}
         <div
           className="admin-profile profile-clickable"
           onClick={() => setShowProfileMenu(!showProfileMenu)}
+          ref={profileRef}
         >
           <div className="admin-avatar">👤</div>
           <span className="admin-name">
@@ -265,6 +285,7 @@ const PanelAdmin = () => {
 
           {showProfileMenu && (
             <div className="profile-menu">
+              <button onClick={handleGoHome}>Ir al menú</button>
               <button onClick={handleLogout}>Cerrar sesión</button>
             </div>
           )}
@@ -298,9 +319,9 @@ const PanelAdmin = () => {
           <div className="modal-content help-modal">
             <h3>Ayuda del Administrador</h3>
             <p>
-              Desde aquí puedes gestionar todos los productos del sistema.
-              Usa el buscador, edita los datos y activa o desactiva los
-              productos según la disponibilidad de stock.
+              Desde aquí puedes gestionar todos los productos del sistema. Usa
+              el buscador, edita los datos y activa o desactiva los productos
+              según la disponibilidad de stock.
             </p>
             <button className="btn btn--add" onClick={() => setShowHelp(false)}>
               Cerrar

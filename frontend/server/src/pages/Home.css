@@ -641,4 +641,17 @@ footer {
 .info-panel.visible {
   display: flex;
 }
+.admin-panel-btn {
+  background-color: #444;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.admin-panel-btn:hover {
+  background-color: #333;
+}
 
