@@ -8,7 +8,7 @@ const HistoriaDulceHogar = () => {
   const secciones = {
     hero: {
       titulo: "Dulce Hogar",
-      subtitulo: "Lo mejor está llegando.",
+      subtitulo: "Almacen de electrodomesticos.",
       imagen: historiaImg
     },
     historia: {
