@@ -123,7 +123,7 @@ html, body, #root {
   padding: 6px 10px;
   margin-left: -1px;
   margin-right: 1px;
-  flex: 1;     /* << ESTO LA HACE CRECER */
+  flex: 1;     /* la hace crecer */
 }
 
 /* Ícono */
@@ -181,7 +181,7 @@ html, body, #root {
   color: #000;
 }
 
-/* botón verde original (solo se usa en modal) lo pasamos a gris oscuro */
+/* botón principal (lo estamos usando en gris oscuro) */
 .btn--add {
   background-color: #7d7d7d;
   color: #ffffff;
@@ -295,10 +295,13 @@ html, body, #root {
 }
 
 
-/* === MODAL === */
+/* === MODAL (modernizado) === */
 .modal {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
   background: rgba(0,0,0,0.35);
   display: flex;
   align-items: center;
@@ -308,41 +311,102 @@ html, body, #root {
 
 .modal-content {
   background: #ffffff;
-  border-radius: 6px;
-  padding: 20px 24px;
-  width: 380px;
+  border-radius: 10px;
+  padding: 22px 26px;
+  width: 100%;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  gap: 14px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.35);
   animation: slideDown 0.3s ease;
   border: 1px solid #9b9b9b;
 }
 
+/* título */
 .modal-content h3 {
-  margin-bottom: 4px;
+  margin: 0;
   color: #000;
   text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e1e1e1;
 }
 
-.modal-content input {
-  padding: 8px 10px;
+/* formulario interno */
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* inputs modernos */
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content input[type="file"] {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 8px;
   border: 1px solid #b3b3b3;
-  border-radius: 3px;
-  outline: none;
+  background-color: #f3f3f3;
   font-size: 14px;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.18s ease,
+              box-shadow 0.18s ease,
+              background-color 0.18s ease;
 }
 
-.modal-content input:focus {
+.modal-content input::placeholder {
+  color: #9ca3af;
+}
+
+/* estado focus */
+.modal-content input[type="text"]:focus,
+.modal-content input[type="number"]:focus {
   border-color: #7a7a7a;
-  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(122,122,122,0.25);
 }
 
+/* input de archivo */
+.modal-content input[type="file"] {
+  padding: 6px 8px;
+  background-color: #f9fafb;
+}
+
+/* zona botones */
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-actions .btn {
+  flex: 1;
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 9px 0;
+}
+
+/* mantenemos tus colores para guardar / cancelar */
+.modal-actions .btn--add {
+  background-color: #7d7d7d;
+  color: #ffffff;
+}
+.modal-actions .btn--add:hover {
+  background-color: #5f5f5f;
+}
+
+.modal-actions .btn--delete {
+  background-color: #696969;
+  color: #ffffff;
+}
+.modal-actions .btn--delete:hover {
+  background-color: #4b4b4b;
 }
 
 @keyframes slideDown {
@@ -376,6 +440,7 @@ html, body, #root {
     align-items: stretch;
   }
 }
+
 /* === BOTONES SUPERIORES === */
 .top-buttons {
   display: flex;
@@ -430,6 +495,7 @@ html, body, #root {
   font-size: 14px;
   line-height: 1.4;
 }
+
 /* === MENÚ DE PERFIL === */
 .profile-clickable {
   position: relative;
