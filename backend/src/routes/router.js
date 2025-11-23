@@ -631,7 +631,6 @@ router.delete("/carrito/vaciar", async (req, res) => {
 });
 
 router.put("/carrito/actualizar", async (req, res) => {
-  const supabase = req.supabase;
   const cedula = req.usuario.id; // usuario logueado
   const { idproducto, cantidad } = req.body;
 
