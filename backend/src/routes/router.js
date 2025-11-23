@@ -306,23 +306,7 @@ router.get("/productos/:id", async (req, res) => {
   }
 });
 
-// =============================================
-// 1️⃣ Obtener categorías (correcto)
-// =============================================
-router.get("/categorias", async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from("categoria")
-      .select("idcategoria, descripcion");
 
-    if (error) throw error;
-
-    res.status(200).json(data);
-  } catch (err) {
-    console.error("❌ Error al obtener categorías:", err.message);
-    res.status(500).json({ message: "Error al obtener categorías" });
-  }
-});
 // ✅ Activar / desactivar producto
 router.patch("/productos/:id/estado", async (req, res) => {
   try {
@@ -1147,9 +1131,9 @@ router.get("/categorias", async (req, res) => {
 
 // ✅ Obtener productos de una categoría específica
 router.get("/categorias/:idcategoria/productos", async (req, res) => {
-  try {
-    const { idcategoria } = req.params;
+  const { idcategoria } = req.params;
 
+  try {
     const { data, error } = await supabase
       .from("producto")
       .select(`
@@ -1158,39 +1142,40 @@ router.get("/categorias/:idcategoria/productos", async (req, res) => {
         precio,
         stock,
         descripcion,
-        categoria:categoria (
-          descripcion
-        )
+        imagen_url,
+        idcategoria,
+        activo
       `)
       .eq("idcategoria", idcategoria)
+      .eq("activo", true) // opcional si quieres solo activos
       .order("nombre", { ascending: true });
 
     if (error) {
-      console.error("❌ Error Supabase:", error);
-      return res.status(500).json({ message: "Error al obtener productos por categoría" });
+      console.log("❌ Error supabase:", error);
+      return res.status(500).json({ message: "Error al obtener productos" });
     }
 
     if (!data || data.length === 0) {
-      return res.status(404).json({ message: "No hay productos en esta categoría" });
+      return res.status(404).json([]);
     }
 
-    // Normalizamos la respuesta para que coincida con tu formato original
-    const productos = data.map((p) => ({
-      id: p.idproducto,
+    const producto = data.map((p) => ({
+      idproducto: p.idproducto,
       nombre: p.nombre,
       precio: p.precio,
       stock: p.stock,
       descripcion: p.descripcion,
-      categoria: p.categoria?.descripcion || null
+      idcategoria: p.idcategoria,
+      imagen_url: p.imagen_url || null,
+      activo: p.activo,
     }));
 
-    res.status(200).json(productos);
-  } catch (error) {
-    console.error("❌ Error servidor:", error);
-    res.status(500).json({ message: "Error al obtener productos por categoría" });
+    res.status(200).json(producto);
+  } catch (err) {
+    console.log("❌ Error servidor:", err);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 });
-
 
 
 export default router;

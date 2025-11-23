@@ -26,14 +26,36 @@ const Home = () => {
   const [usuarioInfo, setUsuarioInfo] = useState(null);
   const navigate = useNavigate();
 
+  const [mensajeCategoria, setMensajeCategoria] = useState("");
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
-  const categorias = ["Muebles", "Electrodomésticos", "Tecnología"];
-
-  const subcategorias = {
-    tecnología: ["Televisores", "Celulares", "Computadores"],
-    electrodomésticos: ["Neveras", "Lavadoras"],
-  };
+  // CATEGORÍAS ACTUALIZADAS - Estructura mejorada con IDs
+  const categorias = [
+    {
+      nombre: "Tecnología",
+      subcategorias: [
+        { id: 1, nombre: "Televisores" },
+        { id: 6, nombre: "Celulares" },
+        { id: 7, nombre: "Computadores" }
+      ]
+    },
+    {
+      nombre: "Electrodomésticos",
+      subcategorias: [
+        { id: 2, nombre: "Aspiradoras" },
+        { id: 3, nombre: "Lavadoras" },
+        { id: 4, nombre: "Refrigeradores" },
+        { id: 5, nombre: "Neveras" }
+      ]
+    },
+    {
+      nombre: "Muebles",
+      subcategorias: [
+        { id: 8, nombre: "Muebles" }
+      ]
+    }
+  ];
 
   useEffect(() => {
     verificarAutenticacion();
@@ -64,8 +86,8 @@ const Home = () => {
     setSubmenuAbierto(null);
   };
 
-  const toggleSubmenu = (categoria) => {
-    setSubmenuAbierto(submenuAbierto === categoria ? null : categoria);
+  const toggleSubmenu = (categoriaIndex) => {
+    setSubmenuAbierto(submenuAbierto === categoriaIndex ? null : categoriaIndex);
   };
 
   const togglePerfilMenu = () => setPerfilMenuAbierto(!perfilMenuAbierto);
@@ -99,6 +121,8 @@ const Home = () => {
     const query = busqueda.trim();
     if (query === "") {
       setProductos([]);
+      setCategoriaSeleccionada(null);
+      setMensajeCategoria("");
       return;
     }
 
@@ -115,6 +139,8 @@ const Home = () => {
       setProductos(
         ordenarPorRelevancia(Array.isArray(data) ? data : [], query)
       );
+      setCategoriaSeleccionada(null);
+      setMensajeCategoria("");
     } catch (error) {
       console.error("Error al buscar productos:", error);
       setProductos([]);
@@ -126,7 +152,10 @@ const Home = () => {
   useEffect(() => {
     const delay = setTimeout(() => {
       if (busqueda.trim() !== "") handleBuscar();
-      else setProductos([]);
+      else if (!categoriaSeleccionada) {
+        setProductos([]);
+        setMensajeCategoria("");
+      }
     }, 500);
 
     return () => clearTimeout(delay);
@@ -137,6 +166,41 @@ const Home = () => {
   };
 
   const toggleCarrito = () => setMostrarCarrito(!mostrarCarrito);
+
+  // FUNCIÓN NUEVA PARA CARGAR PRODUCTOS POR CATEGORÍA
+  const cargarProductosPorCategoria = async (idCategoria) => {
+    setCategoriaSeleccionada(idCategoria);   
+    setCargando(true);
+    setBusqueda("");
+    setProductoSeleccionado(null);
+    setMensajeCategoria("");
+
+    try {
+      const res = await fetch(
+        `https://backend-tpeu.onrender.com/api/categorias/${idCategoria}/productos`
+      );
+
+      const data = await res.json();
+      console.log("Productos recibidos:", data);
+      console.log("URL llamada:", `https://backend-tpeu.onrender.com/api/categorias/${idCategoria}/productos`);
+
+
+      if (res.status === 404 || data.message === "No hay productos en esta categoría") {
+        setProductos([]);
+        setMensajeCategoria("No se encontraron productos para esta categoría.");
+        return;
+      }
+
+      setProductos(Array.isArray(data) ? data : []);
+
+    } catch (err) {
+      console.error("Error cargando productos por categoría:", err);
+      setProductos([]);
+      setMensajeCategoria("Error al cargar productos.");
+    } finally {
+      setCargando(false);
+    }
+  };
 
   return (
     <div>
@@ -181,37 +245,44 @@ const Home = () => {
                   <div className="categorias-lista">
                     {categorias.map((categoria, index) => (
                       <div key={index} className="categoria-item-container">
-                        {(categoria === "Tecnología" ||
-                          categoria === "Electrodomésticos") ? (
+                        {categoria.subcategorias.length > 1 ? (
                           <div
                             className="categoria-item con-submenu"
-                            onMouseEnter={() =>
-                              toggleSubmenu(categoria.toLowerCase())
-                            }
+                            onMouseEnter={() => toggleSubmenu(index)}
                             onMouseLeave={() => setSubmenuAbierto(null)}
                           >
-                            <span>{categoria}</span>
+                            <span>{categoria.nombre}</span>
                             <FaChevronRight className="submenu-icon" />
-                            {submenuAbierto === categoria.toLowerCase() && (
+
+                            {submenuAbierto === index && (
                               <div className="submenu">
-                                {subcategorias[categoria.toLowerCase()].map(
-                                  (subitem, subIndex) => (
-                                    <a
-                                      key={subIndex}
-                                      href="#"
-                                      className="submenu-item"
-                                    >
-                                      {subitem}
-                                    </a>
-                                  )
-                                )}
+                                {categoria.subcategorias.map((sub, i) => (
+                                  <button
+                                    key={i}
+                                    className="submenu-item"
+                                    onClick={() => {
+                                      cargarProductosPorCategoria(sub.id);
+                                      setMenuAbierto(false);
+                                    }}
+                                  >
+                                    {sub.nombre}
+                                  </button>
+                                ))}
                               </div>
                             )}
                           </div>
                         ) : (
-                          <a href="#" className="categoria-item">
-                            {categoria}
-                          </a>
+                          <button
+                            className="categoria-item"
+                            onClick={() => {
+                              cargarProductosPorCategoria(
+                                categoria.subcategorias[0].id
+                              );
+                              setMenuAbierto(false);
+                            }}
+                          >
+                            {categoria.nombre}
+                          </button>
                         )}
                       </div>
                     ))}
@@ -267,8 +338,7 @@ const Home = () => {
                   >
                     Panel Admin
                   </button>
-)}
-
+                  )}
                 </div>
               )}
             </div>
@@ -311,7 +381,7 @@ const Home = () => {
             cedula={usuarioInfo?.cedula}
           />
         </main>
-      ) : busqueda.trim() === "" ? (
+      ) : !categoriaSeleccionada && busqueda.trim().length === 0 && productos.length === 0 ? (
         <main id="main">
           <section className="hero-section" id="hero-section">
             <button className="carousel-btn prev" onClick={prevSlide}>
@@ -368,7 +438,6 @@ const Home = () => {
                       Instagram
                     </a>
 
-                    {/* CORREGIDO */}
                     <a
                       href="https://wa.me/573103749429?text=Hola,+quiero+más+información"
                       target="_blank"
@@ -384,7 +453,14 @@ const Home = () => {
           )}
         </main>
       ) : (
+        /* Mostrar productos ya sea por búsqueda o por categoría */
         <main className="resultados">
+          {/* ⭐ Si hay mensaje por categoría (sin productos) */}
+          {mensajeCategoria && (
+            <p className="no-result">{mensajeCategoria}</p>
+          )}
+
+          {/*Contador de resultados*/}
           {!cargando && productos.length > 0 && (
             <div className="resultados-header">
               <span className="resultados-count">
@@ -393,68 +469,21 @@ const Home = () => {
             </div>
           )}
 
+          {/*Mostrar los productos*/}    
           {cargando ? (
             <p className="loading">Cargando productos...</p>
           ) : productos.length > 0 ? (
-            <div className="productos-grid">
+            <div className="productos-grid">  
               {productos.map((prod) => (
                 <div
-                  key={prod.id_producto || prod.id}
+                  key={prod.id_producto}
                   onClick={() => setProductoSeleccionado(prod)}
                 >
                   <ProductCard producto={prod} />
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="no-result">No se encontraron productos.</p>
-          )}
-
-          {/* MAS INFORMACIÓN - BUSQUEDA VACÍA */}
-          {busqueda.trim().length === 0 && productos.length === 0 && (
-            <div className="info-toggle-wrapper">
-              <button
-                className="info-toggle-btn"
-                onClick={() => setMenuMasInfo(!menuMasInfo)}
-              >
-                Más información ▾
-              </button>
-
-              {menuMasInfo && (
-                <div className="info-panel">
-
-                  <div className="info-column">
-                    <h4>Redes sociales</h4>
-
-                    <a
-                      href="https://www.facebook.com/dulce.hogar.3192479"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Facebook
-                    </a>
-
-                    <a
-                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Instagram
-                    </a>
-                    <a
-                      href="https://api.whatsapp.com/send?phone=573103749429&text=Hola,%20quiero%20más%20información"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      WhatsApp
-                    </a>
-
-                  </div>
-
-                </div>
-              )}
-            </div>
-          )}
+          ) : null}
         </main>
       )}
 
