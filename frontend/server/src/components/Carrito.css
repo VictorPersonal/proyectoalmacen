@@ -445,6 +445,16 @@
   background: #c82333;
 }
 
+.carrito-quantity-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .carrito-modal-container {

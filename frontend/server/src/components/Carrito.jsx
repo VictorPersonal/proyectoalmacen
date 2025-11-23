@@ -124,23 +124,16 @@ const Carrito = ({ abierto, onCerrar }) => {
   };
 
   // ➕➖ Actualizar cantidad de producto
-  const handleActualizarCantidad = async (idproducto, nuevaCantidad) => {
-    if (nuevaCantidad < 1) return;
-
-    try {
-      await axios.post(
-        "https://backend-tpeu.onrender.com/api/carrito/agregar",
-        { idproducto, cantidad: nuevaCantidad},
-        { withCredentials: true }
-      );
-
-      // Recargar carrito para obtener datos actualizados
-      cargarCarrito();
-    } catch (error) {
-      console.error("❌ Error al actualizar cantidad:", error);
-      manejarError(error);
-    }
+  const handleActualizarCantidad = (idproducto, nuevaCantidad) => {
+    axios.put(
+      "https://backend-tpeu.onrender.com/api/carrito/actualizar",
+      { idproducto, cantidad: nuevaCantidad },
+      { withCredentials: true }
+    )
+    .then(() => cargarCarrito())
+    .catch(manejarError);
   };
+
 
   // 🗑️ Eliminar un solo producto del carrito
   const handleEliminarProducto = async (idproducto, nombreProducto) => {
