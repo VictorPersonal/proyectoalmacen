@@ -630,6 +630,69 @@ router.delete("/carrito/vaciar", async (req, res) => {
   }
 });
 
+router.put("/carrito/actualizar", async (req, res) => {
+  const supabase = req.supabase;
+  const cedula = req.usuario.id; // usuario logueado
+  const { idproducto, cantidad } = req.body;
+
+  try {
+    if (!idproducto || cantidad < 1) {
+      return res.status(400).json({
+        message: "Datos inválidos"
+      });
+    }
+
+    // 1️⃣ Obtener precio del producto
+    const { data: producto, error: errorProducto } = await supabase
+      .from("productos")
+      .select("precio")
+      .eq("idproducto", idproducto)
+      .single();
+
+    if (errorProducto || !producto) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    const subtotal = producto.precio * cantidad;
+
+    // 2️⃣ Actualizar cantidad y subtotal en carrito
+    const { error: errorUpdate } = await supabase
+      .from("carrito")
+      .update({
+        cantidad,
+        subtotal
+      })
+      .eq("idproducto", idproducto)
+      .eq("cedula", cedula);
+
+    if (errorUpdate) {
+      return res.status(500).json({ message: "Error al actualizar" });
+    }
+
+    // 3️⃣ Obtener carrito actualizado
+    const { data: carrito, error: errorCarrito } = await supabase
+      .from("carrito")
+      .select("*")
+      .eq("cedula", cedula);
+
+    if (errorCarrito) {
+      return res.status(500).json({ message: "Error cargando carrito" });
+    }
+
+    return res.json({
+      message: "Cantidad actualizada correctamente",
+      carrito
+    });
+
+  } catch (error) {
+    console.error("❌ Error al actualizar carrito:", error);
+    res.status(500).json({
+      message: "Error interno del servidor"
+    });
+  }
+});
+
+
 
 // ====================================================================
 // 📦 Obtener favoritos del usuario autenticado
