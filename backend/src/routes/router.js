@@ -644,7 +644,7 @@ router.put("/carrito/actualizar", async (req, res) => {
 
     // 1️⃣ Obtener precio del producto
     const { data: producto, error: errorProducto } = await supabase
-      .from("productos")
+      .from("producto")
       .select("precio")
       .eq("idproducto", idproducto)
       .single();
