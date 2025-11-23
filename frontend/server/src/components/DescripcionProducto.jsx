@@ -94,8 +94,16 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
 
   // 👉 Función para ir al checkout
+  // En DescripcionProducto.js - modifica handleComprarAhora:
   const handleComprarAhora = () => {
-    navigate("/checkout/forma-entrega");
+    navigate("/checkout/forma-entrega", {
+      state: {
+        producto: {
+          nombre: producto.nombre,
+          precio: producto.precio
+        }
+      }
+    });
   };
 
   return (

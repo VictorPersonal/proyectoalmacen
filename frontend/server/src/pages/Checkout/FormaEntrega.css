@@ -19,7 +19,7 @@
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  max-width: 550px;
+  max-width: 500px;
 }
 
 .envio-titulo {
@@ -38,6 +38,11 @@
   background-color: #fff;
   transition: all 0.2s ease;
   cursor: pointer;
+  min-height: 140px; /* ALTURA MÍNIMA FIJA */
+  display: flex;
+  min-width: 300px;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .envio-opcion:hover {
@@ -75,10 +80,27 @@
   font-size: 15px;
 }
 
+/* CONTENEDOR DE DIRECCIÓN CON ALTURA FIJA */
+.envio-direccion-container {
+  min-height: 50px; /* ALTURA MÍNIMA PARA LA DIRECCIÓN */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 8px 0;
+}
+
 .envio-direccion {
   color: #555;
   font-size: 13px;
   margin-bottom: 3px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+  /* Limitar a 2 líneas máximo */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .envio-tipo {
@@ -92,6 +114,7 @@
   text-decoration: none;
   font-size: 13px;
   display: inline-block;
+  margin-top: auto; /* EMPUJA HACIA ABAJO */
 }
 
 .envio-modificar:hover {
@@ -191,5 +214,9 @@
   .envio-left,
   .envio-right {
     padding: 20px 15px;
+  }
+  
+  .envio-opcion {
+    min-height: 130px; /* ALTURA MÍNIMA MÓVIL */
   }
 }
