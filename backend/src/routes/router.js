@@ -365,33 +365,6 @@ router.patch("/productos/:id/estado", async (req, res) => {
 });
 
 
-
-// ====================================================================
-// 🛒 AGREGAR PRODUCTO AL CARRITO
-// ====================================================================
-router.post("/api/carrito/agregar", async (req, res) => {
-  try {
-    const { cedula, idproducto, cantidad, subtotal } = req.body;
-
-    if (!cedula || !idproducto) {
-      return res.status(400).json({ error: "Faltan datos obligatorios" });
-    }
-
-    const { data, error } = await supabase
-      .from("carrito")
-      .insert([{ cedula, idproducto, cantidad, subtotal }])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    res.json({ success: true, carrito: data });
-  } catch (err) {
-    console.error("❌ Error al agregar producto al carrito:", err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // ====================================================================
 // ➕ CREAR PRODUCTO
 // ====================================================================
@@ -491,38 +464,94 @@ router.get("/carrito", async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
-    const { data, error } = await supabase
+    console.log("🔍 Obteniendo carrito para cédula:", cedula);
+
+    // 1. Obtener items del carrito
+    const { data: carritoItems, error: carritoError } = await supabase
       .from("carrito")
-      .select(
-        `
-        idproducto,
-        cantidad,
-        producto:producto (
-          nombre,
-          precio
-        )
-        `
-      )
+      .select("idproducto, cantidad")
       .eq("cedula", cedula)
       .order("idproducto", { ascending: true });
 
-    if (error) throw error;
+    if (carritoError) throw carritoError;
 
-    // Transformamos la respuesta para mantener tu formato original
-    const carritoFormateado = data.map((item) => ({
-      idproducto: item.idproducto,
-      nombre: item.producto?.nombre,
-      precio: item.producto?.precio,
-      cantidad: item.cantidad,
-      subtotal: (item.producto?.precio || 0) * item.cantidad,
-    }));
+    console.log("📦 Items del carrito:", carritoItems);
 
+    if (!carritoItems || carritoItems.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // 2. Obtener IDs de productos
+    const productIds = carritoItems.map(item => item.idproducto);
+    console.log("🆔 IDs de productos:", productIds);
+
+    // 3. Obtener productos completos - VERIFICAR ESTA CONSULTA
+    const { data: productos, error: productosError } = await supabase
+      .from("producto")
+      .select("idproducto, nombre, precio, imagen_url, descripcion, stock")
+      .in("idproducto", productIds);
+
+    if (productosError) {
+      console.error("❌ Error al obtener productos:", productosError);
+      throw productosError;
+    }
+
+    console.log("📋 Productos encontrados:", JSON.stringify(productos, null, 2));
+    
+    // 🔍 VERIFICAR SI LAS IMÁGENES EXISTEN EN LA BASE DE DATOS
+    console.log("🐛 VERIFICACIÓN DE IMÁGENES EN BD:");
+    if (productos && productos.length > 0) {
+      productos.forEach(p => {
+        console.log(`- Producto ${p.idproducto} (${p.nombre}):`);
+        console.log(`  imagen_url = ${p.imagen_url}`);
+        console.log(`  ¿Tiene imagen?: ${!!p.imagen_url}`);
+      });
+    } else {
+      console.log("❌ No se encontraron productos");
+    }
+
+    // 4. Combinar la información - FORZAR imagen_url
+    const carritoFormateado = carritoItems.map(item => {
+      const producto = productos.find(p => p.idproducto === item.idproducto);
+      
+      if (!producto) {
+        console.warn(`⚠️ Producto ${item.idproducto} no encontrado`);
+        return {
+          idproducto: item.idproducto,
+          nombre: "Producto no disponible",
+          imagen_url: null, // ← EXPLÍCITAMENTE null
+          cantidad: item.cantidad,
+          subtotal: 0,
+          precio_unitario: 0
+        };
+      }
+
+      console.log(`✅ Combinando: ${item.idproducto} ->`, {
+        nombre: producto.nombre,
+        imagen_url: producto.imagen_url,
+        tiene_imagen: !!producto.imagen_url
+      });
+
+      return {
+        idproducto: item.idproducto,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        imagen_url: producto.imagen_url || null, // ← FORZAR que siempre esté presente
+        cantidad: item.cantidad,
+        subtotal: producto.precio * item.cantidad,
+        precio_unitario: producto.precio
+      };
+    });
+
+    console.log("🎯 Carrito FINAL que se envía:", JSON.stringify(carritoFormateado, null, 2));
     res.status(200).json(carritoFormateado);
+
   } catch (error) {
     console.error("❌ Error al obtener carrito:", error.message);
     res.status(500).json({ message: "Error al obtener el carrito" });
   }
 });
+
 
 // ====================================================================
 // ➕ Agregar o actualizar producto en el carrito

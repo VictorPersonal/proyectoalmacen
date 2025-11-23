@@ -13,6 +13,7 @@ import Categorias from "./pages/Categoriaspages";
 import TerminosYCondiciones from "./pages/Terminosycondiciones";
 import PagoExitoso from "./pages/Checkout/PagoExitoso";
 import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";
+import ModificarDireccion from "./pages/Checkout/ModificarDireccion";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/checkout/forma-entrega/pago/exitoso" element={<PagoExitoso />} />
         <Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />
         <Route path="/categorias" element={<Categorias />} />
+        <Route path="/modificar-direccion" element={<ModificarDireccion />} />
       </Routes>
     </Router>
   );
