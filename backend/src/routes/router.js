@@ -631,7 +631,8 @@ router.delete("/carrito/vaciar", async (req, res) => {
 });
 
 router.put("/carrito/actualizar", async (req, res) => {
-  const cedula = req.usuario.id; // usuario logueado
+  const supabase = req.supabase; // ⬅️ Asegúrate de que esto exista
+  const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
 
   try {
@@ -641,26 +642,9 @@ router.put("/carrito/actualizar", async (req, res) => {
       });
     }
 
-    // 1️⃣ Obtener precio del producto
-    const { data: producto, error: errorProducto } = await supabase
-      .from("producto")
-      .select("precio")
-      .eq("idproducto", idproducto)
-      .single();
-
-    if (errorProducto || !producto) {
-      return res.status(404).json({ message: "Producto no encontrado" });
-    }
-
-    const subtotal = producto.precio * cantidad;
-
-    // 2️⃣ Actualizar cantidad y subtotal en carrito
     const { error: errorUpdate } = await supabase
       .from("carrito")
-      .update({
-        cantidad,
-        subtotal
-      })
+      .update({ cantidad })
       .eq("idproducto", idproducto)
       .eq("cedula", cedula);
 
@@ -668,7 +652,6 @@ router.put("/carrito/actualizar", async (req, res) => {
       return res.status(500).json({ message: "Error al actualizar" });
     }
 
-    // 3️⃣ Obtener carrito actualizado
     const { data: carrito, error: errorCarrito } = await supabase
       .from("carrito")
       .select("*")
@@ -690,8 +673,6 @@ router.put("/carrito/actualizar", async (req, res) => {
     });
   }
 });
-
-
 
 // ====================================================================
 // 📦 Obtener favoritos del usuario autenticado

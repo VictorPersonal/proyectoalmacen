@@ -129,7 +129,7 @@ const Home = () => {
     setCargando(true);
     try {
       const res = await fetch(
-        `https://backend-tpeu.onrender.com/api/productos?search=${encodeURIComponent(
+        `http://localhost:4000/api/productos?search=${encodeURIComponent(
           query
         )}&soloActivos=true`
       );
@@ -177,12 +177,12 @@ const Home = () => {
 
     try {
       const res = await fetch(
-        `https://backend-tpeu.onrender.com/api/categorias/${idCategoria}/productos`
+        `http://localhost:4000/api/categorias/${idCategoria}/productos`
       );
 
       const data = await res.json();
       console.log("Productos recibidos:", data);
-      console.log("URL llamada:", `https://backend-tpeu.onrender.com/api/categorias/${idCategoria}/productos`);
+      console.log("URL llamada:", `http://localhost:4000/api/categorias/${idCategoria}/productos`);
 
 
       if (res.status === 404 || data.message === "No hay productos en esta categoría") {

@@ -19,7 +19,7 @@ const RestablecerContrasena = () => {
     }
 
     try {
-      const response = await fetch("https://backend-tpeu.onrender.com/api/auth/restablecer", {
+      const response = await fetch("http://localhost:4000/api/auth/restablecer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, nuevaContrasena }),

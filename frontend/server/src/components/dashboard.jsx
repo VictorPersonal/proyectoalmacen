@@ -53,10 +53,10 @@ const Dashboard = () => {
 
   // 🔹 Cargar todos los datos
   const actualizarDatos = () => {
-    fetchData("https://backend-tpeu.onrender.com/api/estadisticas/ventas-mensuales", setVentasMensuales);
-    fetchData("https://backend-tpeu.onrender.com/api/estadisticas/productos-mas-vendidos", setProductosMasVendidos);
-    fetchData("https://backend-tpeu.onrender.com/api/estadisticas/usuarios", setUsuariosPorTipo);
-    fetchData("https://backend-tpeu.onrender.com/api/estadisticas/estados-pedidos", setEstadosPedidos);
+    fetchData("http://localhost:4000/api/estadisticas/ventas-mensuales", setVentasMensuales);
+    fetchData("http://localhost:4000/api/estadisticas/productos-mas-vendidos", setProductosMasVendidos);
+    fetchData("http://localhost:4000/api/estadisticas/usuarios", setUsuariosPorTipo);
+    fetchData("http://localhost:4000/api/estadisticas/estados-pedidos", setEstadosPedidos);
   };
 
   // 🔁 Refrescar cada 10 segundos

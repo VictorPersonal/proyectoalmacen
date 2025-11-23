@@ -86,7 +86,7 @@ const PanelAdmin = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("https://backend-tpeu.onrender.com/api/productos");
+        const res = await axios.get("http://localhost:4000/api/productos");
         setProducts(res.data);
       } catch (err) {
         console.error(
@@ -102,7 +102,7 @@ const PanelAdmin = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const res = await axios.get("https://backend-tpeu.onrender.com/api/categorias");
+        const res = await axios.get("http://localhost:4000/api/categorias");
         setCategorias(res.data);
       } catch (err) {
         console.error(
@@ -146,7 +146,7 @@ const PanelAdmin = () => {
       if (editingProduct) {
         // Editar producto
         const res = await axios.put(
-          `https://backend-tpeu.onrender.com/api/productos/${editingProduct.idproducto}/con-imagen`,
+          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -162,7 +162,7 @@ const PanelAdmin = () => {
       } else {
         // Crear producto (activo por defecto en la BD)
         const res = await axios.post(
-          "https://backend-tpeu.onrender.com/api/productos/con-imagen",
+          "http://localhost:4000/api/productos/con-imagen",
           data,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -216,7 +216,7 @@ const PanelAdmin = () => {
 
     try {
       const res = await axios.patch(
-        `https://backend-tpeu.onrender.com/api/productos/${product.idproducto}/estado`,
+        `http://localhost:4000/api/productos/${product.idproducto}/estado`,
         { activo: nuevoEstado }
       );
       const actualizado = res.data.producto || res.data;

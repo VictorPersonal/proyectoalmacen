@@ -115,7 +115,7 @@ function Registro() {
 
 
     try {
-      const res = await fetch("https://backend-tpeu.onrender.com/api/usuario", {
+      const res = await fetch("http://localhost:4000/api/usuario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoUsuario),

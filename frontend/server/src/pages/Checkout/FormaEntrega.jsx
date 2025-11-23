@@ -20,7 +20,7 @@ const FormaEntrega = () => {
         setLoading(true);
         
         // 1. Obtener perfil del usuario (dirección)
-        const respuestaUsuario = await fetch("https://backend-tpeu.onrender.com/api/usuario/perfil", {
+        const respuestaUsuario = await fetch("http://localhost:4000/api/usuario/perfil", {
           credentials: "include"
         });
         
@@ -39,7 +39,7 @@ const FormaEntrega = () => {
         setDireccionUsuario(direccionCompleta);
 
         // 2. Obtener TODOS los productos del carrito
-        const respuestaCarrito = await fetch("https://backend-tpeu.onrender.com/api/carrito", {
+        const respuestaCarrito = await fetch("http://localhost:4000/api/carrito", {
           credentials: "include"
         });
         
@@ -54,7 +54,7 @@ const FormaEntrega = () => {
                 try {
                   // Obtener información completa de cada producto
                   const respuestaProducto = await fetch(
-                    `https://backend-tpeu.onrender.com/api/productos/${itemCarrito.idproducto}`
+                    `http://localhost:4000/api/productos/${itemCarrito.idproducto}`
                   );
                   
                   if (respuestaProducto.ok) {

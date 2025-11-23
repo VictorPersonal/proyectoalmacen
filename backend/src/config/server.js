@@ -15,8 +15,7 @@ app.use(express.json());
 
 app.use(cookieParser());
 app.use(cors({
-  origin: [
-    "https://dulchehogar.netlify.app",   // producción
+  origin: [ 
     "http://localhost:5173"              // desarrollo
   ],
   credentials: true
@@ -35,5 +34,5 @@ app.use("/api/stripe", express.json(), stripeRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en https://backend-tpeu.onrender.com/${PORT}`);
+  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
 });

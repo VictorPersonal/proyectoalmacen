@@ -16,8 +16,8 @@ router.post("/create-checkout-session", async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      success_url: "https://dulchehogar.netlify.app/checkout/forma-entrega/pago/exitoso",
-      cancel_url: "https://dulchehogar.netlify.app/pago-cancelado",
+      success_url: "http://localhost:5173/checkout/forma-entrega/pago/exitoso",
+      cancel_url: "http://localhost:5173/pago-cancelado",
       billing_address_collection: "required",
       line_items: [
         {

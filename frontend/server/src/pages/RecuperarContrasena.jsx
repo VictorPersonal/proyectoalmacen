@@ -20,7 +20,7 @@ const RecuperarContrasena = () => {
 
     try {
 
-      const response = await fetch("https://backend-tpeu.onrender.com/api/auth/recuperar", {
+      const response = await fetch("http://localhost:4000/api/auth/recuperar", {
         
         method: "POST",
         headers: { "Content-Type": "application/json" },

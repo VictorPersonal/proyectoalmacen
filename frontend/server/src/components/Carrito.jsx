@@ -32,7 +32,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
     try {
       const res = await axios.get(
-        "https://backend-tpeu.onrender.com/api/carrito",
+        "http://localhost:4000/api/carrito",
         { withCredentials: true }
       );
 
@@ -49,7 +49,7 @@ const Carrito = ({ abierto, onCerrar }) => {
             try {
               // Obtener información completa del producto
               const resProducto = await axios.get(
-                `https://backend-tpeu.onrender.com/api/productos/${productoCarrito.idproducto}`
+                `http://localhost:4000/api/productos/${productoCarrito.idproducto}`
               );
               
               console.log(`✅ Imagen obtenida para ${productoCarrito.idproducto}:`, resProducto.data.imagen_url);
@@ -126,7 +126,7 @@ const Carrito = ({ abierto, onCerrar }) => {
   // ➕➖ Actualizar cantidad de producto
   const handleActualizarCantidad = (idproducto, nuevaCantidad) => {
     axios.put(
-      "https://backend-tpeu.onrender.com/api/carrito/actualizar",
+      "http://localhost:4000/api/carrito/actualizar",
       { idproducto, cantidad: nuevaCantidad },
       { withCredentials: true }
     )
@@ -151,7 +151,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
     try {
       await axios.delete(
-        `https://backend-tpeu.onrender.com/api/carrito/eliminar/${idproducto}`,
+        `http://localhost:4000/api/carrito/eliminar/${idproducto}`,
         { withCredentials: true }
       );
 
@@ -197,7 +197,7 @@ const Carrito = ({ abierto, onCerrar }) => {
     if (!confirmar.isConfirmed) return;
 
     try {
-      await axios.delete("https://backend-tpeu.onrender.com/api/carrito/vaciar", {
+      await axios.delete("http://localhost:4000/api/carrito/vaciar", {
         withCredentials: true,
       });
 

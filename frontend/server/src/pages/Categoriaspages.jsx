@@ -8,7 +8,7 @@ const CategoriaPage = () => {
   const [tituloCategoria, setTituloCategoria] = useState("");
 
   useEffect(() => {
-    fetch(`https://backend-tpeu.onrender.com/api/categorias/${id}/productos`)
+    fetch(`http://localhost:4000/api/categorias/${id}/productos`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
