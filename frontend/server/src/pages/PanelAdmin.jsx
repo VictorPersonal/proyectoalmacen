@@ -145,19 +145,52 @@ const PanelAdmin = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:4000/api/productos");
+      
+      const res = await axios.get("http://localhost:4000/api/admin/productos", {
+        withCredentials: true 
+      });
+      
       setProducts(res.data);
     } catch (err) {
       console.error(
         "Error al obtener productos:",
         err.response?.data || err.message
       );
-      Swal.fire({
-        title: 'Error',
-        text: 'No se pudieron cargar los productos',
-        icon: 'error',
-        confirmButtonText: 'Entendido'
-      });
+      
+      // Si falla por permisos (no es admin), mostrar mensaje específico
+      if (err.response?.status === 403) {
+        Swal.fire({
+          title: 'Acceso denegado',
+          text: 'No tienes permisos de administrador para ver todos los productos.',
+          icon: 'error',
+          confirmButtonText: 'Entendido'
+        });
+      } else if (err.response?.status === 401) {
+        Swal.fire({
+          title: 'Sesión expirada',
+          text: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+          icon: 'warning',
+          confirmButtonText: 'Entendido'
+        }).then(() => {
+          handleLogout();
+        });
+      } else {
+        // Si hay otro error, intentar con el endpoint público
+        try {
+          console.log("⚠️ Intentando con endpoint público...");
+          const resPublic = await axios.get("http://localhost:4000/api/productos", {
+            withCredentials: true
+          });
+          setProducts(resPublic.data);
+        } catch (fallbackErr) {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar los productos',
+            icon: 'error',
+            confirmButtonText: 'Entendido'
+          });
+        }
+      }
     } finally {
       setLoading(false);
     }
