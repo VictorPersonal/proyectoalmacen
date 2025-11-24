@@ -18,9 +18,8 @@ const Carrito = ({ abierto, onCerrar }) => {
   const [productos, setProductos] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Hook para navegación
+  const navigate = useNavigate();
 
-  // 🔄 Cargar carrito del usuario autenticado
   useEffect(() => {
     if (abierto) {
       cargarCarrito();
@@ -52,14 +51,22 @@ const Carrito = ({ abierto, onCerrar }) => {
                 `http://localhost:4000/api/productos/${productoCarrito.idproducto}`
               );
               
-              console.log(`✅ Imagen obtenida para ${productoCarrito.idproducto}:`, resProducto.data.imagen_url);
+              console.log(`✅ Producto obtenido para ${productoCarrito.idproducto}:`, resProducto.data);
+              
+              // ✅ CAMBIO AQUÍ: Usar producto_imagen en lugar de imagen_url
+              const primeraImagen = resProducto.data.producto_imagen && resProducto.data.producto_imagen.length > 0 
+                ? resProducto.data.producto_imagen[0].url 
+                : null;
+              
+              console.log(`✅ Imagen obtenida para ${productoCarrito.idproducto}:`, primeraImagen);
               
               return {
                 id: productoCarrito.idproducto,
                 idproducto: productoCarrito.idproducto,
                 nombre: productoCarrito.nombre,
                 precio: productoCarrito.precio,
-                imagen_url: resProducto.data.imagen_url, // ← Esta SÍ funciona
+                producto_imagen: resProducto.data.producto_imagen || [], // ← CORREGIDO
+                imagen_url: primeraImagen, // ← Mantenemos por compatibilidad
                 cantidad: productoCarrito.cantidad,
                 subtotal: productoCarrito.subtotal
               };
@@ -68,6 +75,7 @@ const Carrito = ({ abierto, onCerrar }) => {
               return {
                 ...productoCarrito,
                 id: productoCarrito.idproducto,
+                producto_imagen: [],
                 imagen_url: null
               };
             }
@@ -84,7 +92,8 @@ const Carrito = ({ abierto, onCerrar }) => {
         console.log(`Producto ${index + 1} en carrito:`, {
           id: producto.id,
           nombre: producto.nombre,
-          imagen_url: producto.imagen_url, // ← Ahora debería tener valor
+          producto_imagen: producto.producto_imagen, // ← Nueva estructura
+          imagen_url: producto.imagen_url, // ← Para compatibilidad
           cantidad: producto.cantidad,
           subtotal: producto.subtotal
         });
@@ -133,7 +142,6 @@ const Carrito = ({ abierto, onCerrar }) => {
     .then(() => cargarCarrito())
     .catch(manejarError);
   };
-
 
   // 🗑️ Eliminar un solo producto del carrito
   const handleEliminarProducto = async (idproducto, nombreProducto) => {
@@ -220,7 +228,7 @@ const Carrito = ({ abierto, onCerrar }) => {
     }
   };
 
-  // 🛒 Finalizar compra - ACTUALIZADO con navegación
+  // 🛒 Finalizar compra
   const handleFinalizarCompra = () => {
     if (productos.length === 0) return;
 
@@ -277,7 +285,7 @@ const Carrito = ({ abierto, onCerrar }) => {
               <ul className="carrito-product-list">
                 {productos.map((producto) => (
                   <li key={producto.idproducto} className="carrito-product-item">
-                    {/* Imagen del producto */}
+                    {/* Imagen del producto - CORREGIDO */}
                     <div className="carrito-product-image">
                       {producto.imagen_url ? (
                         <img 

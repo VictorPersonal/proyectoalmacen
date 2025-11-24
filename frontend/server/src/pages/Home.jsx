@@ -19,6 +19,7 @@ const Home = () => {
 
   const [busqueda, setBusqueda] = useState("");
   const [productos, setProductos] = useState([]);
+  const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
@@ -106,14 +107,58 @@ const Home = () => {
       ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
       : "";
 
+  // FILTRO MEJORADO - más estricto
+  const filtrarProductos = (productos, query) => {
+    if (!query.trim()) return productos;
+    
+    const q = normalizar(query);
+    const palabras = q.split(' ').filter(palabra => palabra.length > 0);
+    
+    return productos.filter(producto => {
+      const nombreNormalizado = normalizar(producto.nombre);
+      const descripcionNormalizada = normalizar(producto.descripcion);
+      
+      // Buscar coincidencias exactas de palabras
+      return palabras.some(palabra => 
+        nombreNormalizado.includes(palabra) || 
+        descripcionNormalizada.includes(palabra)
+      );
+    });
+  };
+
   const ordenarPorRelevancia = (lista, query) => {
     const q = normalizar(query);
+    const palabras = q.split(' ').filter(palabra => palabra.length > 0);
+    
     return lista.sort((a, b) => {
       const aNombre = normalizar(a.nombre);
       const bNombre = normalizar(b.nombre);
-      const aCoin = aNombre.startsWith(q) ? 2 : aNombre.includes(q) ? 1 : 0;
-      const bCoin = bNombre.startsWith(q) ? 2 : bNombre.includes(q) ? 1 : 0;
-      return bCoin - aCoin;
+      const aDesc = normalizar(a.descripcion);
+      const bDesc = normalizar(b.descripcion);
+      
+      // Puntuación más precisa
+      let aPuntos = 0;
+      let bPuntos = 0;
+      
+      palabras.forEach(palabra => {
+        // Coincidencia exacta en nombre
+        if (aNombre === palabra) aPuntos += 10;
+        if (bNombre === palabra) bPuntos += 10;
+        
+        // Empieza con la palabra
+        if (aNombre.startsWith(palabra)) aPuntos += 5;
+        if (bNombre.startsWith(palabra)) bPuntos += 5;
+        
+        // Contiene la palabra en nombre
+        if (aNombre.includes(palabra)) aPuntos += 3;
+        if (bNombre.includes(palabra)) bPuntos += 3;
+        
+        // Contiene en descripción
+        if (aDesc.includes(palabra)) aPuntos += 1;
+        if (bDesc.includes(palabra)) bPuntos += 1;
+      });
+      
+      return bPuntos - aPuntos;
     });
   };
 
@@ -121,6 +166,7 @@ const Home = () => {
     const query = busqueda.trim();
     if (query === "") {
       setProductos([]);
+      setProductosFiltrados([]);
       setCategoriaSeleccionada(null);
       setMensajeCategoria("");
       return;
@@ -136,14 +182,25 @@ const Home = () => {
       if (!res.ok) throw new Error("Error en la búsqueda");
 
       const data = await res.json();
-      setProductos(
-        ordenarPorRelevancia(Array.isArray(data) ? data : [], query)
-      );
+      const productosRecibidos = Array.isArray(data) ? data : [];
+      
+      // Aplicar filtro adicional en frontend
+      const productosFiltrados = filtrarProductos(productosRecibidos, query);
+      const productosOrdenados = ordenarPorRelevancia(productosFiltrados, query);
+      
+      setProductos(productosRecibidos);
+      setProductosFiltrados(productosOrdenados);
       setCategoriaSeleccionada(null);
       setMensajeCategoria("");
+      
+      console.log(`Búsqueda: "${query}"`);
+      console.log(`Productos recibidos: ${productosRecibidos.length}`);
+      console.log(`Productos filtrados: ${productosFiltrados.length}`);
+      
     } catch (error) {
       console.error("Error al buscar productos:", error);
       setProductos([]);
+      setProductosFiltrados([]);
     } finally {
       setCargando(false);
     }
@@ -154,6 +211,7 @@ const Home = () => {
       if (busqueda.trim() !== "") handleBuscar();
       else if (!categoriaSeleccionada) {
         setProductos([]);
+        setProductosFiltrados([]);
         setMensajeCategoria("");
       }
     }, 500);
@@ -182,25 +240,30 @@ const Home = () => {
 
       const data = await res.json();
       console.log("Productos recibidos:", data);
-      console.log("URL llamada:", `http://localhost:4000/api/categorias/${idCategoria}/productos`);
-
 
       if (res.status === 404 || data.message === "No hay productos en esta categoría") {
         setProductos([]);
+        setProductosFiltrados([]);
         setMensajeCategoria("No se encontraron productos para esta categoría.");
         return;
       }
 
-      setProductos(Array.isArray(data) ? data : []);
+      const productosData = Array.isArray(data) ? data : [];
+      setProductos(productosData);
+      setProductosFiltrados(productosData);
 
     } catch (err) {
       console.error("Error cargando productos por categoría:", err);
       setProductos([]);
+      setProductosFiltrados([]);
       setMensajeCategoria("Error al cargar productos.");
     } finally {
       setCargando(false);
     }
   };
+
+  // Determinar qué productos mostrar
+  const productosAMostrar = categoriaSeleccionada ? productosFiltrados : productosFiltrados;
 
   return (
     <div>
@@ -460,11 +523,20 @@ const Home = () => {
             <p className="no-result">{mensajeCategoria}</p>
           )}
 
-          {/*Contador de resultados*/}
-          {!cargando && productos.length > 0 && (
+          {/* Información de búsqueda */}
+          {busqueda.trim() && (
             <div className="resultados-header">
               <span className="resultados-count">
-                Resultados: {productos.length}
+                Búsqueda: "{busqueda}" - Encontrados: {productosFiltrados.length} de {productos.length}
+              </span>
+            </div>
+          )}
+
+          {/*Contador de resultados para categorías*/}
+          {!busqueda.trim() && !cargando && productosFiltrados.length > 0 && (
+            <div className="resultados-header">
+              <span className="resultados-count">
+                Resultados: {productosFiltrados.length}
               </span>
             </div>
           )}
@@ -472,17 +544,22 @@ const Home = () => {
           {/*Mostrar los productos*/}    
           {cargando ? (
             <p className="loading">Cargando productos...</p>
-          ) : productos.length > 0 ? (
+          ) : productosFiltrados.length > 0 ? (
             <div className="productos-grid">  
-              {productos.map((prod) => (
+              {productosFiltrados.map((prod) => (
                 <div
-                  key={prod.id_producto}
+                  key={prod.idproducto}
                   onClick={() => setProductoSeleccionado(prod)}
                 >
                   <ProductCard producto={prod} />
                 </div>
               ))}
             </div>
+          ) : busqueda.trim() && productos.length > 0 ? (
+            <p className="no-result">
+              No se encontraron productos que coincidan exactamente con "{busqueda}".
+              Se encontraron {productos.length} productos similares.
+            </p>
           ) : null}
         </main>
       )}

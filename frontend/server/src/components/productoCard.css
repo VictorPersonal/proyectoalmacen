@@ -2,22 +2,23 @@
   display: flex;              
   flex-wrap: wrap;             
   justify-content: center;     
-  gap: 20px; 
+  gap: 15px;
 }                  
 
 .producto-card {
-  width: 200px;
-  height: 275px; /* cambiar min-height a height para tamaño fijo */
+  width: 180px;
+  height: 260px;
   background-color: #ffffff;
   border: 1px solid #ddd;
-  border-radius: 15px;
-  padding: 15px;
+  border-radius: 12px;
+  padding: 12px;
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* evita que se estire según el contenido */
+  justify-content: space-between;
+  overflow: hidden;
 }
 
 .producto-card:hover {
@@ -25,41 +26,162 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.imagen-placeholder {
+/* Contenedor principal de la imagen */
+.imagen-container {
   width: 100%;
-  height: 140px; /* tamaño fijo del contenedor de la imagen */
+  height: 250px;
   background-color: #f0f0f0;
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px; /* Aumentado para más espacio debajo de la imagen */
   overflow: hidden;
+  position: relative;
 }
 
-.imagen-placeholder img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain; /* mantiene proporción */
+/* Imagen del producto */
+.producto-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
+
+/* Placeholder cuando no hay imagen */
+.imagen-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 11px;
+}
+
+.placeholder-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.placeholder-text {
+  font-size: 10px;
+}
+
 .producto-info {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 70px; /* ajusta según necesites */
+  flex-grow: 1;
+  gap: 8px; /* Aumentado el gap general */
+}
+
+.producto-nombre {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0;
+  padding-top: 10px; /* Más espacio con la imagen */
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.6em;
+}
+
+
+.precio {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2c5aa0;
+  margin: 0;
+  margin-top: 4px; /* Espacio adicional arriba del precio */
 }
 
 .btn-agregar {
   background-color: #007bff;
   color: #fff;
   border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  font-size: 12px;
+  margin-top: 8px; /* Más espacio arriba del botón */
 }
 
 .btn-agregar:hover {
   background-color: #0056b3;
+}
+
+/* Información adicional opcional */
+.stock-info {
+  font-size: 10px;
+  color: #666;
+  margin: 0;
+  margin-top: 2px; /* Pequeño espacio arriba del stock */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .productos-container {
+    gap: 12px;
+  }
+  
+  .producto-card {
+    width: 160px;
+    height: 220px;
+    padding: 10px;
+  }
+  
+  .imagen-container {
+    height: 150px;
+    margin-bottom: 10px; /* Mantener espacio consistente */
+  }
+  
+  .producto-nombre {
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+  
+  .precio {
+    font-size: 14px;
+    margin-top: 3px;
+  }
+  
+  .btn-agregar {
+    padding: 5px 8px;
+    font-size: 11px;
+    margin-top: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .productos-container {
+    gap: 10px;
+  }
+  
+  .producto-card {
+    width: 145px;
+    height: 200px;
+    padding: 8px;
+  }
+  
+  .imagen-container {
+    height: 90px;
+    margin-bottom: 8px;
+  }
+  
+  .placeholder-icon {
+    font-size: 18px;
+  }
+  
+  .producto-info {
+    gap: 6px;
+  }
 }
