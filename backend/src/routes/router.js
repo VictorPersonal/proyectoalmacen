@@ -226,9 +226,6 @@ router.put("/usuario/perfil", verificarToken, async (req, res) => {
 // ====================================================================
 // 🧾 OBTENER UN PRODUCTO POR ID
 // ====================================================================
-// ====================================================================
-// 🧾 OBTENER UN PRODUCTO POR ID - ✅ ENDPOINT CORRECTO
-// ====================================================================
 router.get("/productos/:id", async (req, res) => {
   const { id } = req.params;
   
@@ -250,6 +247,7 @@ router.get("/productos/:id", async (req, res) => {
         )
       `)
       .eq("idproducto", id)
+      .eq("activo", true)  // ← ¡AGREGA ESTE FILTRO!
       .single();
 
     if (error) {
@@ -269,48 +267,6 @@ router.get("/productos/:id", async (req, res) => {
     res.status(500).json({ message: "Error al obtener producto" });
   }
 });
-
-// ✅ Activar / desactivar producto
-router.patch("/productos/:id/estado", async (req, res) => {
-  try {
-    const { id } = req.params;
-    let { activo } = req.body;
-
-    // forzar booleano
-    activo = !!activo;
-
-    // Verificar stock del producto
-    const { data: prod, error: errorProd } = await req.supabase
-      .from("producto")
-      .select("stock")
-      .eq("idproducto", id)
-      .single();
-
-    if (errorProd) throw errorProd;
-
-    // Si stock es 0, nunca puede quedar activo
-    if (prod.stock <= 0) {
-      activo = false;
-    }
-
-    const { data, error } = await req.supabase
-      .from("producto")
-      .update({ activo })
-      .eq("idproducto", id)
-      .select(
-        "idproducto, nombre, precio, stock, idcategoria, imagen_url, activo"
-      )
-      .single();
-
-    if (error) throw error;
-
-    res.status(200).json({ producto: data });
-  } catch (err) {
-    console.error("❌ Error al cambiar estado del producto:", err.message);
-    res.status(500).json({ message: "Error al cambiar estado del producto" });
-  }
-});
-
 
 // ====================================================================
 // ➕ CREAR PRODUCTO
@@ -907,11 +863,12 @@ router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => 
 // ========== RUTAS COMPLETAS PARA PRODUCTOS ==========
 
 // GET - Obtener todos los productos con imágenes
+// GET - Obtener todos los productos con imágenes (MODIFICAR ESTE)
 router.get("/productos", async (req, res) => {
   try {
-    console.log("🔍 Intentando obtener productos...");
+    const { search, soloActivos } = req.query;
     
-    const { data: productos, error } = await supabaseDB
+    let query = supabaseDB
       .from("producto")
       .select(`
         idproducto,
@@ -926,19 +883,29 @@ router.get("/productos", async (req, res) => {
           idimagen,
           url
         )
-      `)
-      .order('idproducto', { ascending: false });
+      `);
+
+    // ✅ SIEMPRE filtrar por activo = true en endpoints públicos
+    query = query.eq('activo', true);
+
+    // Si hay búsqueda, agregar filtro de búsqueda
+    if (search) {
+      query = query.or(`nombre.ilike.%${search}%,descripcion.ilike.%${search}%`);
+    }
+
+    query = query.order('idproducto', { ascending: false });
+
+    const { data: productos, error } = await query;
 
     if (error) {
-      console.error("❌ Error de Supabase al obtener productos:", error);
+      console.error("❌ Error de Supabase:", error);
       return res.status(500).json({ 
         message: "Error al obtener productos",
         error: error.message 
       });
     }
 
-    console.log(`✅ Productos obtenidos: ${productos?.length || 0}`);
-    
+    console.log(`✅ Productos activos obtenidos: ${productos?.length || 0}`);
     res.json(productos);
   } catch (err) {
     console.error("❌ Error al obtener productos:", err);
@@ -971,6 +938,7 @@ router.get("/productos/:id", async (req, res) => {
         )
       `)
       .eq("idproducto", id)
+      .eq("activo", true)
       .single();
 
     if (error) throw error;
@@ -1484,6 +1452,51 @@ router.get("/categorias/:idcategoria/productos", async (req, res) => {
   } catch (err) {
     console.log("❌ Error servidor:", err);
     res.status(500).json({ message: "Error interno del servidor" });
+  }
+});
+
+// ====================================================================
+// 📋 OBTENER TODOS LOS PRODUCTOS (INCLUYENDO DESACTIVADOS) - SOLO ADMIN
+// ====================================================================
+router.get("/admin/productos", verificarToken, async (req, res) => {
+  try {
+    console.log("🔍 [ADMIN] Obteniendo todos los productos (incluyendo desactivados)...");
+    
+    const { data: productos, error } = await supabaseDB
+      .from("producto")
+      .select(`
+        idproducto,
+        nombre,
+        precio,
+        stock,
+        descripcion,
+        idcategoria,
+        idmarca,
+        activo,
+        producto_imagen (
+          idimagen,
+          url
+        )
+      `)
+      .order('idproducto', { ascending: false });
+
+    if (error) {
+      console.error("❌ [ADMIN] Error al obtener productos:", error);
+      return res.status(500).json({ 
+        message: "Error al obtener productos",
+        error: error.message 
+      });
+    }
+
+    console.log(`✅ [ADMIN] Productos obtenidos: ${productos?.length || 0}`);
+    
+    res.json(productos);
+  } catch (err) {
+    console.error("❌ [ADMIN] Error al obtener productos:", err);
+    res.status(500).json({ 
+      message: "Error al obtener productos",
+      error: err.message 
+    });
   }
 });
 
