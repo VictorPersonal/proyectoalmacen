@@ -91,17 +91,46 @@ const DescripcionProducto = ({ producto, onVolver }) => {
     }
   };
 
-
-
-  // 👉 Función para ir al checkout
-  // En DescripcionProducto.js - modifica handleComprarAhora:
+  // 👉 Función CORREGIDA para Comprar Ahora (COMPRA DIRECTA - SEPARADA DEL CARRITO)
   const handleComprarAhora = () => {
+    const userInfo = localStorage.getItem("usuarioInfo");
+
+    if (!userInfo) {
+      Swal.fire({
+        icon: "warning",
+        title: "Inicia sesión",
+        text: "Debes iniciar sesión para realizar una compra.",
+        confirmButtonText: "Entendido",
+        padding: "1.5rem",
+      });
+      return;
+    }
+
+    // Crear objeto de compra directa (NO se mezcla con carrito)
+    const compraDirecta = {
+      tipo: "compra_directa", // Identificar que es compra directa
+      productos: [
+        {
+          id: producto.id_producto || producto.id || producto.idproducto,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          cantidad: cantidad,
+          imagen_url: producto.imagen_url,
+          descripcion: producto.descripcion || producto.descripcion_producto || producto.descripcion_text,
+          stock: producto.stock || "10"
+        }
+      ],
+      total: producto.precio * cantidad,
+      cantidadTotal: cantidad
+    };
+
+    console.log("🛒 Compra directa:", compraDirecta);
+
+    // Navegar al checkout con los datos de compra directa
     navigate("/checkout/forma-entrega", {
       state: {
-        producto: {
-          nombre: producto.nombre,
-          precio: producto.precio
-        }
+        compraTipo: "directa",
+        compraData: compraDirecta
       }
     });
   };

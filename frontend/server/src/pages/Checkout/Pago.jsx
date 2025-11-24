@@ -1,5 +1,13 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { 
+  FaCreditCard, 
+  FaMobileAlt, 
+  FaUniversity, 
+  FaArrowRight, 
+  FaBan,
+  FaQuestionCircle
+} from "react-icons/fa";
 import logo from "../../assets/Logo dulce hogar.png";
 import "./Pago.css";
 
@@ -41,7 +49,9 @@ const Pago = () => {
             <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
           </div>
         </div>
-        <div className="help-icon">?</div>
+        <div className="help-icon">
+          <FaQuestionCircle />
+        </div>
       </header>
 
       {/* CONTENIDO PRINCIPAL */}
@@ -72,62 +82,36 @@ const Pago = () => {
 
             {/* 🔵 STRIPE - ÚNICO MÉTODO ACTIVO */}
             <div
-              className="metodo-pago"
+              className="metodo-pago activo"
               onClick={handlePagarStripe}
-              style={{
-                padding: "12px",
-                borderRadius: "8px",
-                backgroundColor: "#ffffff",
-                border: "1px solid #ddd",
-                cursor: "pointer",
-                marginBottom: "12px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
             >
-              <span>💳 Pagar con tarjeta (Stripe)</span>
-              <span>➡</span>
+              <div className="metodo-pago-info">
+                <FaCreditCard className="metodo-icon" />
+                <span>Pagar con tarjeta (Stripe)</span>
+              </div>
+              <FaArrowRight className="metodo-flecha" />
             </div>
 
             {/* 🔒 NEQUI - DESACTIVADO */}
             <div
-              className="metodo-pago"
-              style={{
-                padding: "12px",
-                borderRadius: "8px",
-                backgroundColor: "#f0f0f0",
-                border: "1px solid #ccc",
-                marginBottom: "12px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                opacity: 0.5,
-                cursor: "not-allowed",
-              }}
+              className="metodo-pago desactivado"
             >
-              <span>📱 Pagar con Nequi (Próximamente)</span>
-              <span>🚫</span>
+              <div className="metodo-pago-info">
+                <FaMobileAlt className="metodo-icon" />
+                <span>Pagar con Nequi (Próximamente)</span>
+              </div>
+              <FaBan className="metodo-bloqueado" />
             </div>
 
             {/* 🔒 BANCOLOMBIA - DESACTIVADO */}
             <div
-              className="metodo-pago"
-              style={{
-                padding: "12px",
-                borderRadius: "8px",
-                backgroundColor: "#f0f0f0",
-                border: "1px solid #ccc",
-                marginBottom: "12px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                opacity: 0.5,
-                cursor: "not-allowed",
-              }}
+              className="metodo-pago desactivado"
             >
-              <span>🏦 Transferencia Bancolombia (Próximamente)</span>
-              <span>🚫</span>
+              <div className="metodo-pago-info">
+                <FaUniversity className="metodo-icon" />
+                <span>Transferencia Bancolombia (Próximamente)</span>
+              </div>
+              <FaBan className="metodo-bloqueado" />
             </div>
           </div>
 
