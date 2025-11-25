@@ -43,10 +43,11 @@
 /* Imagen del producto */
 .producto-imagen {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
 }
+
 
 /* Placeholder cuando no hay imagen */
 .imagen-placeholder {
