@@ -14,7 +14,7 @@ body {
 }
 
 /* ===== Estructura general ===== */
-.recuperar-wrapper {
+.recuperar-page-wrapper {
   background-color: #c8c4c1;
   min-height: 100vh;
   display: flex;
@@ -22,7 +22,7 @@ body {
 }
 
 /* ===== Header ===== */
-.top-bar {
+.recuperar-top-bar {
   background-color: #b8b4b1;
   padding: 30px 30px;
   display: flex;
@@ -30,35 +30,35 @@ body {
   align-items: center;
 }
 
-.logo-section {
+.recuperar-logo-section {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.logo-icon {
+.recuperar-logo-img {
   width: 80px;
   height: auto;
 }
 
-.logo-text {
+.recuperar-logo-text {
   display: flex;
   flex-direction: column;
 }
 
-.logo-title {
+.recuperar-logo-title {
   font-size: 18px;
   font-weight: bold;
   color: #000;
 }
 
-.logo-subtitle {
+.recuperar-logo-subtitle {
   font-size: 7px;
   letter-spacing: 0.5px;
   color: #000;
 }
 
-.help-icon {
+.recuperar-help-icon {
   width: 26px;
   height: 26px;
   border: 2px solid #000;
@@ -73,7 +73,7 @@ body {
 }
 
 /* ===== Contenedor principal ===== */
-.container {
+.recuperar-container {
   all: unset;
   flex: 1;
   display: flex;
@@ -84,7 +84,7 @@ body {
 }
 
 /* ===== Caja principal ===== */
-.recuperar-box {
+.recuperar-form-box {
   background-color: #fff;
   border-radius: 12px;
   padding: 35px 45px;
@@ -94,7 +94,7 @@ body {
   text-align: center;
 }
 
-.recuperar-title {
+.recuperar-form-title {
   font-size: 18px;
   font-weight: normal;
   color: #D84040;
@@ -108,20 +108,20 @@ body {
   gap: 18px;
 }
 
-.recuperar-group {
+.recuperar-form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
   text-align: left;
 }
 
-.recuperar-group label {
+.recuperar-form-label {
   font-size: 12px;
   color: #000;
   font-weight: 500;
 }
 
-.recuperar-group input {
+.recuperar-form-input {
   padding: 10px 14px;
   border: 1px solid #999;
   border-radius: 4px;
@@ -131,16 +131,16 @@ body {
   transition: border-color 0.3s;
 }
 
-.recuperar-group input:focus {
+.recuperar-form-input:focus {
   border-color: #D84040;
 }
 
-.recuperar-group input::placeholder {
+.recuperar-form-input::placeholder {
   color: #999;
   font-size: 11px;
 }
 
-.recuperar-info {
+.recuperar-info-text {
   font-size: 11px;
   color: #555;
   line-height: 1.4;
@@ -148,7 +148,7 @@ body {
 }
 
 /* ===== Botón ===== */
-.recuperar-btn {
+.recuperar-btn-enviar {
   background-color: #fff;
   color: #D84040;
   border: 1px solid #D84040;
@@ -161,7 +161,7 @@ body {
   text-transform: capitalize;
 }
 
-.recuperar-btn:hover {
+.recuperar-btn-enviar:hover {
   background-color: #D84040;
   color: #fff;
 }
@@ -175,37 +175,44 @@ body {
   text-align: center;
 }
 
-.recuperar-exito {
+.recuperar-mensaje-exito {
   background-color: #e2f5e2;
   color: #2e7d32;
   border: 1px solid #2e7d32;
 }
 
-.recuperar-error {
+.recuperar-mensaje-error {
   background-color: #fdecea;
   color: #c62828;
   border: 1px solid #c62828;
 }
 
 /* ===== Enlaces ===== */
-.recuperar-links {
+.recuperar-form-links {
   margin-top: 15px;
   font-size: 11px;
   color: #000;
 }
 
-.recuperar-links a {
+.recuperar-login-link {
+  font-size: 11px;
+  color: #000;
+}
+
+.recuperar-form-links a,
+.recuperar-login-link a {
   color: #D84040;
   text-decoration: none;
   font-weight: 500;
 }
 
-.recuperar-links a:hover {
+.recuperar-form-links a:hover,
+.recuperar-login-link a:hover {
   text-decoration: underline;
 }
 
 /* ===== Footer ===== */
-.footer {
+.recuperar-footer {
   background-color: #b8b4b1;
   padding: 20px 30px;
   display: flex;
@@ -215,48 +222,48 @@ body {
   color: #333;
 }
 
-.footer-links {
+.recuperar-footer-links {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.footer-links a {
+.recuperar-footer-links a {
   text-decoration: none;
   color: #333;
 }
 
-.footer-links a:hover {
+.recuperar-footer-links a:hover {
   text-decoration: underline;
 }
 
-.footer-links span {
+.recuperar-footer-links span {
   color: #333;
 }
 
-.footer-copyright {
+.recuperar-footer-copyright {
   color: #333;
 }
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .recuperar-box {
+  .recuperar-form-box {
     padding: 30px 35px;
     max-width: 380px;
   }
 
-  .container {
+  .recuperar-container {
     margin: 15px;
     padding: 30px 15px;
   }
 
-  .footer {
+  .recuperar-footer {
     flex-direction: column;
     gap: 8px;
     text-align: center;
   }
 
-  .top-bar {
+  .recuperar-top-bar {
     padding: 10px 20px;
   }
 }

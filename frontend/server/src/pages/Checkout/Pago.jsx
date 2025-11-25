@@ -39,92 +39,79 @@ const Pago = () => {
   };
 
   return (
-    <div className="page-wrapper">
+    <div className="pago-page-wrapper">
       {/* HEADER */}
-      <header className="top-bar">
-        <div className="logo-section">
-          <img src={logo} alt="Logo" className="logo-icon" />
-          <div className="logo-text">
-            <span className="logo-title">Dulce hogar</span>
-            <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+      <header className="pago-top-bar">
+        <div className="pago-logo-section">
+          <img src={logo} alt="Logo" className="pago-logo-img" />
+          <div className="pago-logo-text">
+            <span className="pago-logo-title">Dulce hogar</span>
+            <span className="pago-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
           </div>
         </div>
-        <div className="help-icon">
+        <div className="pago-help-icon">
           <FaQuestionCircle />
         </div>
       </header>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="container">
-        <div className="login-box">
-          <h2 className="form-title">Método de pago</h2>
+      <main className="pago-container">
+        <div className="pago-form-box">
+          <h2 className="pago-form-title">Método de pago</h2>
 
-          <p style={{ fontSize: "13px", marginBottom: "15px", textAlign: "center" }}>
+          <p className="pago-descripcion">
             Selecciona un método de pago para completar tu compra.
           </p>
 
           {/* RESUMEN */}
-          <div
-            style={{
-              backgroundColor: "#f5f5f5",
-              borderRadius: "8px",
-              padding: "15px",
-              marginBottom: "20px",
-              fontSize: "13px",
-            }}
-          >
+          <div className="pago-resumen">
             <p><b>Producto:</b> {nombreProducto}</p>
             <p><b>Total a pagar:</b> ${total.toLocaleString("es-CO")}</p>
           </div>
 
           {/* MÉTODOS DE PAGO */}
-          <div className="metodos-pago-container">
+          <div className="pago-metodos-container">
 
             {/* 🔵 STRIPE - ÚNICO MÉTODO ACTIVO */}
             <div
-              className="metodo-pago activo"
+              className="pago-metodo pago-activo"
               onClick={handlePagarStripe}
             >
-              <div className="metodo-pago-info">
-                <FaCreditCard className="metodo-icon" />
+              <div className="pago-metodo-info">
+                <FaCreditCard className="pago-metodo-icon" />
                 <span>Pagar con tarjeta (Stripe)</span>
               </div>
-              <FaArrowRight className="metodo-flecha" />
+              <FaArrowRight className="pago-metodo-flecha" />
             </div>
 
             {/* 🔒 NEQUI - DESACTIVADO */}
             <div
-              className="metodo-pago desactivado"
+              className="pago-metodo pago-desactivado"
             >
-              <div className="metodo-pago-info">
-                <FaMobileAlt className="metodo-icon" />
+              <div className="pago-metodo-info">
+                <FaMobileAlt className="pago-metodo-icon" />
                 <span>Pagar con Nequi (Próximamente)</span>
               </div>
-              <FaBan className="metodo-bloqueado" />
+              <FaBan className="pago-metodo-bloqueado" />
             </div>
 
             {/* 🔒 BANCOLOMBIA - DESACTIVADO */}
             <div
-              className="metodo-pago desactivado"
+              className="pago-metodo pago-desactivado"
             >
-              <div className="metodo-pago-info">
-                <FaUniversity className="metodo-icon" />
+              <div className="pago-metodo-info">
+                <FaUniversity className="pago-metodo-icon" />
                 <span>Transferencia Bancolombia (Próximamente)</span>
               </div>
-              <FaBan className="metodo-bloqueado" />
+              <FaBan className="pago-metodo-bloqueado" />
             </div>
           </div>
 
           {/* BOTÓN VOLVER */}
-          <div style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}>
+          <div className="pago-boton-volver-container">
             <button
               onClick={() => navigate("/")}
-              className="btn-ingresar"
-              style={{
-                width: "fit-content",
-                minWidth: "160px",
-                textAlign: "center",
-              }}
+              className="pago-btn-volver"
             >
               Volver al inicio
             </button>
@@ -133,15 +120,15 @@ const Pago = () => {
       </main>
 
       {/* FOOTER */}
-      <footer className="footer">
-        <div className="footer-links">
+      <footer className="pago-footer">
+        <div className="pago-footer-links">
           <a href="#">Preguntas frecuentes</a>
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
           <a href="#">Términos</a>
         </div>
-        <p className="footer-copyright">
+        <p className="pago-footer-copyright">
           © 2025 FHO, todos los derechos reservados
         </p>
       </footer>

@@ -6,6 +6,17 @@ import "./ModificarDireccion.css";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 import logo from "../../assets/Logo dulce hogar.png";
+import { 
+  FaSearch, 
+  FaMapMarkerAlt, 
+  FaHome, 
+  FaCity, 
+  FaExclamationCircle,
+  FaLightbulb,
+  FaTimes,
+  FaCheck,
+  FaQuestionCircle
+} from 'react-icons/fa';
 
 // Fix para los iconos de Leaflet en React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -414,52 +425,56 @@ const ModificarDireccion = () => {
   };
 
   return (
-    <div className="page-wrapper">
+    <div className="direccion-page-wrapper">
       {/* Header */}
-      <header className="top-bar">
-        <div className="logo-section">
-          <img src={logo} alt="Dulce hogar logo" id="logo-img" />
-          <div className="logo-text">
-            <span className="logo-title">Dulce hogar</span>
-            <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+      <header className="direccion-top-bar">
+        <div className="direccion-logo-section">
+          <img src={logo} alt="Dulce hogar logo" className="direccion-logo-img" />
+          <div className="direccion-logo-text">
+            <span className="direccion-logo-title">Dulce hogar</span>
+            <span className="direccion-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
           </div>
         </div>
-        <div className="help-icon">?</div>
+        <div className="direccion-help-icon">
+          <FaQuestionCircle />
+        </div>
       </header>
 
-      <div className="modificar-direccion-container">
-        <div className="modificar-direccion-content">
-          <h2 className="modificar-titulo">Modificar Dirección de Entrega</h2>
+      <div className="direccion-container">
+        <div className="direccion-content">
+          <h2 className="direccion-titulo">Modificar Dirección de Entrega</h2>
           
           {/* Buscador de Dirección */}
-          <div className="buscador-direccion">
-            <div className="buscador-input-group">
+          <div className="direccion-buscador">
+            <div className="direccion-buscador-input-group">
               <input
                 type="text"
                 placeholder="Ej: Calle 10 # 9-05, Caicedonia, Valle del Cauca"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && buscarDireccion()}
-                className="buscador-input"
+                className="direccion-buscador-input"
               />
               <button 
                 onClick={buscarDireccion} 
                 disabled={loading}
-                className="buscador-btn"
+                className="direccion-buscador-btn"
               >
+                <FaSearch className="direccion-buscador-icon" />
                 {loading ? "Buscando..." : "Buscar"}
               </button>
             </div>
             <button 
               onClick={usarMiUbicacion}
-              className="btn-ubicacion-actual"
+              className="direccion-btn-ubicacion-actual"
             >
-              📍 Usar mi ubicación actual
+              <FaMapMarkerAlt className="direccion-ubicacion-icon" />
+              Usar mi ubicación actual
             </button>
           </div>
 
           {/* Mapa de OpenStreetMap */}
-          <div className="mapa-container">
+          <div className="direccion-mapa-container">
             <MapContainer
               center={coordenadas}
               zoom={13}
@@ -491,44 +506,55 @@ const ModificarDireccion = () => {
                 </Popup>
               </Marker>
             </MapContainer>
-            <div className="mapa-leyenda">
+            <div className="direccion-mapa-leyenda">
+              <FaMapMarkerAlt className="direccion-leyenda-icon" />
               {direccion 
-                ? `📍 Ubicación: ${direccion}${ciudad ? `, ${ciudad}` : ''}` 
-                : "🔍 Busca una dirección o haz clic en el mapa para seleccionar tu ubicación"}
+                ? `Ubicación: ${direccion}${ciudad ? `, ${ciudad}` : ''}` 
+                : "Busca una dirección o haz clic en el mapa para seleccionar tu ubicación"}
             </div>
           </div>
 
           {/* Formulario de Dirección */}
-          <div className="formulario-direccion">
+          <div className="direccion-formulario">
             <h3>Confirmar Dirección</h3>
             
-            <div className="campo-formulario">
-              <label>Dirección Completa *:</label>
+            <div className="direccion-campo-formulario">
+              <label>
+                <FaHome className="direccion-campo-icon" />
+                Dirección Completa *
+              </label>
               <input
                 type="text"
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
                 placeholder="Ej: Calle 10 # 9-05, Barrio Las Américas"
-                className="input-direccion"
+                className="direccion-input"
               />
-              <small className="texto-ayuda">
+              <small className="direccion-texto-ayuda">
+                <FaExclamationCircle className="direccion-ayuda-icon" />
                 Puedes editar manualmente si la dirección no se detectó correctamente
               </small>
             </div>
 
-            <div className="campo-formulario">
-              <label>Ciudad *:</label>
+            <div className="direccion-campo-formulario">
+              <label>
+                <FaCity className="direccion-campo-icon" />
+                Ciudad *
+              </label>
               <input
                 type="text"
                 value={ciudad}
                 onChange={(e) => setCiudad(e.target.value)}
                 placeholder="Ej: Caicedonia, Valle del Cauca"
-                className="input-direccion"
+                className="direccion-input"
               />
             </div>
 
-            <div className="instrucciones">
-              <p>💡 <strong>Consejo:</strong></p>
+            <div className="direccion-instrucciones">
+              <p>
+                <FaLightbulb className="direccion-instrucciones-icon" />
+                <strong>Consejo:</strong>
+              </p>
               <ul>
                 <li>Si la dirección no se detecta automáticamente, puedes <strong>editarla manualmente</strong> en los campos de arriba</li>
                 <li>Asegúrate de que el <strong>marcador en el mapa</strong> esté en la ubicación correcta</li>
@@ -538,18 +564,20 @@ const ModificarDireccion = () => {
           </div>
 
           {/* Botones de Acción */}
-          <div className="botones-accion">
+          <div className="direccion-botones-accion">
             <button 
               onClick={handleCancelar}
-              className="btn-cancelar"
+              className="direccion-btn-cancelar"
             >
+              <FaTimes className="direccion-btn-icon" />
               Cancelar
             </button>
             <button 
               onClick={confirmarDireccion}
               disabled={!direccion.trim() || !ciudad.trim()}
-              className="btn-confirmar"
+              className="direccion-btn-confirmar"
             >
+              <FaCheck className="direccion-btn-icon" />
               Confirmar Dirección
             </button>
           </div>
@@ -557,15 +585,15 @@ const ModificarDireccion = () => {
       </div>
 
       {/* Footer */}
-      <footer className="footer">
-        <div className="footer-links">
+      <footer className="direccion-footer">
+        <div className="direccion-footer-links">
           <a href="#">Preguntas frecuentes</a>
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
           <a href="#">Términos</a>
         </div>
-        <div className="footer-copyright">
+        <div className="direccion-footer-copyright">
           © 2025 FHO, todos los derechos reservados
         </div>
       </footer>

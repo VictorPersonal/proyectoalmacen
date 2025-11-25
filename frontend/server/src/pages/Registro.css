@@ -12,14 +12,14 @@ html, body, #root {
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #d0cbc8; /* 🔹 Gris más claro y equilibrado */
+    background-color: #d0cbc8;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
 /* Header */
-#top-bar {
+.registro-top-bar {
     background-color: #b8b4b1;
     padding: 20px 30px;
     display: flex;
@@ -28,35 +28,35 @@ body {
     width: 100%;
 }
 
-#logo-section {
+.registro-logo-section {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-#logo-img {
+.registro-logo-img {
     width: 80px;
     height: auto;
 }
 
-#logo-text {
+.registro-logo-text {
     display: flex;
     flex-direction: column;
 }
 
-#logo-title {
+.registro-logo-title {
     font-size: 20px;
     font-weight: bold;
     color: #000;
 }
 
-#logo-subtitle {
+.registro-logo-subtitle {
     font-size: 9px;
     letter-spacing: 0.5px;
     color: #000;
 }
 
-#help-icon {
+.registro-help-icon {
     width: 28px;
     height: 28px;
     border: 2px solid #000;
@@ -70,158 +70,160 @@ body {
 }
 
 /* Container */
-#container {
+.registro-container {
     width: 100%;
-    height: 80vh; 
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
-    background-color: #d0cbc8; /* 🔹 Mismo tono del fondo general */
+    padding: 40px 20px;
+    background-color: #d0cbc8;
+    flex: 1;
 }
 
 /* Formulario */
-#form-wrapper {
+.registro-form-wrapper {
     background-color: #ffffff;
     border-radius: 10px;
-    padding: 20px 40px;
+    padding: 30px 40px;
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
 }
 
-#form-title {
+.registro-form-title {
     text-align: center;
     font-size: 22px;
     font-weight: normal;
     color: #D84040;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
-#registro-form {
+.registro-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
 
-.form-group {
+.registro-form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
-.form-group label {
+.registro-form-group label {
     font-size: 13px;
     color: #000;
     font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
 }
 
-.form-group input {
-    padding: 5px 14px;
+/* INPUTS - ESTILOS CORREGIDOS */
+.registro-form-group input {
+    width: 100%;
+    padding: 10px 12px;
     border: 1px solid #999;
     border-radius: 5px;
-    font-size: 13px;
+    font-size: 14px;
     background-color: #fff;
     outline: none;
     transition: border-color 0.3s;
 }
 
-.form-group input:focus {
+.registro-form-group input:focus {
     border-color: #D84040;
 }
 
-.form-group input::placeholder {
+.registro-form-group input::placeholder {
     color: #999;
     font-size: 12px;
 }
 
 /* Estilos para errores */
-.error-input {
+.registro-error-input {
     border: 2px solid #E53E3E !important;
     background-color: #FFF3F3;
-    transition: all 0.3s ease;
     box-shadow: 0 0 4px rgba(229, 62, 62, 0.4);
 }
 
-
-.error-message {
+.registro-error-message {
     display: flex;
     align-items: center;
     gap: 6px;
     color: #E53E3E;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     background-color: #FFE5E5;
     border-left: 3px solid #E53E3E;
     padding: 6px 10px;
-    margin-top: 6px;
+    margin-top: 4px;
     border-radius: 4px;
-}
-.error-message {
-    animation: fadeIn 0.25s ease;
+    animation: registro-fadeIn 0.25s ease;
 }
 
-@keyframes fadeIn {
+@keyframes registro-fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-
-#hint {
-  color: #666;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.form-group input:focus {
-  border-color: #4CAF50;
-  outline: none;
-}
-
-#hint {
-    font-size: 10px;
+.registro-hint {
     color: #666;
+    font-size: 11px;
     margin-top: 3px;
+    display: block;
+    line-height: 1.3;
 }
 
 /* Botón */
-#btn-registrar {
+.registro-btn-registrar {
     background-color: #fff;
     color: #D84040;
     border: 1px solid #D84040;
-    padding: 12px 22px;
-    font-size: 13px;
+    padding: 12px 24px;
+    font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s;
-    margin-top: 15px;
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-#btn-registrar:hover {
+.registro-btn-registrar:hover:not(:disabled) {
     background-color: #D84040;
     color: #fff;
 }
 
+.registro-btn-registrar:disabled {
+    background-color: #cccccc;
+    border-color: #cccccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Spinner para registro */
+.registro-spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: registro-spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes registro-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Footer */
-#footer {
+.registro-footer {
     background-color: #b8b4b1;
-    padding: 18px 30px;
+    padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -231,39 +233,70 @@ body {
     margin-top: auto;
 }
 
-#footer-links {
+.registro-footer-links {
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-#footer-links a {
+.registro-footer-links a {
     text-decoration: none;
     color: #333;
 }
 
-#footer-links a:hover {
+.registro-footer-links a:hover {
     text-decoration: underline;
 }
 
-#footer-copy {
+.registro-footer-copy {
     color: #333;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    #form-wrapper {
+    .registro-form-wrapper {
         padding: 25px 30px;
-        max-width: 350px;
+        max-width: 400px;
     }
 
-    #footer {
+    .registro-footer {
         flex-direction: column;
         gap: 8px;
         text-align: center;
+        padding: 12px 20px;
     }
 
-    #top-bar {
+    .registro-top-bar {
+        padding: 15px 20px;
+    }
+
+    .registro-container {
+        padding: 20px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .registro-form-wrapper {
+        padding: 20px 25px;
+        max-width: 100%;
+    }
+
+    .registro-form-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .registro-form {
+        gap: 15px;
+    }
+
+    .registro-form-group input {
+        padding: 10px 12px;
+        font-size: 16px; /* Mejor para móviles */
+    }
+
+    .registro-btn-registrar {
         padding: 12px 20px;
+        font-size: 14px;
     }
 }

@@ -1,12 +1,21 @@
-.modificar-direccion-container {
+/* ===== ESTRUCTURA PRINCIPAL ===== */
+.direccion-page-wrapper {
+  background-color: #ceccca;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.direccion-container {
   display: flex;
   justify-content: center;
   padding: 40px 20px;
   background-color: #ceccca;
   min-height: calc(100vh - 160px);
+  flex: 1;
 }
 
-.modificar-direccion-content {
+.direccion-content {
   background-color: #fff;
   padding: 30px;
   border-radius: 8px;
@@ -15,7 +24,7 @@
   width: 100%;
 }
 
-.modificar-titulo {
+.direccion-titulo {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 25px;
@@ -23,18 +32,71 @@
   text-align: center;
 }
 
-/* Buscador */
-.buscador-direccion {
+/* ===== HEADER ===== */
+.direccion-top-bar {
+  background-color: #b8b4b1;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.direccion-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.direccion-logo-img {
+  width: 80px;
+  height: auto;
+}
+
+.direccion-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.direccion-logo-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+.direccion-logo-subtitle {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: #000;
+}
+
+.direccion-help-icon {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+}
+
+/* ===== BUSCADOR ===== */
+.direccion-buscador {
   margin-bottom: 25px;
 }
 
-.buscador-input-group {
+.direccion-buscador-input-group {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.buscador-input {
+.direccion-buscador-input {
   flex: 1;
   padding: 12px 15px;
   border: 1px solid #ddd;
@@ -43,12 +105,12 @@
   transition: border-color 0.2s;
 }
 
-.buscador-input:focus {
+.direccion-buscador-input:focus {
   outline: none;
   border-color: #1a73e8;
 }
 
-.buscador-btn {
+.direccion-buscador-btn {
   background-color: #1a73e8;
   color: white;
   border: none;
@@ -58,26 +120,58 @@
   font-weight: 600;
   transition: background-color 0.2s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.buscador-btn:hover:not(:disabled) {
+.direccion-buscador-btn:hover:not(:disabled) {
   background-color: #0b5ed7;
 }
 
-.buscador-btn:disabled {
+.direccion-buscador-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
 
-/* Mapa */
-.mapa-container {
+.direccion-buscador-icon {
+  font-size: 14px;
+}
+
+/* ===== BOTÓN UBICACIÓN ACTUAL ===== */
+.direccion-btn-ubicacion-actual {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.direccion-btn-ubicacion-actual:hover {
+  background-color: #218838;
+}
+
+.direccion-ubicacion-icon {
+  font-size: 14px;
+}
+
+/* ===== MAPA ===== */
+.direccion-mapa-container {
   margin-bottom: 25px;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.mapa-placeholder {
+.direccion-mapa-placeholder {
   height: 300px;
   background: linear-gradient(135deg, #e3f2fd, #bbdefb);
   display: flex;
@@ -88,15 +182,35 @@
   font-weight: 500;
 }
 
-.mapa-descripcion {
+.direccion-mapa-descripcion {
   margin-top: 10px;
   font-size: 14px;
   color: #555;
   text-align: center;
 }
 
-/* Formulario */
-.formulario-direccion h3 {
+.direccion-mapa-leyenda {
+  background-color: #f8f9fa;
+  padding: 10px 15px;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  font-size: 14px;
+  color: #495057;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.direccion-leyenda-icon {
+  color: #dc3545;
+  font-size: 14px;
+}
+
+/* ===== FORMULARIO ===== */
+.direccion-formulario h3 {
   font-size: 18px;
   margin-bottom: 20px;
   color: #333;
@@ -104,19 +218,26 @@
   padding-bottom: 10px;
 }
 
-.campo-formulario {
+.direccion-campo-formulario {
   margin-bottom: 20px;
 }
 
-.campo-formulario label {
-  display: block;
+.direccion-campo-formulario label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
   font-weight: 500;
   color: #555;
   font-size: 14px;
 }
 
-.input-direccion {
+.direccion-campo-icon {
+  font-size: 16px;
+  color: #1a73e8;
+}
+
+.direccion-input {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #ddd;
@@ -126,13 +247,28 @@
   box-sizing: border-box;
 }
 
-.input-direccion:focus {
+.direccion-input:focus {
   outline: none;
   border-color: #1a73e8;
 }
 
-/* Instrucciones */
-.instrucciones {
+/* ===== TEXTO DE AYUDA ===== */
+.direccion-texto-ayuda {
+  color: #6c757d;
+  font-size: 12px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.direccion-ayuda-icon {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+/* ===== INSTRUCCIONES ===== */
+.direccion-instrucciones {
   background-color: #f8f9fa;
   padding: 15px;
   border-radius: 6px;
@@ -140,24 +276,32 @@
   border-left: 4px solid #1a73e8;
 }
 
-.instrucciones p {
+.direccion-instrucciones p {
   margin: 0 0 10px 0;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.instrucciones ul {
+.direccion-instrucciones-icon {
+  color: #ffc107;
+  font-size: 16px;
+}
+
+.direccion-instrucciones ul {
   margin: 0;
   padding-left: 20px;
   font-size: 13px;
   color: #555;
 }
 
-.instrucciones li {
+.direccion-instrucciones li {
   margin-bottom: 5px;
 }
 
-/* Botones de Acción */
-.botones-accion {
+/* ===== BOTONES DE ACCIÓN ===== */
+.direccion-botones-accion {
   display: flex;
   justify-content: flex-end;
   gap: 15px;
@@ -166,7 +310,7 @@
   border-top: 1px solid #eee;
 }
 
-.btn-cancelar {
+.direccion-btn-cancelar {
   background-color: #6c757d;
   color: white;
   border: none;
@@ -175,13 +319,16 @@
   cursor: pointer;
   font-weight: 600;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.btn-cancelar:hover {
+.direccion-btn-cancelar:hover {
   background-color: #5a6268;
 }
 
-.btn-confirmar {
+.direccion-btn-confirmar {
   background-color: #28a745;
   color: white;
   border: none;
@@ -190,100 +337,148 @@
   cursor: pointer;
   font-weight: 600;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.btn-confirmar:hover:not(:disabled) {
+.direccion-btn-confirmar:hover:not(:disabled) {
   background-color: #218838;
 }
 
-.btn-confirmar:disabled {
+.direccion-btn-confirmar:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
 
-/* Agrega esto a tu ModificarDireccion.css */
-.btn-ubicacion-actual {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
-  transition: background-color 0.2s;
-}
-
-.btn-ubicacion-actual:hover {
-  background-color: #218838;
-}
-
-.mapa-google {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.mapa-leyenda {
-  background-color: #f8f9fa;
-  padding: 10px 15px;
-  border: 1px solid #dee2e6;
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  font-size: 14px;
-  color: #495057;
-  text-align: center;
-}
-
-/* Agrega al ModificarDireccion.css */
-.texto-ayuda {
-  color: #6c757d;
-  font-size: 12px;
-  margin-top: 5px;
-  display: block;
-}
-
-.campo-formulario label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
+.direccion-btn-icon {
   font-size: 14px;
 }
 
-.campo-formulario label:after {
-  content: " *";
-  color: #dc3545;
+/* ===== FOOTER ===== */
+.direccion-footer {
+  background-color: #b8b4b1;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #333;
+  width: 100%;
+  margin-top: auto;
 }
 
-.campo-formulario:last-child label:after {
-  content: ""; /* No agregar asterisco al último campo (tipo de vivienda) */
+.direccion-footer-links {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-/* Responsive */
+.direccion-footer-links a {
+  text-decoration: none;
+  color: #333;
+}
+
+.direccion-footer-links a:hover {
+  text-decoration: underline;
+}
+
+.direccion-footer-copyright {
+  color: #333;
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .modificar-direccion-container {
+  .direccion-container {
     padding: 20px 15px;
   }
   
-  .modificar-direccion-content {
+  .direccion-content {
     padding: 20px;
   }
   
-  .buscador-input-group {
+  .direccion-buscador-input-group {
     flex-direction: column;
   }
   
-  .buscador-input,
-  .buscador-btn {
+  .direccion-buscador-input,
+  .direccion-buscador-btn {
     width: 100%;
   }
   
-  .botones-accion {
+  .direccion-botones-accion {
     flex-direction: column;
   }
   
-  .mapa-placeholder {
+  .direccion-mapa-placeholder {
     height: 200px;
     padding: 20px;
   }
+  
+  .direccion-top-bar {
+    padding: 15px 20px;
+  }
+  
+  .direccion-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 12px 20px;
+  }
+  
+  .direccion-logo-img {
+    width: 60px;
+  }
+  
+  .direccion-logo-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .direccion-titulo {
+    font-size: 20px;
+  }
+  
+  .direccion-content {
+    padding: 15px;
+  }
+  
+  .direccion-buscador-input-group {
+    gap: 8px;
+  }
+  
+  .direccion-buscador-btn,
+  .direccion-btn-ubicacion-actual {
+    padding: 10px 15px;
+    font-size: 13px;
+  }
+  
+  .direccion-btn-cancelar,
+  .direccion-btn-confirmar {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* ===== ESTILOS PARA LEAFLET (MAPAS) ===== */
+.leaflet-container {
+  height: 400px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.leaflet-popup-content {
+  font-size: 14px;
+  margin: 8px 12px;
+}
+
+.leaflet-control-zoom a {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f4f4f4;
 }

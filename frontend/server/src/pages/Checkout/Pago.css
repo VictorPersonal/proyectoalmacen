@@ -15,7 +15,7 @@ body {
 }
 
 /* Header */
-.top-bar {
+.pago-top-bar {
   background-color: #b8b4b1;
   padding: 30px 30px;
   display: flex;
@@ -23,35 +23,35 @@ body {
   align-items: center;
 }
 
-.logo-section {
+.pago-logo-section {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.logo-icon {
+.pago-logo-img {
   width: 80px;
   height: auto;
 }
 
-.logo-text {
+.pago-logo-text {
   display: flex;
   flex-direction: column;
 }
 
-.logo-title {
+.pago-logo-title {
   font-size: 18px;
   font-weight: bold;
   color: #000;
 }
 
-.logo-subtitle {
+.pago-logo-subtitle {
   font-size: 7px;
   letter-spacing: 0.5px;
   color: #000;
 }
 
-.help-icon {
+.pago-help-icon {
   width: 26px;
   height: 26px;
   border: 2px solid #000;
@@ -63,22 +63,23 @@ body {
   font-weight: bold;
   cursor: pointer;
   background-color: #fff;
+  color: #000;
 }
 
-.help-icon svg {
+.pago-help-icon svg {
   width: 14px;
   height: 14px;
 }
 
 /* Container Principal */
-.page-wrapper {
+.pago-page-wrapper {
   background-color: #d0cbc8;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.container {
+.pago-container {
   all: unset;
   flex: 1;
   display: flex;
@@ -88,7 +89,7 @@ body {
   background-color: #d0cbc8;
 }
 
-.login-box {
+.pago-form-box {
   background-color: #fff;
   border-radius: 12px;
   padding: 35px 45px;
@@ -97,7 +98,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.form-title {
+.pago-form-title {
   text-align: center;
   font-size: 18px;
   font-weight: normal;
@@ -105,14 +106,40 @@ body {
   margin-bottom: 30px;
 }
 
+/* Descripción */
+.pago-descripcion {
+  font-size: 13px;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #555;
+}
+
+/* Resumen de compra */
+.pago-resumen {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.pago-resumen p {
+  margin-bottom: 5px;
+}
+
+.pago-resumen p:last-child {
+  margin-bottom: 0;
+}
+
 /* Métodos de Pago */
-.metodos-pago-container {
+.pago-metodos-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.metodo-pago {
+.pago-metodo {
   padding: 15px;
   border-radius: 8px;
   display: flex;
@@ -121,54 +148,60 @@ body {
   transition: all 0.3s ease;
 }
 
-.metodo-pago.activo {
+.pago-metodo.pago-activo {
   background-color: #ffffff;
   border: 1px solid #ddd;
   cursor: pointer;
 }
 
-.metodo-pago.activo:hover {
+.pago-metodo.pago-activo:hover {
   background-color: #f8f9fa;
   border-color: #D84040;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.metodo-pago.desactivado {
+.pago-metodo.pago-desactivado {
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.metodo-pago-info {
+.pago-metodo-info {
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 14px;
 }
 
-.metodo-icon {
+.pago-metodo-icon {
   font-size: 18px;
   color: #555;
 }
 
-.metodo-pago.activo .metodo-icon {
+.pago-metodo.pago-activo .pago-metodo-icon {
   color: #D84040;
 }
 
-.metodo-flecha {
+.pago-metodo-flecha {
   font-size: 14px;
   color: #D84040;
 }
 
-.metodo-bloqueado {
+.pago-metodo-bloqueado {
   font-size: 14px;
   color: #999;
 }
 
-/* Botón */
-.btn-ingresar {
+/* Botón Volver */
+.pago-boton-volver-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.pago-btn-volver {
   background-color: #fff;
   color: #D84040;
   border: 1px solid #D84040;
@@ -178,17 +211,18 @@ body {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
-  margin-top: 8px;
   text-transform: capitalize;
+  min-width: 160px;
+  text-align: center;
 }
 
-.btn-ingresar:hover {
+.pago-btn-volver:hover {
   background-color: #D84040;
   color: #fff;
 }
 
 /* Footer */
-.footer {
+.pago-footer {
   background-color: #b8b4b1;
   padding: 20px 30px;
   display: flex;
@@ -198,71 +232,115 @@ body {
   color: #333;
 }
 
-.footer-links {
+.pago-footer-links {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.footer-links a {
+.pago-footer-links a {
   text-decoration: none;
   color: #333;
 }
 
-.footer-links a:hover {
+.pago-footer-links a:hover {
   text-decoration: underline;
 }
 
-.footer-links span {
+.pago-footer-links span {
   color: #333;
 }
 
-.footer-copyright {
+.pago-footer-copyright {
   color: #333;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .login-box {
+  .pago-form-box {
     padding: 30px 35px;
     max-width: 380px;
   }
 
-  .container {
+  .pago-container {
     margin: 15px;
     padding: 30px 15px;
   }
 
-  .footer {
+  .pago-footer {
     flex-direction: column;
     gap: 8px;
     text-align: center;
   }
 
-  .top-bar {
+  .pago-top-bar {
     padding: 10px 20px;
   }
 
-  .metodo-pago-info {
+  .pago-metodo-info {
     font-size: 13px;
   }
 
-  .metodo-icon {
+  .pago-metodo-icon {
     font-size: 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .login-box {
+  .pago-form-box {
     padding: 25px 20px;
   }
 
-  .metodo-pago-info {
+  .pago-metodo-info {
     font-size: 12px;
     gap: 8px;
   }
 
-  .metodo-pago {
+  .pago-metodo {
     padding: 12px;
   }
+
+  .pago-btn-volver {
+    padding: 8px 16px;
+    font-size: 11px;
+    min-width: 140px;
+  }
+
+  .pago-top-bar {
+    padding: 15px 20px;
+  }
+
+  .pago-logo-img {
+    width: 60px;
+  }
+
+  .pago-logo-title {
+    font-size: 16px;
+  }
+}
+
+/* Estados de carga y deshabilitado */
+.pago-btn-volver:disabled {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}
+
+.pago-btn-volver:disabled:hover {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  color: #666666;
+  transform: none;
+}
+
+/* Mejoras de accesibilidad */
+.pago-metodo.pago-activo:focus {
+  outline: 2px solid #D84040;
+  outline-offset: 2px;
+}
+
+.pago-btn-volver:focus {
+  outline: 2px solid #D84040;
+  outline-offset: 2px;
 }
