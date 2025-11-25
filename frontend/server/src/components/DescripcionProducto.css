@@ -5,6 +5,11 @@
   background-color: #d9d5d2;
   min-height: calc(100vh - 140px);
   padding: 60px 0;
+  /* Propiedades específicas para Chrome */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transform: translateZ(0); /* Force GPU acceleration */
 }
 
 .producto-detalle {
@@ -16,6 +21,10 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: 80%;
   max-width: 1200px;
+  /* Chrome-specific fixes */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .producto-imagen-placeholder {
@@ -240,7 +249,6 @@
   justify-content: center;
 }
 
-/* 👇 PON ESTO ABAJO */
 .producto-cantidad select {
   height: 50px !important;
   padding: 0 15px;
@@ -253,3 +261,161 @@
   align-items: center;
 }
 
+.producto-detalle {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000;
+  -webkit-perspective: 1000;
+}
+
+.producto-info {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.producto-info h1,
+.producto-info h2,
+.producto-info h3,
+.producto-info h4,
+.producto-info h5,
+.producto-info h6,
+.producto-info p,
+.producto-info span,
+.producto-info div {
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  text-rendering: geometricPrecision !important;
+  filter: none !important;
+}
+
+@media all and (-webkit-min-device-pixel-ratio:0) {
+  .producto-info h1 {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    text-shadow: 0 0 0 #000000 !important;
+  }
+  
+  .producto-info p,
+  .producto-info span:not(.tarjeta-icono) {
+    color: #333333 !important;
+    -webkit-text-fill-color: #333333 !important;
+    text-shadow: 0 0 0 #333333 !important;
+  }
+  
+  .producto-stock {
+    color: #555555 !important;
+    -webkit-text-fill-color: #555555 !important;
+    text-shadow: 0 0 0 #555555 !important;
+  }
+  
+  .medios-pago p {
+    color: #333333 !important;
+    -webkit-text-fill-color: #333333 !important;
+    text-shadow: 0 0 0 #333333 !important;
+  }
+}
+
+.btn-comprar,
+.btn-agregar {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.tarjeta-icono,
+.logos-pago * {
+  -webkit-font-smoothing: auto !important;
+  text-rendering: auto !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.contador-imagenes {
+  color: #666666 !important;
+  -webkit-text-fill-color: #666666 !important;
+  text-shadow: 0 0 0 #666666 !important;
+  opacity: 1 !important;
+}
+
+.producto-cantidad select,
+.producto-cantidad option {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.flecha-navegacion {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.btn-volver {
+  color: #555555 !important;
+  -webkit-text-fill-color: #555555 !important;
+  text-shadow: 0 0 0 #555555 !important;
+  opacity: 1 !important;
+}
+
+.producto-info *:not(.tarjeta-icono) {
+  opacity: 1 !important;
+}
+
+@media all and (-webkit-min-device-pixel-ratio:0) {
+  .contador-imagenes,
+  .producto-cantidad select,
+  .flecha-navegacion,
+  .btn-volver {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+  }
+  
+  .producto-cantidad select option {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+}
+
+.producto-detalle h1 {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: 0 0 0 #000000 !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+.producto-cantidad label,
+.producto-cantidad .cantidad-label {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: 0 0 0 #000000 !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+}
+
+@media all and (-webkit-min-device-pixel-ratio:0) {
+  /* Fuerza el título */
+  .producto-detalle h1 {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    text-shadow: 0 0 1px #000000 !important;
+    opacity: 1 !important;
+  }
+  
+  .producto-cantidad label,
+  .producto-cantidad .cantidad-label {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    text-shadow: 0 0 1px #000000 !important;
+    opacity: 1 !important;
+  }
+  
+  .producto-info * {
+    opacity: 1 !important;
+  }
+}
+.producto-info h1,
+.producto-cantidad,
+.producto-cantidad * {
+  opacity: 1 !important;
+}

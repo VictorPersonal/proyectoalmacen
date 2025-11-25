@@ -2,15 +2,54 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Registro.css";
 import logo from "../assets/Logo dulce hogar.png";
+import Swal from "sweetalert2";
 
 function Registro() {
   const [email, setEmail] = useState("");
   const [cedula, setCedula] = useState("");
   const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");
-  const [mensaje, setMensaje] = useState("");
   const [errores, setErrores] = useState({});
+  const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
+
+  // 🔹 Función para mostrar alertas de éxito
+  const mostrarExito = (mensaje) => {
+    Swal.fire({
+      icon: 'success',
+      title: '¡Éxito!',
+      text: mensaje,
+      confirmButtonColor: '#D84040',
+      confirmButtonText: 'Aceptar',
+      timer: 3000,
+      timerProgressBar: true
+    });
+  };
+
+  // 🔹 Función para mostrar alertas de error
+  const mostrarError = (mensaje) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: mensaje,
+      confirmButtonColor: '#D84040',
+      confirmButtonText: 'Entendido'
+    });
+  };
+
+  // 🔹 Función para mostrar confirmación
+  const mostrarConfirmacion = () => {
+    return Swal.fire({
+      title: '¿Crear cuenta?',
+      text: "¿Estás seguro de que quieres crear una nueva cuenta?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#D84040',
+      cancelButtonColor: '#666',
+      confirmButtonText: 'Sí, crear cuenta',
+      cancelButtonText: 'Cancelar'
+    });
+  };
 
   // Validaciones
   const validarEmail = (email) => {
@@ -97,13 +136,19 @@ function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setMensaje("");
-    
     // Validar el formulario antes de enviar
     if (!validarFormulario()) {
-      setMensaje("Por favor, corrige los errores en el formulario ❌");
+      mostrarError("Por favor, corrige los errores en el formulario");
       return;
     }
+
+    // Mostrar confirmación antes de registrar
+    const confirmacion = await mostrarConfirmacion();
+    if (!confirmacion.isConfirmed) {
+      return;
+    }
+
+    setCargando(true);
 
     // Crear objeto sin email y contraseña
     const nuevoUsuario = {
@@ -113,7 +158,6 @@ function Registro() {
       contrasena,
     };
 
-
     try {
       const res = await fetch("http://localhost:4000/api/usuario", {
         method: "POST",
@@ -122,14 +166,16 @@ function Registro() {
       });
 
       if (res.status === 409) {
-        setMensaje("La cédula ya está registrada ❌");
+        mostrarError("La cédula ya está registrada");
         return;
       }
 
       if (!res.ok) throw new Error("Error al registrar usuario");
 
       const data = await res.json();
-      setMensaje("Cuenta creada exitosamente ✅");
+      
+      // Mostrar mensaje de éxito
+      mostrarExito("Cuenta creada exitosamente");
 
       // Limpiar los campos
       setEmail("");
@@ -144,74 +190,65 @@ function Registro() {
       }, 2000);
     } catch (error) {
       console.error("Error:", error);
-      setMensaje("No se pudo registrar el usuario ❌");
+      mostrarError("No se pudo registrar el usuario");
+    } finally {
+      setCargando(false);
     }
   };
 
   return (
     <>
-      <header id="top-bar">
-        <div id="logo-section">
-          <img src={logo} alt="Dulce hogar logo" id="logo-img" />
-          <div id="logo-text">
-            <span id="logo-title">Dulce hogar</span>
-            <span id="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+      <header className="registro-top-bar">
+        <div className="registro-logo-section">
+          <img src={logo} alt="Dulce hogar logo" className="registro-logo-img" />
+          <div className="registro-logo-text">
+            <span className="registro-logo-title">Dulce hogar</span>
+            <span className="registro-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
           </div>
         </div>
-        <div id="help-icon">?</div>
+        <div className="registro-help-icon">?</div>
       </header>
 
-      <main id="container">
-        <div id="form-wrapper">
-          <h1 id="form-title">Crear Cuenta</h1>
+      <main className="registro-container">
+        <div className="registro-form-wrapper">
+          <h1 className="registro-form-title">Crear Cuenta</h1>
 
-          {mensaje && (
-            <div
-              style={{
-                color: mensaje.includes("exitosamente") ? "green" : "red",
-                marginBottom: "1rem",
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
-              {mensaje}
-            </div>
-          )}
-
-          <form id="registro-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="email">Email:</label>
+          <form className="registro-form" onSubmit={handleSubmit}>
+            <div className="registro-form-group">
+              <label htmlFor="registro-email">Email:</label>
               <input
                 type="email"
-                id="email"
+                id="registro-email"
                 placeholder="nombre@tucorreo.com"
                 value={email}
                 onChange={handleEmailChange}
                 required
-                className={errores.email ? "error-input" : ""}
+                disabled={cargando}
+                className={errores.email ? "registro-error-input" : ""}
               />
-              {errores.email && <span className="error-message">{errores.email}</span>}
+              {errores.email && <span className="registro-error-message">{errores.email}</span>}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="cedula">Cédula:</label>
+            <div className="registro-form-group">
+              <label htmlFor="registro-cedula">Cédula:</label>
               <input
                 type="text"
-                id="cedula"
+                id="registro-cedula"
                 value={cedula}
                 onChange={handleCedulaChange}
                 placeholder="Solo números, máximo 10 dígitos"
                 required
-                className={errores.cedula ? "error-input" : ""}
+                disabled={cargando}
+                className={errores.cedula ? "registro-error-input" : ""}
               />
-              {errores.cedula && <span className="error-message">{errores.cedula}</span>}
+              {errores.cedula && <span className="registro-error-message">{errores.cedula}</span>}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="nombre">Nombre completo:</label>
+            <div className="registro-form-group">
+              <label htmlFor="registro-nombre">Nombre completo:</label>
               <input
                 type="text"
-                id="nombre"
+                id="registro-nombre"
                 value={nombre}
                 onChange={(e) => {
                   setNombre(e.target.value);
@@ -220,43 +257,56 @@ function Registro() {
                   }
                 }}
                 required
-                className={errores.nombre ? "error-input" : ""}
+                disabled={cargando}
+                className={errores.nombre ? "registro-error-input" : ""}
               />
-              {errores.nombre && <span className="error-message">{errores.nombre}</span>}
+              {errores.nombre && <span className="registro-error-message">{errores.nombre}</span>}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="contrasena">Contraseña:</label>
+            <div className="registro-form-group">
+              <label htmlFor="registro-contrasena">Contraseña:</label>
               <input
                 type="password"
-                id="contrasena"
+                id="registro-contrasena"
                 value={contrasena}
                 onChange={handleContrasenaChange}
                 required
-                className={errores.contrasena ? "error-input" : ""}
+                disabled={cargando}
+                className={errores.contrasena ? "registro-error-input" : ""}
               />
-              <small id="hint">
+              <small className="registro-hint">
                 Al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)
               </small>
-              {errores.contrasena && <span className="error-message">{errores.contrasena}</span>}
+              {errores.contrasena && <span className="registro-error-message">{errores.contrasena}</span>}
             </div>
 
-            <button type="submit" id="btn-registrar">
-              Registrar
+            <button 
+              type="submit" 
+              className="registro-btn-registrar"
+              disabled={cargando}
+            >
+              {cargando ? (
+                <>
+                  <div className="registro-spinner"></div>
+                  Creando cuenta...
+                </>
+              ) : (
+                "Registrar"
+              )}
             </button>
           </form>
         </div>
       </main>
 
-      <footer id="footer">
-        <div id="footer-links">
+      <footer className="registro-footer">
+        <div className="registro-footer-links">
           <a href="#">Preguntas frecuentes</a>
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
           <a href="#">Términos</a>
         </div>
-        <div id="footer-copy">© 2025 FHO, todos los derechos reservados</div>
+        <div className="registro-footer-copy">© 2025 FHO, todos los derechos reservados</div>
       </footer>
     </>
   );

@@ -7,14 +7,14 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #d0cbc8; /* 🔹 Fondo gris claro igual al registro */
+  background-color: #d0cbc8;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 /* Header */
-.top-bar {
+.login-top-bar {
   background-color: #b8b4b1;
   padding: 30px 30px;
   display: flex;
@@ -22,35 +22,35 @@ body {
   align-items: center;
 }
 
-.logo-section {
+.login-logo-section {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.logo-icon {
+.login-logo-img {
   width: 80px;
   height: auto;
 }
 
-.logo-text {
+.login-logo-text {
   display: flex;
   flex-direction: column;
 }
 
-.logo-title {
+.login-logo-title {
   font-size: 18px;
   font-weight: bold;
   color: #000;
 }
 
-.logo-subtitle {
+.login-logo-subtitle {
   font-size: 7px;
   letter-spacing: 0.5px;
   color: #000;
 }
 
-.help-icon {
+.login-help-icon {
   width: 26px;
   height: 26px;
   border: 2px solid #000;
@@ -65,25 +65,25 @@ body {
 }
 
 /* Container Principal */
-.page-wrapper {
-  background-color: #d0cbc8; /* 🔹 Mismo gris del fondo general */
+.login-page-wrapper {
+  background-color: #d0cbc8;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 /* Evita heredar estilos del anterior contenedor */
-.container {
+.login-container {
   all: unset;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  background-color: #d0cbc8; /* 🔹 También igualado */
+  background-color: #d0cbc8;
 }
 
-.login-box {
+.login-form-box {
   background-color: #fff;
   border-radius: 12px;
   padding: 35px 45px;
@@ -92,7 +92,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.form-title {
+.login-form-title {
   text-align: center;
   font-size: 18px;
   font-weight: normal;
@@ -107,19 +107,19 @@ body {
   gap: 18px;
 }
 
-.form-group {
+.login-form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.form-group label {
+.login-form-label {
   font-size: 12px;
   color: #000;
   font-weight: 500;
 }
 
-.form-group input {
+.login-form-input {
   padding: 10px 14px;
   border: 1px solid #999;
   border-radius: 4px;
@@ -130,17 +130,17 @@ body {
   transition: border-color 0.3s;
 }
 
-.form-group input:focus {
+.login-form-input:focus {
   border-color: #D84040;
 }
 
-.form-group input::placeholder {
+.login-form-input::placeholder {
   color: #999;
   font-size: 11px;
 }
 
 /* Botón */
-.btn-ingresar {
+.login-btn-ingresar {
   background-color: #fff;
   color: #D84040;
   border: 1px solid #D84040;
@@ -154,13 +154,13 @@ body {
   text-transform: capitalize;
 }
 
-.btn-ingresar:hover {
+.login-btn-ingresar:hover {
   background-color: #D84040;
   color: #fff;
 }
 
 /* Enlaces */
-.form-links {
+.login-form-links {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -168,28 +168,27 @@ body {
   margin-top: 15px;
 }
 
-
-.forgot-password,
-.register-link {
+.login-forgot-password,
+.login-register-link {
   font-size: 11px;
   color: #000;
   text-align: center;
 }
 
-.forgot-password a,
-.register-link a {
+.login-forgot-password a,
+.login-register-link a {
   color: #D84040;
   text-decoration: none;
   font-weight: 500;
 }
 
-.forgot-password a:hover,
-.register-link a:hover {
+.login-forgot-password a:hover,
+.login-register-link a:hover {
   text-decoration: underline;
 }
 
 /* Footer */
-.footer {
+.login-footer {
   background-color: #b8b4b1;
   padding: 20px 30px;
   display: flex;
@@ -199,53 +198,31 @@ body {
   color: #333;
 }
 
-.footer-links {
+.login-footer-links {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.footer-links a {
+.login-footer-links a {
   text-decoration: none;
   color: #333;
 }
 
-.footer-links a:hover {
+.login-footer-links a:hover {
   text-decoration: underline;
 }
 
-.footer-links span {
+.login-footer-links span {
   color: #333;
 }
 
-.footer-copyright {
+.login-footer-copyright {
   color: #333;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .login-box {
-    padding: 30px 35px;
-    max-width: 380px;
-  }
-
-  .container {
-    margin: 15px;
-    padding: 30px 15px;
-  }
-
-  .footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-
-  .top-bar {
-    padding: 10px 20px;
-  }
-}
-
-.mensaje {
+/* Mensajes */
+.login-mensaje {
   text-align: center;
   margin-bottom: 15px;
   padding: 10px;
@@ -254,31 +231,31 @@ body {
   font-weight: 500;
 }
 
-.mensaje-exito {
+.login-mensaje-exito {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
-.mensaje-error {
+.login-mensaje-error {
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
 
 /* ---- Ícono de mostrar/ocultar contraseña ---- */
-.password-wrapper {
+.login-password-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.password-wrapper input {
+.login-password-wrapper input {
   width: 100%;
   padding-right: 36px;
 }
 
-.toggle-password {
+.login-toggle-password {
   position: absolute;
   right: 10px;
   cursor: pointer;
@@ -286,6 +263,65 @@ body {
   font-size: 16px;
 }
 
-.toggle-password:hover {
+.login-toggle-password:hover {
   color: #D84040;
+}
+
+/* Grupo de contraseña específico */
+.login-password-group {
+  /* Estilos específicos si los necesitas */
+}
+
+.login-password-input {
+  /* Estilos específicos para input de password */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-form-box {
+    padding: 30px 35px;
+    max-width: 380px;
+  }
+
+  .login-container {
+    margin: 15px;
+    padding: 30px 15px;
+  }
+
+  .login-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .login-top-bar {
+    padding: 10px 20px;
+  }
+}
+/* Spinner para login */
+.login-spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.login-btn-ingresar:disabled {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.login-btn-ingresar:disabled:hover {
+  background-color: #cccccc;
+  border-color: #cccccc;
 }

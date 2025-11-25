@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "./RestablecerContrasena.css"; // 👈 importante importar los estilos
+import "./RestablecerContrasena.css";
 
-import logo from "../assets/Logo dulce hogar.png"; // si tienes logo
+import logo from "../assets/Logo dulce hogar.png";
 
 const RestablecerContrasena = () => {
   const [nuevaContrasena, setNuevaContrasena] = useState("");
@@ -40,68 +40,69 @@ const RestablecerContrasena = () => {
   };
 
   return (
-    <div className="recuperar-wrapper">
+    <div className="restablecer-page-wrapper">
       {/* ===== HEADER ===== */}
-      <header className="top-bar">
-        <div className="logo-section">
-          <img src={logo} alt="Logo" className="logo-icon" />
-          <div className="logo-text">
-            <span className="logo-title">Dulce Hogar</span>
-            <span className="logo-subtitle">Almacen de electrodomesticos</span>
+      <header className="restablecer-top-bar">
+        <div className="restablecer-logo-section">
+          <img src={logo} alt="Logo" className="restablecer-logo-img" />
+          <div className="restablecer-logo-text">
+            <span className="restablecer-logo-title">Dulce Hogar</span>
+            <span className="restablecer-logo-subtitle">Almacen de electrodomesticos</span>
           </div>
         </div>
-        <div className="help-icon">?</div>
+        <div className="restablecer-help-icon">?</div>
       </header>
 
       {/* ===== BODY ===== */}
-      <main className="container">
-        <div className="recuperar-box">
-          <h2 className="recuperar-title">Restablecer Contraseña</h2>
+      <main className="restablecer-container">
+        <div className="restablecer-form-box">
+          <h2 className="restablecer-form-title">Restablecer Contraseña</h2>
 
           {mensaje && (
             <p
-              className={`recuperar-mensaje ${
+              className={`restablecer-mensaje ${
                 mensaje.includes("correctamente")
-                  ? "recuperar-exito"
-                  : "recuperar-error"
+                  ? "restablecer-mensaje-exito"
+                  : "restablecer-mensaje-error"
               }`}
             >
               {mensaje}
             </p>
           )}
 
-          <form className="recuperar-form" onSubmit={handleSubmit}>
-            <div className="recuperar-group">
-              <label>Nueva Contraseña</label>
+          <form className="restablecer-form" onSubmit={handleSubmit}>
+            <div className="restablecer-form-group">
+              <label className="restablecer-form-label">Nueva Contraseña</label>
               <input
                 type="password"
                 placeholder="Ingresa tu nueva contraseña"
                 value={nuevaContrasena}
                 onChange={(e) => setNuevaContrasena(e.target.value)}
+                className="restablecer-form-input"
               />
             </div>
 
-            <button type="submit" className="recuperar-btn">
+            <button type="submit" className="restablecer-btn-actualizar">
               Actualizar Contraseña
             </button>
           </form>
 
-          <div className="recuperar-links">
+          <div className="restablecer-form-links">
             <a href="/login">Volver al inicio de sesión</a>
           </div>
         </div>
       </main>
 
       {/* ===== FOOTER ===== */}
-      <footer className="footer">
-        <div className="footer-links">
+      <footer className="restablecer-footer">
+        <div className="restablecer-footer-links">
           <a href="#">Preguntas frecuentes</a>
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
           <a href="#">Terminos</a>
         </div>
-        <div className="footer-copyright">
+        <div className="restablecer-footer-copyright">
           © 2025 help. Todos los derechos reservados.
         </div>
       </footer>
