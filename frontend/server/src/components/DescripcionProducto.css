@@ -79,7 +79,7 @@
 .botones-compra {
   display: flex;
   gap: 15px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 /* Estilos para la navegación de imágenes */
@@ -138,6 +138,7 @@
   white-space: nowrap;
   /* Tamaño específico para este botón */
   width: auto; /* Ancho automático según el contenido */
+  margin-top: 8px;
 }
 
 .btn-agregar {
@@ -252,7 +253,3 @@
   align-items: center;
 }
 
-.producto-detalle {
-  display: flex !important;
-  flex-direction: row;
-}
