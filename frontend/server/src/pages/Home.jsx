@@ -70,7 +70,6 @@ const Home = () => {
         setUsuarioLogueado(true);
         setUsuarioInfo(usuario);
       } catch (error) {
-        console.error("Error al parsear usuario:", error);
         localStorage.removeItem("usuarioInfo");
       }
     }
@@ -193,12 +192,7 @@ const Home = () => {
       setCategoriaSeleccionada(null);
       setMensajeCategoria("");
       
-      console.log(`Búsqueda: "${query}"`);
-      console.log(`Productos recibidos: ${productosRecibidos.length}`);
-      console.log(`Productos filtrados: ${productosFiltrados.length}`);
-      
     } catch (error) {
-      console.error("Error al buscar productos:", error);
       setProductos([]);
       setProductosFiltrados([]);
     } finally {
@@ -239,7 +233,6 @@ const Home = () => {
       );
 
       const data = await res.json();
-      console.log("Productos recibidos:", data);
 
       if (res.status === 404 || data.message === "No hay productos en esta categoría") {
         setProductos([]);
@@ -253,7 +246,6 @@ const Home = () => {
       setProductosFiltrados(productosData);
 
     } catch (err) {
-      console.error("Error cargando productos por categoría:", err);
       setProductos([]);
       setProductosFiltrados([]);
       setMensajeCategoria("Error al cargar productos.");

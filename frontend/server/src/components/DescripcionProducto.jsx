@@ -15,9 +15,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
   const imagenes = producto?.producto_imagen || [];
   const imagenActual = imagenes[imagenSeleccionada];
 
-  console.log("Producto completo:", producto);
-  console.log("Imágenes disponibles:", imagenes);
-  console.log("Imagen actual:", imagenActual);
 
   if (!producto || !producto.nombre) {
     return (
@@ -73,7 +70,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
         { withCredentials: true }
       );
 
-      console.log("✅ Producto agregado:", res.data);
 
       Swal.fire({
         icon: "success",
@@ -84,7 +80,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
       });
 
     } catch (error) {
-      console.error("❌ Error al agregar producto:", error);
 
       if (error.response?.status === 401 || error.response?.status === 403) {
         Swal.fire({
@@ -140,7 +135,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
       cantidadTotal: cantidad
     };
 
-    console.log("🛒 Compra directa:", compraDirecta);
 
     // Navegar al checkout
     navigate("/checkout/forma-entrega", {
