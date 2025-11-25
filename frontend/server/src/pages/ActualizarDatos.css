@@ -19,45 +19,45 @@ body {
 }
 
 /* Header */
-#top-bar {
+.actualizar-top-bar {
     background-color: #b8b4b1;
     padding: 20px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    flex-shrink: 0; /* Evita que se reduzca */
+    flex-shrink: 0;
 }
 
-#logo-section {
+.actualizar-logo-section {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-#logo-img {
+.actualizar-logo-img {
     width: 80px;
     height: auto;
 }
 
-#logo-text {
+.actualizar-logo-text {
     display: flex;
     flex-direction: column;
 }
 
-#logo-title {
+.actualizar-logo-title {
     font-size: 20px;
     font-weight: bold;
     color: #000;
 }
 
-#logo-subtitle {
+.actualizar-logo-subtitle {
     font-size: 9px;
     letter-spacing: 0.5px;
     color: #000;
 }
 
-#help-icon {
+.actualizar-help-icon {
     width: 28px;
     height: 28px;
     border: 2px solid #000;
@@ -71,40 +71,40 @@ body {
 }
 
 /* Container - CENTRADO Y ALTURA REDUCIDA */
-#container {
+.actualizar-container {
     width: 100%;
-    flex: 1; /* Ocupa el espacio disponible entre header y footer */
+    flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center; /* Centrado vertical */
-    padding: 20px; /* Reducido el padding */
+    align-items: center;
+    padding: 20px;
     background-color: #d0cbc8;
-    min-height: auto; /* Elimina altura mínima fija */
+    min-height: auto;
 }
 
 /* Formulario - ALTURA REDUCIDA */
-#form-wrapper {
+.actualizar-form-wrapper {
     background-color: #ffffff;
     border-radius: 10px;
-    padding: 25px 35px; /* Reducido el padding */
+    padding: 25px 35px;
     width: 100%;
-    max-width: 650px; /* Ligeramente reducido */
+    max-width: 650px;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
-    margin: 0; /* Elimina márgenes extra */
-    max-height: 85vh; /* Limita la altura máxima */
-    overflow-y: auto; /* Scroll si es necesario */
+    margin: 0;
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
-#form-title {
+.actualizar-form-title {
     text-align: center;
-    font-size: 22px; /* Ligeramente reducido */
+    font-size: 22px;
     font-weight: normal;
     color: #D84040;
-    margin-bottom: 20px; /* Reducido */
+    margin-bottom: 20px;
 }
 
 /* Mensajes */
-.mensaje {
+.actualizar-mensaje {
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 15px;
@@ -113,19 +113,19 @@ body {
     font-size: 14px;
 }
 
-.mensaje.exito {
+.actualizar-mensaje-exito {
     background-color: #e6f7e6;
     color: #2d662d;
     border: 1px solid #2d662d;
 }
 
-.mensaje.error {
+.actualizar-mensaje-error {
     background-color: #ffe6e6;
     color: #cc0000;
     border: 1px solid #cc0000;
 }
 
-.cargando {
+.actualizar-cargando {
     text-align: center;
     padding: 8px;
     color: #666;
@@ -134,36 +134,36 @@ body {
 }
 
 /* Formulario - ESPACIOS REDUCIDOS */
-#actualizar-form {
+.actualizar-form {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Reducido el gap */
+    gap: 15px;
 }
 
-.campos-grid {
+.actualizar-campos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px; /* Reducido el gap */
+    gap: 15px;
 }
 
-.form-group {
+.actualizar-form-group {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Reducido el gap */
+    gap: 5px;
 }
 
-.form-group.direccion-completa {
+.actualizar-form-group.actualizar-direccion-completa {
     grid-column: 1 / -1;
 }
 
-.form-group label {
+.actualizar-form-group label {
     font-size: 13px;
     color: #000;
     font-weight: 500;
 }
 
-.form-group input {
-    padding: 8px 12px; /* Reducido el padding */
+.actualizar-form-group input {
+    padding: 8px 12px;
     border: 1px solid #999;
     border-radius: 5px;
     font-size: 14px;
@@ -172,83 +172,83 @@ body {
     transition: border-color 0.3s, background-color 0.3s;
 }
 
-.form-group input:focus {
+.actualizar-form-group input:focus {
     border-color: #D84040;
     background-color: #fff8f8;
 }
 
-.form-group input::placeholder {
+.actualizar-form-group input::placeholder {
     color: #999;
     font-size: 12px;
 }
 
 /* Campos bloqueados */
-.campo-bloqueado {
+.actualizar-campo-bloqueado {
     background-color: #f5f5f5 !important;
     color: #666;
     cursor: not-allowed;
 }
 
-.texto-ayuda {
+.actualizar-texto-ayuda {
     font-size: 10px;
     color: #888;
-    margin-top: 2px; /* Reducido */
+    margin-top: 2px;
     font-style: italic;
 }
 
 /* Botones */
-.botones-accion {
+.actualizar-botones-accion {
     display: flex;
-    gap: 12px; /* Reducido */
+    gap: 12px;
     justify-content: center;
-    margin-top: 20px; /* Reducido */
+    margin-top: 20px;
     grid-column: 1 / -1;
 }
 
-#btn-actualizar {
+.actualizar-btn-actualizar {
     background-color: #D84040;
     color: #fff;
     border: 1px solid #D84040;
-    padding: 10px 20px; /* Reducido */
+    padding: 10px 20px;
     font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s;
-    min-width: 150px; /* Ligeramente reducido */
+    min-width: 150px;
 }
 
-#btn-actualizar:hover:not(:disabled) {
+.actualizar-btn-actualizar:hover:not(:disabled) {
     background-color: #c03939;
     border-color: #c03939;
 }
 
-#btn-actualizar:disabled {
+.actualizar-btn-actualizar:disabled {
     background-color: #cccccc;
     border-color: #cccccc;
     cursor: not-allowed;
 }
 
-#btn-cancelar {
+.actualizar-btn-cancelar {
     background-color: #fff;
     color: #666;
     border: 1px solid #999;
-    padding: 10px 20px; /* Reducido */
+    padding: 10px 20px;
     font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s;
-    min-width: 110px; /* Ligeramente reducido */
+    min-width: 110px;
 }
 
-#btn-cancelar:hover {
+.actualizar-btn-cancelar:hover {
     background-color: #f5f5f5;
     border-color: #666;
 }
 
 /* Footer */
-#footer {
+.actualizar-footer {
     background-color: #b8b4b1;
-    padding: 15px 30px; /* Reducido */
+    padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -256,100 +256,100 @@ body {
     color: #333;
     width: 100%;
     margin-top: auto;
-    flex-shrink: 0; /* Evita que se reduzca */
+    flex-shrink: 0;
 }
 
-#footer-links {
+.actualizar-footer-links {
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-#footer-links a {
+.actualizar-footer-links a {
     text-decoration: none;
     color: #333;
 }
 
-#footer-links a:hover {
+.actualizar-footer-links a:hover {
     text-decoration: underline;
 }
 
-#footer-copy {
+.actualizar-footer-copy {
     color: #333;
 }
 
-.info-ayuda {
-  text-align: center;
-  margin-top: 15px;
-  color: #666;
-  font-size: 12px;
+.actualizar-info-ayuda {
+    text-align: center;
+    margin-top: 15px;
+    color: #666;
+    font-size: 12px;
 }
 
-.info-ayuda small {
-  color: #888;
+.actualizar-info-ayuda small {
+    color: #888;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    #container {
-        padding: 15px; /* Reducido en móviles */
-        align-items: flex-start; /* En móviles empieza desde arriba */
+    .actualizar-container {
+        padding: 15px;
+        align-items: flex-start;
     }
     
-    #form-wrapper {
-        padding: 20px 25px; /* Reducido en móviles */
+    .actualizar-form-wrapper {
+        padding: 20px 25px;
         max-width: 100%;
         margin: 10px 0;
     }
     
-    .campos-grid {
+    .actualizar-campos-grid {
         grid-template-columns: 1fr;
-        gap: 12px; /* Reducido en móviles */
+        gap: 12px;
     }
     
-    .botones-accion {
+    .actualizar-botones-accion {
         flex-direction: column;
-        gap: 8px; /* Reducido en móviles */
+        gap: 8px;
     }
     
-    #btn-actualizar,
-    #btn-cancelar {
+    .actualizar-btn-actualizar,
+    .actualizar-btn-cancelar {
         width: 100%;
         min-width: auto;
     }
 
-    #footer {
+    .actualizar-footer {
         flex-direction: column;
-        gap: 6px; /* Reducido */
+        gap: 6px;
         text-align: center;
-        padding: 12px 20px; /* Reducido */
+        padding: 12px 20px;
     }
 
-    #top-bar {
-        padding: 15px 20px; /* Reducido */
+    .actualizar-top-bar {
+        padding: 15px 20px;
     }
 }
 
 @media (max-width: 480px) {
-    #container {
-        padding: 10px; /* Mínimo padding en móviles pequeños */
+    .actualizar-container {
+        padding: 10px;
     }
     
-    #form-wrapper {
-        padding: 15px 20px; /* Mínimo padding */
+    .actualizar-form-wrapper {
+        padding: 15px 20px;
     }
     
-    #form-title {
+    .actualizar-form-title {
         font-size: 20px;
         margin-bottom: 15px;
     }
     
-    .form-group input {
-        padding: 6px 10px; /* Mínimo padding */
+    .actualizar-form-group input {
+        padding: 6px 10px;
     }
     
-    #btn-actualizar,
-    #btn-cancelar {
-        padding: 8px 16px; /* Mínimo padding */
+    .actualizar-btn-actualizar,
+    .actualizar-btn-cancelar {
+        padding: 8px 16px;
     }
 }

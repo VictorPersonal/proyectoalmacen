@@ -1,0 +1,245 @@
+/* PagoExitoso.css */
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #d0cbc8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.pago-exitoso-top-bar {
+  background-color: #b8b4b1;
+  padding: 30px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pago-exitoso-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pago-exitoso-logo-img {
+  width: 80px;
+  height: auto;
+}
+
+.pago-exitoso-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.pago-exitoso-logo-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+.pago-exitoso-logo-subtitle {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: #000;
+}
+
+.pago-exitoso-help-icon {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+}
+
+/* Container Principal */
+.pago-exitoso-page-wrapper {
+  background-color: #d0cbc8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pago-exitoso-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: #d0cbc8;
+}
+
+.pago-exitoso-content {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 40px 45px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.pago-exitoso-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: normal;
+  color: #D84040;
+  margin-bottom: 15px;
+}
+
+.pago-exitoso-mensaje {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.pago-exitoso-icono {
+  font-size: 60px;
+  margin: 25px 0;
+  color: #28a745;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pago-exitoso-btn-volver {
+  background-color: #fff;
+  color: #D84040;
+  border: 1px solid #D84040;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+  margin-top: 15px;
+  text-transform: capitalize;
+}
+
+.pago-exitoso-btn-volver:hover {
+  background-color: #D84040;
+  color: #fff;
+}
+
+/* Footer */
+.pago-exitoso-footer {
+  background-color: #b8b4b1;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  color: #333;
+}
+
+.pago-exitoso-footer-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pago-exitoso-footer-links a {
+  text-decoration: none;
+  color: #333;
+}
+
+.pago-exitoso-footer-links a:hover {
+  text-decoration: underline;
+}
+
+.pago-exitoso-footer-links span {
+  color: #333;
+}
+
+.pago-exitoso-footer-copyright {
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pago-exitoso-content {
+    padding: 30px 35px;
+    max-width: 380px;
+  }
+
+  .pago-exitoso-container {
+    margin: 15px;
+    padding: 30px 15px;
+  }
+
+  .pago-exitoso-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .pago-exitoso-top-bar {
+    padding: 10px 20px;
+  }
+
+  .pago-exitoso-title {
+    font-size: 18px;
+  }
+
+  .pago-exitoso-icono {
+    font-size: 50px;
+    margin: 20px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .pago-exitoso-content {
+    padding: 25px 20px;
+  }
+
+  .pago-exitoso-title {
+    font-size: 16px;
+  }
+
+  .pago-exitoso-mensaje {
+    font-size: 13px;
+  }
+
+  .pago-exitoso-btn-volver {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .pago-exitoso-top-bar {
+    padding: 15px 20px;
+  }
+
+  .pago-exitoso-logo-img {
+    width: 60px;
+  }
+
+  .pago-exitoso-logo-title {
+    font-size: 16px;
+  }
+}
+
+/* Estados de hover y focus para accesibilidad */
+.pago-exitoso-btn-volver:focus {
+  outline: 2px solid #D84040;
+  outline-offset: 2px;
+}
+
+.pago-exitoso-help-icon:hover {
+  background-color: #f0f0f0;
+}

@@ -1,5 +1,5 @@
 /* ===== CONTENEDOR PRINCIPAL ===== */
-.envio-container {
+.entrega-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -13,7 +13,7 @@
 }
 
 /* ===== LADO IZQUIERDO ===== */
-.envio-left {
+.entrega-left {
   flex: 1;
   background-color: #fff;
   padding: 25px;
@@ -22,7 +22,7 @@
   max-width: 500px;
 }
 
-.envio-titulo {
+.entrega-titulo {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 20px;
@@ -30,7 +30,7 @@
 }
 
 /* ===== OPCIONES ===== */
-.envio-opcion {
+.entrega-opcion {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 18px;
@@ -45,43 +45,43 @@
   justify-content: space-between;
 }
 
-.envio-opcion:hover {
+.entrega-opcion:hover {
   border-color: #d84040;
 }
 
-.envio-opcion.seleccionado {
+.entrega-opcion.entrega-seleccionado {
   border-color: #d84040;
   background-color: #fff;
 }
 
-.envio-opcion-header {
+.entrega-opcion-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
 }
 
-.envio-opcion-header h3 {
+.entrega-opcion-header h3 {
   margin: 0;
   font-size: 15px;
   color: #000;
   font-weight: 600;
 }
 
-.envio-precio {
+.entrega-precio {
   color: #000;
   font-weight: 600;
   font-size: 15px;
 }
 
-.envio-gratis {
+.entrega-gratis {
   color: green;
   font-weight: 600;
   font-size: 15px;
 }
 
 /* CONTENEDOR DE DIRECCIÓN CON ALTURA FIJA */
-.envio-direccion-container {
+.entrega-direccion-container {
   min-height: 50px; /* ALTURA MÍNIMA PARA LA DIRECCIÓN */
   display: flex;
   flex-direction: column;
@@ -89,7 +89,7 @@
   margin: 8px 0;
 }
 
-.envio-direccion {
+.entrega-direccion {
   color: #555;
   font-size: 13px;
   margin-bottom: 3px;
@@ -103,13 +103,13 @@
   overflow: hidden;
 }
 
-.envio-tipo {
+.entrega-tipo {
   font-size: 12px;
   color: #777;
   margin-bottom: 6px;
 }
 
-.envio-modificar {
+.entrega-modificar {
   color: #1a73e8;
   text-decoration: none;
   font-size: 13px;
@@ -117,17 +117,17 @@
   margin-top: auto; /* EMPUJA HACIA ABAJO */
 }
 
-.envio-modificar:hover {
+.entrega-modificar:hover {
   text-decoration: underline;
 }
 
 /* ===== BOTÓN CONTINUAR ===== */
-.envio-btn-continuar-container {
+.entrega-btn-continuar-container {
   text-align: right;
   margin-top: 20px;
 }
 
-.envio-btn-continuar {
+.entrega-btn-continuar {
   background-color: #1a73e8;
   color: #fff;
   border: none;
@@ -139,12 +139,17 @@
   transition: background-color 0.2s;
 }
 
-.envio-btn-continuar:hover {
+.entrega-btn-continuar:hover {
   background-color: #0b5ed7;
 }
 
+.entrega-btn-continuar:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 /* ===== LADO DERECHO (RESUMEN COMPRA - MÁS PEQUEÑO) ===== */
-.envio-right {
+.entrega-right {
   flex: 0 0 280px; /* Más pequeño */
   background-color: #fff;
   padding: 20px;
@@ -155,7 +160,7 @@
   height: fit-content;
 }
 
-.envio-resumen-compra h3 {
+.entrega-resumen-compra h3 {
   font-size: 16px;
   margin-bottom: 15px;
   font-weight: 600;
@@ -164,7 +169,7 @@
   border-bottom: 1px solid #eee;
 }
 
-.envio-resumen-item {
+.entrega-resumen-item {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
@@ -172,7 +177,7 @@
   color: #333;
 }
 
-.envio-resumen-total {
+.entrega-resumen-total {
   display: flex;
   justify-content: space-between;
   font-size: 15px;
@@ -184,20 +189,20 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .envio-container {
+  .entrega-container {
     flex-direction: column;
     align-items: center;
     padding: 40px 15px;
     gap: 15px;
   }
 
-  .envio-left,
-  .envio-right {
+  .entrega-left,
+  .entrega-right {
     width: 100%;
     max-width: 100%;
   }
 
-  .envio-right {
+  .entrega-right {
     position: static;
     order: -1;
     flex: none;
@@ -207,16 +212,142 @@
 }
 
 @media (max-width: 480px) {
-  .envio-container {
+  .entrega-container {
     padding: 30px 10px;
   }
   
-  .envio-left,
-  .envio-right {
+  .entrega-left,
+  .entrega-right {
     padding: 20px 15px;
   }
   
-  .envio-opcion {
+  .entrega-opcion {
     min-height: 130px; /* ALTURA MÍNIMA MÓVIL */
+  }
+}
+
+/* ===== HEADER Y FOOTER ===== */
+.entrega-page-wrapper {
+  background-color: #ceccca;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.entrega-top-bar {
+  background-color: #b8b4b1;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.entrega-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.entrega-logo-img {
+  width: 80px;
+  height: auto;
+}
+
+.entrega-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.entrega-logo-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+.entrega-logo-subtitle {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: #000;
+}
+
+.entrega-help-icon {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.entrega-footer {
+  background-color: #b8b4b1;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #333;
+  width: 100%;
+  margin-top: auto;
+}
+
+.entrega-footer-links {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.entrega-footer-links a {
+  text-decoration: none;
+  color: #333;
+}
+
+.entrega-footer-links a:hover {
+  text-decoration: underline;
+}
+
+.entrega-footer-copyright {
+  color: #333;
+}
+
+/* ===== RADIO BUTTONS ===== */
+.entrega-opcion-header input[type="radio"] {
+  margin-right: 10px;
+  accent-color: #d84040;
+}
+
+/* ===== ESTADOS DE CARGA ===== */
+.entrega-cargando {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* ===== RESPONSIVE HEADER/FOOTER ===== */
+@media (max-width: 768px) {
+  .entrega-top-bar {
+    padding: 15px 20px;
+  }
+  
+  .entrega-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 12px 20px;
+  }
+  
+  .entrega-logo-img {
+    width: 60px;
+  }
+  
+  .entrega-logo-title {
+    font-size: 16px;
   }
 }

@@ -464,11 +464,11 @@ const Home = () => {
             </button>
           </section>
 
-          {/* MAS INFORMACIÓN */}
+          {/* MAS INFORMACIÓN - CON LA CORRECCIÓN */}
           {busqueda.trim().length === 0 && (
             <div className="info-toggle-wrapper">
               <button
-                className="info-toggle-btn"
+                className={`info-toggle-btn ${menuMasInfo ? 'abierto' : ''}`}
                 onClick={() => setMenuMasInfo(!menuMasInfo)}
               >
                 Más información ▾
@@ -476,7 +476,6 @@ const Home = () => {
 
               {menuMasInfo && (
                 <div className="info-panel">
-
                   <div className="info-column">
                     <h4>Acerca de</h4>
                     <Link to="/Acerca-de/Dulce-Hogar">Dulce Hogar</Link>
@@ -484,7 +483,6 @@ const Home = () => {
 
                   <div className="info-column">
                     <h4>Redes sociales</h4>
-
                     <a
                       href="https://www.facebook.com/dulce.hogar.3192479"
                       target="_blank"
@@ -492,7 +490,6 @@ const Home = () => {
                     >
                       Facebook
                     </a>
-
                     <a
                       href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
                       target="_blank"
@@ -500,7 +497,6 @@ const Home = () => {
                     >
                       Instagram
                     </a>
-
                     <a
                       href="https://wa.me/573103749429?text=Hola,+quiero+más+información"
                       target="_blank"
@@ -509,7 +505,6 @@ const Home = () => {
                       WhatsApp
                     </a>
                   </div>
-
                 </div>
               )}
             </div>

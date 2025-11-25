@@ -1,48 +1,46 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/Logo dulce hogar.png";
+import { FaCheckCircle, FaQuestionCircle } from "react-icons/fa";
+import "./PagoExitoso.css";
 
 const PagoExitoso = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="page-wrapper">
+    <div className="pago-exitoso-page-wrapper">
 
       {/* 🔹 Header */}
-      <header className="top-bar">
-        <div className="logo-section">
-          <img src={logo} alt="Logo" className="logo-icon" />
-          <div className="logo-text">
-            <span className="logo-title">Dulce hogar</span>
-            <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+      <header className="pago-exitoso-top-bar">
+        <div className="pago-exitoso-logo-section">
+          <img src={logo} alt="Logo" className="pago-exitoso-logo-img" />
+          <div className="pago-exitoso-logo-text">
+            <span className="pago-exitoso-logo-title">Dulce hogar</span>
+            <span className="pago-exitoso-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
           </div>
         </div>
-        <div className="help-icon">?</div>
+        <div className="pago-exitoso-help-icon">
+          <FaQuestionCircle />
+        </div>
       </header>
 
       {/* 🔹 Cuerpo */}
-      <main className="container">
-        <div className="login-box" style={{ textAlign: "center", padding: "25px" }}>
+      <main className="pago-exitoso-container">
+        <div className="pago-exitoso-content">
           
-          <h2 className="form-title">¡Pago exitoso! 🎉</h2>
+          <h2 className="pago-exitoso-title">¡Pago exitoso! 🎉</h2>
 
-          <p style={{ marginTop: "10px", fontSize: "14px" }}>
+          <p className="pago-exitoso-mensaje">
             Gracias por tu compra. Tu pago ha sido procesado correctamente.
           </p>
 
-          <div style={{ fontSize: "50px", margin: "20px 0" }}>✅</div>
+          <div className="pago-exitoso-icono">
+            <FaCheckCircle />
+          </div>
 
           <button
             onClick={() => navigate("/")}
-            className="btn-ingresar"
-            style={{
-              width: "100%",
-              marginTop: "15px",
-              padding: "12px",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
+            className="pago-exitoso-btn-volver"
           >
             Volver al inicio
           </button>
@@ -50,15 +48,15 @@ const PagoExitoso = () => {
       </main>
 
       {/* 🔹 Footer */}
-      <footer className="footer">
-        <div className="footer-links">
+      <footer className="pago-exitoso-footer">
+        <div className="pago-exitoso-footer-links">
           <a href="#">Preguntas frecuentes</a>
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
           <a href="#">Términos</a>
         </div>
-        <p className="footer-copyright">
+        <p className="pago-exitoso-footer-copyright">
           © 2025 FHO, todos los derechos reservados
         </p>
       </footer>

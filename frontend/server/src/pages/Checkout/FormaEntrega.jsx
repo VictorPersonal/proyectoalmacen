@@ -217,57 +217,57 @@ const FormaEntrega = () => {
 
   if (loading) {
     return (
-      <div className="page-wrapper">
-        <header className="top-bar">
-          <div className="logo-section">
-            <img src={logo} alt="Dulce hogar logo" id="logo-img" />
-            <div className="logo-text">
-              <span className="logo-title">Dulce hogar</span>
-              <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+      <div className="entrega-page-wrapper">
+        <header className="entrega-top-bar">
+          <div className="entrega-logo-section">
+            <img src={logo} alt="Dulce hogar logo" className="entrega-logo-img" />
+            <div className="entrega-logo-text">
+              <span className="entrega-logo-title">Dulce hogar</span>
+              <span className="entrega-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
             </div>
           </div>
-          <div className="help-icon">?</div>
+          <div className="entrega-help-icon">?</div>
         </header>
 
-        <div className="envio-container">
-          <div className="envio-left">
-            <h2 className="envio-titulo">Elige la forma de entrega</h2>
-            <div className="envio-opcion">
-              <div className="envio-opcion-header">
+        <div className="entrega-container">
+          <div className="entrega-left">
+            <h2 className="entrega-titulo">Elige la forma de entrega</h2>
+            <div className="entrega-opcion">
+              <div className="entrega-opcion-header">
                 <input type="radio" checked readOnly />
                 <h3>Enviar a domicilio</h3>
-                <span className="envio-precio">$15.400</span>
+                <span className="entrega-precio">$15.400</span>
               </div>
-              <p className="envio-direccion">Cargando dirección...</p>
-              <p className="envio-tipo">Residencial</p>
+              <p className="entrega-direccion">Cargando dirección...</p>
+              <p className="entrega-tipo">Residencial</p>
               <a 
                 href="#" 
-                className="envio-modificar"
+                className="entrega-modificar"
                 onClick={handleModificarDireccion}
               >
                 Modificar domicilio o elegir otro
               </a>
             </div>
-            <div className="envio-btn-continuar-container">
-              <button className="envio-btn-continuar" disabled>
+            <div className="entrega-btn-continuar-container">
+              <button className="entrega-btn-continuar" disabled>
                 Cargando...
               </button>
             </div>
           </div>
 
-          <div className="envio-right">
-            <div className="envio-resumen-compra">
+          <div className="entrega-right">
+            <div className="entrega-resumen-compra">
               <h3>Resumen de compra</h3>
-              <div className="envio-resumen-item">
+              <div className="entrega-resumen-item">
                 <span>Productos</span>
                 <span>Cargando...</span>
               </div>
-              <div className="envio-resumen-item">
+              <div className="entrega-resumen-item">
                 <span>Envío</span>
                 <span>$15.400</span>
               </div>
               <hr />
-              <div className="envio-resumen-total">
+              <div className="entrega-resumen-total">
                 <span>Total</span>
                 <strong>Cargando...</strong>
               </div>
@@ -275,15 +275,15 @@ const FormaEntrega = () => {
           </div>
         </div>
 
-        <footer className="footer">
-          <div className="footer-links">
+        <footer className="entrega-footer">
+          <div className="entrega-footer-links">
             <a href="#">Preguntas frecuentes</a>
             <span>/</span>
             <a href="#">Consejos de seguridad</a>
             <span>/</span>
             <a href="#">Términos</a>
           </div>
-          <div className="footer-copyright">
+          <div className="entrega-footer-copyright">
             © 2025 FHO, todos los derechos reservados
           </div>
         </footer>
@@ -292,81 +292,81 @@ const FormaEntrega = () => {
   }
 
   return (
-    <div className="page-wrapper">
-      <header className="top-bar">
-        <div className="logo-section">
-          <img src={logo} alt="Dulce hogar logo" id="logo-img" />
-          <div className="logo-text">
-            <span className="logo-title">Dulce hogar</span>
-            <span className="logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+    <div className="entrega-page-wrapper">
+      <header className="entrega-top-bar">
+        <div className="entrega-logo-section">
+          <img src={logo} alt="Dulce hogar logo" className="entrega-logo-img" />
+          <div className="entrega-logo-text">
+            <span className="entrega-logo-title">Dulce hogar</span>
+            <span className="entrega-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
           </div>
         </div>
-        <div className="help-icon">?</div>
+        <div className="entrega-help-icon">?</div>
       </header>
 
-      <div className="envio-container">
-        <div className="envio-left">
-          <h2 className="envio-titulo">Elige la forma de entrega</h2>
+      <div className="entrega-container">
+        <div className="entrega-left">
+          <h2 className="entrega-titulo">Elige la forma de entrega</h2>
 
           <div
-            className={`envio-opcion ${
-              opcion === "domicilio" ? "seleccionado" : ""
+            className={`entrega-opcion ${
+              opcion === "domicilio" ? "entrega-seleccionado" : ""
             }`}
             onClick={() => setOpcion("domicilio")}
           >
-            <div className="envio-opcion-header">
+            <div className="entrega-opcion-header">
               <input
                 type="radio"
                 checked={opcion === "domicilio"}
                 onChange={() => setOpcion("domicilio")}
               />
               <h3>Enviar a domicilio</h3>
-              <span className="envio-precio">$15.400</span>
+              <span className="entrega-precio">$15.400</span>
             </div>
-            <p className="envio-direccion">
+            <p className="entrega-direccion">
               {direccionUsuario}
             </p>
-            <p className="envio-tipo">Residencial</p>
+            <p className="entrega-tipo">Residencial</p>
             <a 
               href="#" 
-              className="envio-modificar"
+              className="entrega-modificar"
               onClick={handleModificarDireccion}
             >
               Modificar domicilio o elegir otro
             </a>
           </div>
 
-          <div className="envio-btn-continuar-container">
-            <button className="envio-btn-continuar" onClick={handleContinuar}>
+          <div className="entrega-btn-continuar-container">
+            <button className="entrega-btn-continuar" onClick={handleContinuar}>
               Continuar
             </button>
           </div>
         </div>
 
-        <div className="envio-right">
-          <div className="envio-resumen-compra">
+        <div className="entrega-right">
+          <div className="entrega-resumen-compra">
             <h3>Resumen de compra</h3>
             
             {/* Mostrar todos los productos con validación segura */}
             {productos.map((producto, index) => (
-              <div key={index} className="envio-resumen-item">
+              <div key={index} className="entrega-resumen-item">
                 <span>{producto.nombre} ({producto.cantidad}x)</span>
                 <span>${((producto.subtotal || producto.precio * producto.cantidad) || 0).toLocaleString()}</span>
               </div>
             ))}
             
-            <div className="envio-resumen-item">
+            <div className="entrega-resumen-item">
               <span>Subtotal</span>
               <span>${(subtotal || 0).toLocaleString()}</span>
             </div>
             
-            <div className="envio-resumen-item">
+            <div className="entrega-resumen-item">
               <span>Envío</span>
               <span>{opcion === "domicilio" ? "$15.400" : "Gratis"}</span>
             </div>
             
             <hr />
-            <div className="envio-resumen-total">
+            <div className="entrega-resumen-total">
               <span>Total</span>
               <strong>${((subtotal || 0) + (opcion === "domicilio" ? 15400 : 0)).toLocaleString()}</strong>
             </div>
@@ -374,15 +374,15 @@ const FormaEntrega = () => {
         </div>
       </div>
 
-      <footer className="footer">
-        <div className="footer-links">
+      <footer className="entrega-footer">
+        <div className="entrega-footer-links">
           <a href="#">Preguntas frecuentes</a>
           <span>/</span>
           <a href="#">Consejos de seguridad</a>
           <span>/</span>
           <a href="#">Términos</a>
         </div>
-        <div className="footer-copyright">
+        <div className="entrega-footer-copyright">
           © 2025 FHO, todos los derechos reservados
         </div>
       </footer>

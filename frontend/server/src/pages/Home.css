@@ -580,6 +580,7 @@ footer {
   background: transparent;
 }
 
+/* BOTÓN NORMAL (CERRADO) - CON BORDES */
 .info-toggle-btn {
   padding: 12px 30px;
   border-radius: 8px 8px 0 0;
@@ -600,6 +601,21 @@ footer {
 .info-toggle-btn:hover {
   background-color: #ffffff;
   box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* BOTÓN CUANDO ESTÁ ABIERTO - SIN BORDES, SOLO TEXTO */
+.info-toggle-btn.abierto {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  color: #000;
+  font-weight: 600;
+}
+
+.info-toggle-btn.abierto:hover {
+  background-color: transparent;
+  box-shadow: none;
+  color: #D84040; /* Cambia el color del texto al hacer hover */
 }
 
 /* PANEL DESPLEGADO */
@@ -673,4 +689,3 @@ footer {
 .admin-panel-btn:hover {
   background-color: #333;
 }
-
