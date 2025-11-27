@@ -1,57 +1,84 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./DescripcionProducto.css";
 import Swal from "sweetalert2";
-import { FaStar, FaHeart } from "react-icons/fa";
+import { FaStar, FaHeart, FaShoppingCart, FaArrowLeft } from "react-icons/fa";
 import { SiVisa, SiMastercard, SiAmericanexpress, SiJcb } from "react-icons/si";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import Carrito from "./Carrito";
 
-const DescripcionProducto = ({ producto, onVolver }) => {
+const DescripcionProducto = () => {
+  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const [producto, setProducto] = useState(null);
   const [cantidad, setCantidad] = useState(1);
   const [imagenSeleccionada, setImagenSeleccionada] = useState(0);
   const [esFavorito, setEsFavorito] = useState(false);
-  const navigate = useNavigate();
+  const [cargando, setCargando] = useState(true);
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
   const ejecutadoRef = useRef(false);
-  
-  // Obtener todas las imágenes del producto
-  const imagenes = producto?.producto_imagen || [];
-  const imagenActual = imagenes[imagenSeleccionada];
 
-  if (!producto || !producto.nombre) {
-    return (
-      <div className="descripcion-producto-error">
-        <p>No se encontró la información del producto.</p>
-        {onVolver && (
-          <button className="btn-volver" onClick={onVolver}>
-            ← Volver
-          </button>
-        )}
-      </div>
-    );
-  }
+  // 🔒 Efecto para deshabilitar el scroll cuando el modal está abierto
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
 
-  // Función para manejar el clic en el corazón
-  const handleFavoritoClick = () => {
-    setEsFavorito(!esFavorito);
-    // Aquí puedes agregar la lógica para guardar en favoritos en tu backend
-    console.log("Producto marcado como favorito:", !esFavorito);
-  };
+  // Cargar producto desde API o desde state
+  useEffect(() => {
+    const cargarProducto = async () => {
+      setCargando(true);
+      
+      if (location.state?.productoData) {
+        setProducto(location.state.productoData);
+        setCargando(false);
+      } else {
+        await cargarProductoDesdeAPI();
+      }
+    };
 
-  // Función para cambiar a la siguiente imagen
-  const siguienteImagen = () => {
-    if (imagenes.length > 1) {
-      setImagenSeleccionada((prev) => (prev + 1) % imagenes.length);
+    cargarProducto();
+  }, [id, location.state]);
+
+  const cargarProductoDesdeAPI = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/productos/${id}`);
+      if (!response.ok) {
+        throw new Error('Producto no encontrado');
+      }
+      const data = await response.json();
+      setProducto(data);
+    } catch (error) {
+      console.error("Error cargando producto:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo cargar la información del producto.",
+        confirmButtonText: "Cerrar",
+      });
+    } finally {
+      setCargando(false);
     }
   };
 
-  // Función para cambiar a la imagen anterior
-  const anteriorImagen = () => {
-    if (imagenes.length > 1) {
-      setImagenSeleccionada((prev) => (prev - 1 + imagenes.length) % imagenes.length);
-    }
+  const cerrarModal = () => {
+    navigate(-1);
   };
 
-  // Función para agregar al carrito
+  const handleAbrirCarrito = () => {
+    setMostrarCarrito(true);
+  };
+
+  const handleCerrarCarrito = () => {
+    setMostrarCarrito(false);
+  };
+
   const handleAgregarCarrito = async () => {
     const userInfo = localStorage.getItem("usuarioInfo");
 
@@ -108,7 +135,58 @@ const DescripcionProducto = ({ producto, onVolver }) => {
     }
   };
 
-  // Función para Comprar Ahora - CON PREVENCIÓN DE DOBLE EJECUCIÓN
+  // Si está cargando, mostrar loading
+  if (cargando) {
+    return (
+      <div className="descripcion-producto">
+        <div className="producto-detalle">
+          <button onClick={cerrarModal} className="btn-volver" title="Volver">
+            <FaArrowLeft />
+          </button>
+          <div className="cargando-producto">
+            <p>Cargando producto...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no hay producto después de cargar, mostrar error
+  if (!producto || !producto.nombre) {
+    return (
+      <div className="descripcion-producto">
+        <div className="producto-detalle">
+          <button onClick={cerrarModal} className="btn-volver" title="Volver">
+            <FaArrowLeft />
+          </button>
+          <div className="descripcion-producto-error">
+            <p>No se encontró la información del producto.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const imagenes = producto?.producto_imagen || [];
+  const imagenActual = imagenes[imagenSeleccionada];
+
+  const handleFavoritoClick = () => {
+    setEsFavorito(!esFavorito);
+    console.log("Producto marcado como favorito:", !esFavorito);
+  };
+
+  const siguienteImagen = () => {
+    if (imagenes.length > 1) {
+      setImagenSeleccionada((prev) => (prev + 1) % imagenes.length);
+    }
+  };
+
+  const anteriorImagen = () => {
+    if (imagenes.length > 1) {
+      setImagenSeleccionada((prev) => (prev - 1 + imagenes.length) % imagenes.length);
+    }
+  };
+
   const handleComprarAhora = () => {
     if (ejecutadoRef.current) {
       console.log("⏭️ Compra ya en proceso...");
@@ -133,7 +211,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
       console.log("🛒 Iniciando compra directa (solo una vez)");
 
-      // Crear objeto de compra directa
       const compraDirecta = {
         tipo: "compra_directa",
         productos: [
@@ -153,7 +230,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
       console.log("📦 Datos de compra directa:", compraDirecta);
 
-      // Navegar al checkout
       navigate("/checkout/forma-entrega", {
         state: {
           compraTipo: "directa",
@@ -169,8 +245,24 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
   return (
     <div className="descripcion-producto">
+      {/* ✅ Icono del carrito FUERA del modal - SE OCULTA CUANDO EL CARRITO ESTÁ ABIERTO */}
+      {!mostrarCarrito && (
+        <button 
+          className="carrito-modal-btn"
+          onClick={handleAbrirCarrito}
+          title="Ver carrito"
+        >
+          <FaShoppingCart />
+        </button>
+      )}
+
       <div className="producto-detalle">
-        {/* ❤️ Corazón de favoritos - AHORA EN EL CONTENEDOR PRINCIPAL */}
+        {/* ✅ Botón volver - SOLO FLECHA */}
+        <button onClick={cerrarModal} className="btn-volver" title="Volver">
+          <FaArrowLeft />
+        </button>
+
+        {/* ❤️ Corazón de favoritos */}
         <button 
           className={`corazon-favorito ${esFavorito ? 'activo' : ''}`}
           onClick={handleFavoritoClick}
@@ -181,7 +273,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
 
         {/* 📦 Sección de Imágenes */}
         <div className="producto-imagen-placeholder">
-          {/* Imagen principal */}
           <div className="imagen-cuadro">
             {imagenActual?.url ? (
               <img 
@@ -199,7 +290,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
               <p>Imagen del producto</p>
             )}
             
-            {/* Flechas de navegación si hay más de una imagen */}
             {imagenes.length > 1 && (
               <>
                 <button 
@@ -218,7 +308,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
             )}
           </div>
 
-          {/* Contador de imágenes - SOLO el contador, sin miniaturas */}
           {imagenes.length > 1 && (
             <div className="contador-imagenes">
               {imagenSeleccionada + 1} / {imagenes.length}
@@ -230,7 +319,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
         <div className="producto-info">
           <h2>{producto.nombre}</h2>
           
-          {/* Descripción */}
           {producto.descripcion ? (
             <p className="producto-descripcion">{producto.descripcion}</p>
           ) : producto.descripcion_producto ? (
@@ -250,7 +338,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
             <p>Calificación promedio</p>
           </div>
 
-          {/* ⭐ SELECT MEJORADO */}
           <div className="producto-cantidad" style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
             <label htmlFor="cantidad">Cantidad:</label>
             <select
@@ -299,14 +386,16 @@ const DescripcionProducto = ({ producto, onVolver }) => {
               Agregar al carrito
             </button>
           </div>
-
-          {onVolver && (
-            <button className="btn-volver" onClick={onVolver}>
-              ← Volver
-            </button>
-          )}
         </div>
       </div>
+
+      {/* ✅ CARRITO RENDERIZADO DENTRO DEL MODAL */}
+      {mostrarCarrito && (
+        <Carrito
+          abierto={mostrarCarrito}
+          onCerrar={handleCerrarCarrito}
+        />
+      )}
     </div>
   );
 };

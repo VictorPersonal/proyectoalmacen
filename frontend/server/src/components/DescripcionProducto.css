@@ -174,20 +174,32 @@
 }
 
 .btn-volver {
-  margin-top: 25px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
   background-color: transparent;
   border: none;
   color: #555;
-  font-size: 16px;
+  font-size: 28px; /* Tamaño aumentado */
   cursor: pointer;
-  text-decoration: underline;
-  display: block;
-  width: 100%;
-  text-align: center;
-  position: relative;
-  top: -40px;
-  left: -80px;
+  z-index: 10;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  transition: all 0.3s ease;
 }
+
+.btn-volver:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+/* EL RESTO DEL CSS PERMANECE IGUAL */
 
 .descripcion-producto-error {
   text-align: center;
@@ -455,4 +467,104 @@
 
 .producto-detalle {
   position: relative;
+}
+
+/* En DescripcionProducto.css */
+.descripcion-producto {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.descripcion-producto .producto-detalle {
+  background: white;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 20px;
+}
+
+.cargando-producto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* ✅ BOTÓN DEL CARRITO MEJORADO - POSICIÓN MÁS ESTÉTICA */
+.carrito-modal-btn {
+  position: fixed; /* Cambiado de absolute a fixed */
+  top: 100px;
+  right: 30px;
+  background: white;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #555;
+  transition: all 0.3s ease;
+  z-index: 1001; /* Z-index más alto */
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.carrito-modal-btn:hover {
+  color: #D84040;
+  transform: scale(1.1);
+  background-color: #f8f8f8;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ AJUSTAR POSICIÓN DEL CORAZÓN PARA NO SUPERPONERSE */
+.corazon-favorito {
+  position: absolute;
+  top: 20px;
+  right: 25px; /* Más a la derecha para dar espacio al carrito */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 100;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+}
+
+.corazon-favorito:hover {
+  transform: scale(1.2);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.corazon-favorito svg {
+  font-size: 28px; /* Reducido un poco para mejor proporción */
+  color: #ccc;
+  transition: all 0.3s ease;
+}
+
+.corazon-favorito.activo svg {
+  color: #ff4757;
+}
+
+.corazon-favorito:hover svg {
+  color: #ff4757;
 }

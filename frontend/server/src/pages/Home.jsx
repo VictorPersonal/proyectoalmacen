@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./Home.css";
 import logo from "../assets/Logo dulce hogar.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart } from "react-icons/fa";
 import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
-import DescripcionProducto from "../components/DescripcionProducto";
 import Carrito from "../components/Carrito";
 
 const Home = () => {
@@ -17,19 +16,73 @@ const Home = () => {
   const [submenuAbierto, setSubmenuAbierto] = useState(null);
   const [perfilMenuAbierto, setPerfilMenuAbierto] = useState(false);
 
-  const [busqueda, setBusqueda] = useState("");
-  const [productos, setProductos] = useState([]);
-  const [productosFiltrados, setProductosFiltrados] = useState([]);
+  // ✅ INICIALIZAR ESTADO DESDE sessionStorage
+  const getEstadoInicial = () => {
+    const estadoGuardado = sessionStorage.getItem('homeEstado');
+    if (estadoGuardado) {
+      try {
+        return JSON.parse(estadoGuardado);
+      } catch (error) {
+        console.error("Error parsing saved state:", error);
+        sessionStorage.removeItem('homeEstado');
+      }
+    }
+    return {
+      busqueda: "",
+      productos: [],
+      productosFiltrados: [],
+      categoriaSeleccionada: null,
+      mensajeCategoria: ""
+    };
+  };
+
+  const estadoInicial = getEstadoInicial();
+  
+  const [busqueda, setBusqueda] = useState(estadoInicial.busqueda);
+  const [productos, setProductos] = useState(estadoInicial.productos);
+  const [productosFiltrados, setProductosFiltrados] = useState(estadoInicial.productosFiltrados);
   const [cargando, setCargando] = useState(false);
-  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
   const [usuarioLogueado, setUsuarioLogueado] = useState(false);
   const [usuarioInfo, setUsuarioInfo] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [mensajeCategoria, setMensajeCategoria] = useState("");
+  const [mensajeCategoria, setMensajeCategoria] = useState(estadoInicial.mensajeCategoria);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(estadoInicial.categoriaSeleccionada);
+
+  // ✅ GUARDAR ESTADO EN sessionStorage CUANDO CAMBIE
+  useEffect(() => {
+    const estado = {
+      busqueda,
+      productos,
+      productosFiltrados,
+      categoriaSeleccionada,
+      mensajeCategoria
+    };
+    sessionStorage.setItem('homeEstado', JSON.stringify(estado));
+  }, [busqueda, productos, productosFiltrados, categoriaSeleccionada, mensajeCategoria]);
+
+  // ✅ LIMPIAR ESTADO CUANDO SE ENTRE DIRECTAMENTE AL HOME SIN BÚSQUEDA ACTIVA
+  useEffect(() => {
+    // Solo limpiar si venimos de una navegación externa (no del modal de producto)
+    const isNavigationFromProduct = 
+      location.state?.from === 'producto' || 
+      location.state?.backgroundLocation;
+    
+    const hasActiveSearch = estadoInicial.busqueda || estadoInicial.categoriaSeleccionada;
+    
+    if (!isNavigationFromProduct && !hasActiveSearch) {
+      // Limpiar todo el estado
+      setBusqueda("");
+      setProductos([]);
+      setProductosFiltrados([]);
+      setCategoriaSeleccionada(null);
+      setMensajeCategoria("");
+      sessionStorage.removeItem('homeEstado');
+    }
+  }, [location]);
 
   // CATEGORÍAS ACTUALIZADAS - Estructura mejorada con IDs
   const categorias = [
@@ -94,11 +147,11 @@ const Home = () => {
 
   const handleCerrarSesion = () => {
     localStorage.removeItem("usuarioInfo");
+    sessionStorage.removeItem('homeEstado'); // ✅ Limpiar estado al cerrar sesión
     setUsuarioLogueado(false);
     setUsuarioInfo(null);
     setPerfilMenuAbierto(false);
     navigate("/");
-    window.location.reload();
   };
 
   const normalizar = (texto) =>
@@ -219,12 +272,22 @@ const Home = () => {
 
   const toggleCarrito = () => setMostrarCarrito(!mostrarCarrito);
 
+  // ✅ FUNCIÓN ACTUALIZADA: Navegación a producto con modal superpuesto
+  const handleSeleccionarProducto = (producto) => {
+    navigate(`/producto/${producto.id_producto || producto.id || producto.idproducto}`, {
+      state: { 
+        backgroundLocation: location,
+        productoData: producto,
+        from: 'producto' // ✅ Indicar que venimos del producto
+      }
+    });
+  };
+
   // FUNCIÓN NUEVA PARA CARGAR PRODUCTOS POR CATEGORÍA
   const cargarProductosPorCategoria = async (idCategoria) => {
     setCategoriaSeleccionada(idCategoria);   
     setCargando(true);
     setBusqueda("");
-    setProductoSeleccionado(null);
     setMensajeCategoria("");
 
     try {
@@ -254,8 +317,21 @@ const Home = () => {
     }
   };
 
+  // ✅ FUNCIÓN MEJORADA: Limpiar búsqueda completamente
+  const limpiarBusqueda = () => {
+    setBusqueda("");
+    setProductos([]);
+    setProductosFiltrados([]);
+    setCategoriaSeleccionada(null);
+    setMensajeCategoria("");
+    sessionStorage.removeItem('homeEstado');
+  };
+
   // Determinar qué productos mostrar
   const productosAMostrar = categoriaSeleccionada ? productosFiltrados : productosFiltrados;
+
+  // ✅ NUEVO: Determinar si mostrar el carrusel o los resultados
+  const mostrarCarrusel = !categoriaSeleccionada && busqueda.trim().length === 0 && productos.length === 0;
 
   return (
     <div>
@@ -272,6 +348,7 @@ const Home = () => {
             </div>
           </div>
 
+          {/* ✅ BUSCADOR CORREGIDO - Solo un botón visible a la vez */}
           <div className="search-container-home" id="search-container">
             <input
               type="text"
@@ -280,10 +357,23 @@ const Home = () => {
               onChange={(e) => setBusqueda(e.target.value)}
               onKeyDown={handleKeyPress}
             />
+            
+            {/* Botón X - Solo visible cuando hay texto */}
+            <button
+              className="clear-btn"
+              onClick={limpiarBusqueda}
+              title="Limpiar búsqueda"
+              style={{ display: busqueda.trim() ? 'flex' : 'none' }}
+            >
+              ✕
+            </button>
+            
+            {/* Botón Lupa - Solo visible cuando NO hay texto */}
             <button
               className="search-btn"
-              id="search-btn"
               onClick={handleBuscar}
+              title="Buscar"
+              style={{ display: busqueda.trim() ? 'none' : 'flex' }}
             >
               🔍
             </button>
@@ -384,7 +474,6 @@ const Home = () => {
                   >
                     Cerrar sesión
                   </button>
-                  {/* 👉 SOLO ADMIN: acceso al panel admin */}
                   {usuarioInfo?.rol === "administrador" && (
                   <button
                     className="nav-link admin-panel-btn"
@@ -408,7 +497,6 @@ const Home = () => {
             </>
           )}
 
-          {/* ❤️ ICONO DE FAVORITOS ACTUALIZADO */}
           <Link to="/favoritos" className="nav-link favoritos-link">
             <FaHeart className="favoritos-icon" />
             Favoritos
@@ -429,16 +517,8 @@ const Home = () => {
         />
       )}
 
-      {/* CONTENIDO */}
-      {productoSeleccionado ? (
-        <main id="main">
-          <DescripcionProducto
-            producto={productoSeleccionado}
-            onVolver={() => setProductoSeleccionado(null)}
-            cedula={usuarioInfo?.cedula}
-          />
-        </main>
-      ) : !categoriaSeleccionada && busqueda.trim().length === 0 && productos.length === 0 ? (
+      {/* CONTENIDO ACTUALIZADO */}
+      {mostrarCarrusel ? (
         <main id="main">
           <section className="hero-section" id="hero-section">
             <button className="carousel-btn prev" onClick={prevSlide}>
@@ -458,7 +538,6 @@ const Home = () => {
             </button>
           </section>
 
-          {/* MAS INFORMACIÓN - CON LA CORRECCIÓN */}
           {busqueda.trim().length === 0 && (
             <div className="info-toggle-wrapper">
               <button
@@ -538,7 +617,7 @@ const Home = () => {
               {productosFiltrados.map((prod) => (
                 <div
                   key={prod.idproducto}
-                  onClick={() => setProductoSeleccionado(prod)}
+                  onClick={() => handleSeleccionarProducto(prod)}
                 >
                   <ProductCard producto={prod} />
                 </div>
