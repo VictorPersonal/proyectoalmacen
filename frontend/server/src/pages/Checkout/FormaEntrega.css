@@ -351,3 +351,25 @@
     font-size: 16px;
   }
 }
+.entrega-back-wrapper {
+  max-width: 900px;
+  margin: 10px auto 0;
+}
+
+.entrega-btn-volver {
+  position: absolute;
+  top: 150;/* Ajusta si lo quieres más arriba o abajo */
+  left: 35px; /* Pegado al lado izquierdo como en tu captura */
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #2d2d2d;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.entrega-btn-volver:hover {
+  color: #000;
+}
+
