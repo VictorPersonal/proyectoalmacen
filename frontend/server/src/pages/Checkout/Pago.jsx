@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   FaCreditCard, 
@@ -14,27 +14,76 @@ import "./Pago.css";
 const Pago = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const ejecutadoRef = useRef(false); // 👈 Nueva referencia
 
-  const total = state?.total || 0;
-  const nombreProducto = state?.producto || "Sin producto";
+  const {
+    tipoCompra = "carrito",
+    productos = [],
+    subtotal = 0,
+    costoEnvio = 0,
+    total = 0,
+    iddireccion = null
+  } = state || {};
+
+  // 👈 Log solo una vez cuando el componente se monta
+  useEffect(() => {
+    if (!ejecutadoRef.current) {
+      console.log("📦 Productos recibidos en Pago (solo una vez):", productos);
+      ejecutadoRef.current = true;
+    }
+  }, [productos]);
+
+  const nombresProductos = productos.length === 1
+    ? productos[0].nombre
+    : productos.map(p => p.nombre).join(", ");
 
   const handlePagarStripe = async () => {
     try {
-      const producto = {
-        productName: nombreProducto,
+      const productName = productos.length === 1
+        ? productos[0].nombre
+        : `Compra de ${productos.length} productos`;
+
+      console.log("🛒 Preparando productos para Stripe (solo una vez):", productos);
+
+      // 🔥 PREPARAR PRODUCTOS CORRECTAMENTE
+      const productosParaStripe = productos.map(producto => ({
+        id: producto.idproducto || producto.id,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        cantidad: producto.cantidad || 1
+      }));
+
+      console.log("🚀 Productos formateados (solo una vez):", productosParaStripe);
+
+      // 🔥 BODY COMPLETO CON PRODUCTOS
+      const bodyData = {
+        productName,
         price: total,
+        source: tipoCompra === "directa" ? "producto" : "carrito",
+        iddireccion: iddireccion,
+        productos: productosParaStripe
       };
+
+      console.log("📤 Enviando a Stripe (solo una vez):", bodyData);
 
       const res = await fetch("http://localhost:4000/api/stripe/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(producto),
+        body: JSON.stringify(bodyData),
       });
 
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Error del servidor");
+      }
+
       const data = await res.json();
+      console.log("✅ Respuesta de Stripe (solo una vez):", data);
       window.location.href = data.url;
+
     } catch (error) {
-      console.log("Error iniciando pago:", error);
+      console.error("❌ Error iniciando pago:", error);
+      alert("Error al procesar el pago: " + error.message);
     }
   };
 
@@ -63,9 +112,10 @@ const Pago = () => {
             Selecciona un método de pago para completar tu compra.
           </p>
 
-          {/* RESUMEN */}
+          {/* RESUMEN MEJORADO */}
           <div className="pago-resumen">
-            <p><b>Producto:</b> {nombreProducto}</p>
+            <p><b>Productos:</b> {nombresProductos}</p>
+            <p><b>Cantidad de productos:</b> {productos.length}</p>
             <p><b>Total a pagar:</b> ${total.toLocaleString("es-CO")}</p>
           </div>
 

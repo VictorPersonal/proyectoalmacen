@@ -19,6 +19,7 @@
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  position: relative; /* Para el corazón */
 }
 
 .producto-card:hover {
@@ -26,33 +27,33 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Contenedor principal de la imagen */
+/* Contenedor principal de la imagen - ALTURA FIJA */
 .imagen-container {
   width: 100%;
-  height: 250px;
+  height: 140px; /* Reducida para ser consistente */
   background-color: #f0f0f0;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px; /* Aumentado para más espacio debajo de la imagen */
+  margin-bottom: 12px;
   overflow: hidden;
   position: relative;
+  flex-shrink: 0; /* Evita que se encoja */
 }
 
-/* Imagen del producto */
+/* Imagen del producto - FORZAR MISMAS DIMENSIONES */
 .producto-imagen {
   width: 100%;
-  height: auto;
-  max-height: 100%;
+  height: 100%;
   object-fit: contain;
+  object-position: center;
 }
 
-
-/* Placeholder cuando no hay imagen */
+/* Placeholder cuando no hay imagen - MISMAS DIMENSIONES */
 .imagen-placeholder {
   width: 100%;
-  height: 100%;
+  height: 140px; /* Misma altura que el contenedor */
   background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
   border-radius: 8px;
   display: flex;
@@ -61,6 +62,7 @@
   justify-content: center;
   color: #666;
   font-size: 11px;
+  flex-shrink: 0;
 }
 
 .placeholder-icon {
@@ -75,9 +77,10 @@
 .producto-info {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start; /* Cambiado de space-between */
   flex-grow: 1;
-  gap: 8px; /* Aumentado el gap general */
+  gap: 6px; /* Reducido un poco */
+  min-height: 80px; /* Altura mínima para info consistente */
 }
 
 .producto-nombre {
@@ -85,23 +88,21 @@
   font-weight: 600;
   color: #2c2c2c;
   margin: 0;
-  padding-top: 10px; /* Más espacio con la imagen */
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 2.6em;
+  min-height: 2.8em; /* Altura mínima consistente */
 }
-
 
 .precio {
   font-size: 15px;
   font-weight: 700;
   color: #2c5aa0;
   margin: 0;
-  margin-top: 4px; /* Espacio adicional arriba del precio */
+  margin-top: auto; /* Empuja el precio hacia abajo */
 }
 
 .btn-agregar {
@@ -113,7 +114,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   font-size: 12px;
-  margin-top: 8px; /* Más espacio arriba del botón */
+  margin-top: 8px;
 }
 
 .btn-agregar:hover {
@@ -125,7 +126,40 @@
   font-size: 10px;
   color: #666;
   margin: 0;
-  margin-top: 2px; /* Pequeño espacio arriba del stock */
+  margin-top: 2px;
+}
+
+/* ❤️ Estilos para el corazón de favoritos en las tarjetas */
+.corazon-favorito-card {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  padding: 4px;
+}
+
+.corazon-favorito-card:hover {
+  transform: scale(1.2);
+}
+
+.corazon-favorito-card svg {
+  font-size: 24px;
+  color: #ccc;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.corazon-favorito-card.activo svg {
+  color: #ff4757;
+  filter: drop-shadow(0 1px 3px rgba(255, 71, 87, 0.3));
+}
+
+.corazon-favorito-card:hover svg {
+  color: #ff4757;
 }
 
 /* Responsive */
@@ -141,24 +175,37 @@
   }
   
   .imagen-container {
-    height: 150px;
-    margin-bottom: 10px; /* Mantener espacio consistente */
+    height: 120px; /* Ajustada para móvil */
+    margin-bottom: 10px;
+  }
+  
+  .imagen-placeholder {
+    height: 120px; /* Misma altura en móvil */
   }
   
   .producto-nombre {
     font-size: 12px;
-    margin-bottom: 3px;
+    min-height: 2.6em;
   }
   
   .precio {
     font-size: 14px;
-    margin-top: 3px;
   }
   
   .btn-agregar {
     padding: 5px 8px;
     font-size: 11px;
     margin-top: 6px;
+  }
+  
+  .corazon-favorito-card {
+    top: 8px;
+    right: 8px;
+    padding: 3px;
+  }
+  
+  .corazon-favorito-card svg {
+    font-size: 20px;
   }
 }
 
@@ -174,8 +221,12 @@
   }
   
   .imagen-container {
-    height: 90px;
+    height: 100px; /* Ajustada para móvil pequeño */
     margin-bottom: 8px;
+  }
+  
+  .imagen-placeholder {
+    height: 100px; /* Misma altura en móvil pequeño */
   }
   
   .placeholder-icon {
@@ -183,6 +234,20 @@
   }
   
   .producto-info {
-    gap: 6px;
+    gap: 4px;
+    min-height: 70px;
+  }
+  
+  .producto-nombre {
+    min-height: 2.4em;
+  }
+  
+  .corazon-favorito-card {
+    top: 6px;
+    right: 6px;
+  }
+  
+  .corazon-favorito-card svg {
+    font-size: 18px;
   }
 }

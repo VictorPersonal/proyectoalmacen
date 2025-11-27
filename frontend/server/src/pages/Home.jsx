@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate } from "react-router-dom";
-import { FaShoppingCart, FaChevronRight, FaUserCircle } from "react-icons/fa";
+import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart } from "react-icons/fa";
 import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
@@ -408,8 +408,10 @@ const Home = () => {
             </>
           )}
 
+          {/* ❤️ ICONO DE FAVORITOS ACTUALIZADO */}
           <Link to="/favoritos" className="nav-link favoritos-link">
-            ❤️ Favoritos
+            <FaHeart className="favoritos-icon" />
+            Favoritos
           </Link>
 
           <div className="cart-icon" onClick={toggleCarrito}>

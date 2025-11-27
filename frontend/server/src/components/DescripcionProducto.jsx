@@ -1,20 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./DescripcionProducto.css";
 import Swal from "sweetalert2";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaHeart } from "react-icons/fa";
 import { SiVisa, SiMastercard, SiAmericanexpress, SiJcb } from "react-icons/si";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const DescripcionProducto = ({ producto, onVolver }) => {
   const [cantidad, setCantidad] = useState(1);
-  const [imagenSeleccionada, setImagenSeleccionada] = useState(0); // Índice de la imagen actual
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(0);
+  const [esFavorito, setEsFavorito] = useState(false);
   const navigate = useNavigate();
+  const ejecutadoRef = useRef(false);
   
   // Obtener todas las imágenes del producto
   const imagenes = producto?.producto_imagen || [];
   const imagenActual = imagenes[imagenSeleccionada];
-
 
   if (!producto || !producto.nombre) {
     return (
@@ -28,6 +29,13 @@ const DescripcionProducto = ({ producto, onVolver }) => {
       </div>
     );
   }
+
+  // Función para manejar el clic en el corazón
+  const handleFavoritoClick = () => {
+    setEsFavorito(!esFavorito);
+    // Aquí puedes agregar la lógica para guardar en favoritos en tu backend
+    console.log("Producto marcado como favorito:", !esFavorito);
+  };
 
   // Función para cambiar a la siguiente imagen
   const siguienteImagen = () => {
@@ -70,7 +78,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
         { withCredentials: true }
       );
 
-
       Swal.fire({
         icon: "success",
         title: "Producto agregado",
@@ -80,7 +87,6 @@ const DescripcionProducto = ({ producto, onVolver }) => {
       });
 
     } catch (error) {
-
       if (error.response?.status === 401 || error.response?.status === 403) {
         Swal.fire({
           icon: "error",
@@ -102,8 +108,13 @@ const DescripcionProducto = ({ producto, onVolver }) => {
     }
   };
 
-  // Función para Comprar Ahora
+  // Función para Comprar Ahora - CON PREVENCIÓN DE DOBLE EJECUCIÓN
   const handleComprarAhora = () => {
+    if (ejecutadoRef.current) {
+      console.log("⏭️ Compra ya en proceso...");
+      return;
+    }
+
     const userInfo = localStorage.getItem("usuarioInfo");
 
     if (!userInfo) {
@@ -117,37 +128,57 @@ const DescripcionProducto = ({ producto, onVolver }) => {
       return;
     }
 
-    // Crear objeto de compra directa
-    const compraDirecta = {
-      tipo: "compra_directa",
-      productos: [
-        {
-          id: producto.id_producto || producto.id || producto.idproducto,
-          nombre: producto.nombre,
-          precio: producto.precio,
-          cantidad: cantidad,
-          imagen_url: imagenActual?.url, // Usar la imagen actual
-          descripcion: producto.descripcion || producto.descripcion_producto || producto.descripcion_text,
-          stock: producto.stock || "10"
+    try {
+      ejecutadoRef.current = true;
+
+      console.log("🛒 Iniciando compra directa (solo una vez)");
+
+      // Crear objeto de compra directa
+      const compraDirecta = {
+        tipo: "compra_directa",
+        productos: [
+          {
+            id: producto.id_producto || producto.id || producto.idproducto,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            cantidad: cantidad,
+            imagen_url: imagenActual?.url,
+            descripcion: producto.descripcion || producto.descripcion_producto || producto.descripcion_text,
+            stock: producto.stock || "10"
+          }
+        ],
+        total: producto.precio * cantidad,
+        cantidadTotal: cantidad
+      };
+
+      console.log("📦 Datos de compra directa:", compraDirecta);
+
+      // Navegar al checkout
+      navigate("/checkout/forma-entrega", {
+        state: {
+          compraTipo: "directa",
+          compraData: compraDirecta
         }
-      ],
-      total: producto.precio * cantidad,
-      cantidadTotal: cantidad
-    };
+      });
 
-
-    // Navegar al checkout
-    navigate("/checkout/forma-entrega", {
-      state: {
-        compraTipo: "directa",
-        compraData: compraDirecta
-      }
-    });
+    } catch (error) {
+      console.error("❌ Error en compra directa:", error);
+      ejecutadoRef.current = false;
+    }
   };
 
   return (
     <div className="descripcion-producto">
       <div className="producto-detalle">
+        {/* ❤️ Corazón de favoritos - AHORA EN EL CONTENEDOR PRINCIPAL */}
+        <button 
+          className={`corazon-favorito ${esFavorito ? 'activo' : ''}`}
+          onClick={handleFavoritoClick}
+          aria-label={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
+        >
+          <FaHeart />
+        </button>
+
         {/* 📦 Sección de Imágenes */}
         <div className="producto-imagen-placeholder">
           {/* Imagen principal */}
@@ -258,7 +289,10 @@ const DescripcionProducto = ({ producto, onVolver }) => {
           </div>
 
           <div className="botones-compra">
-            <button className="btn-comprar" onClick={handleComprarAhora}>
+            <button 
+              className="btn-comprar" 
+              onClick={handleComprarAhora}
+            >
               Comprar Ahora
             </button>
             <button className="btn-agregar" onClick={handleAgregarCarrito}>

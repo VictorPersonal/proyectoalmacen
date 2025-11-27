@@ -243,3 +243,81 @@ body {
 .pago-exitoso-help-icon:hover {
   background-color: #f0f0f0;
 }
+
+/* Agrega estos estilos a tu PagoExitoso.css */
+.pago-exitoso-btn-descargar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+  margin-top: 15px;
+  text-decoration: none;
+  text-transform: capitalize;
+}
+
+.pago-exitoso-btn-descargar:hover {
+  background-color: #218838;
+  color: white;
+  text-decoration: none;
+}
+
+.pago-exitoso-btn-descargar:focus {
+  outline: 2px solid #28a745;
+  outline-offset: 2px;
+}
+
+/* Estilos para el mensaje de "Generando factura" */
+.pago-exitoso-generando-factura {
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  border: 2px dashed #dee2e6;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.pago-exitoso-generando-factura h3 {
+  color: #495057;
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.pago-exitoso-generando-factura p {
+  color: #6c757d;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.pago-exitoso-spinner {
+  font-size: 2.5rem;
+  color: #28a745;
+  animation: spin 1.5s linear infinite;
+}
+
+/* Animación del spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Asegurar que el botón de descargar tenga buena transición */
+.pago-exitoso-btn-descargar {
+  animation: fadeIn 0.5s ease-in;
+}

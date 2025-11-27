@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "../../assets/Logo dulce hogar.png";
 import "./FormaEntrega.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -11,22 +11,32 @@ const FormaEntrega = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [tipoCompra, setTipoCompra] = useState("carrito");
+  const [idDireccion, setIdDireccion] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
+  const ejecutadoRef = useRef(false); // 👈 Nueva referencia para prevenir doble ejecución
 
   // Obtener datos del usuario y productos según el tipo de compra
   useEffect(() => {
     const cargarDatos = async () => {
+      // 👈 Prevenir doble ejecución
+      if (ejecutadoRef.current) {
+        console.log("⏭️ Carga de datos ya ejecutada");
+        return;
+      }
+
       try {
+        ejecutadoRef.current = true; // 👈 Marcar como ejecutado
         setLoading(true);
         
         // VERIFICAR TIPO DE COMPRA
         const compraState = location.state;
-        console.log("Estado de la compra:", compraState);
+        console.log("🔄 Estado de la compra (solo una vez):", compraState);
 
         if (compraState?.compraTipo === "directa") {
           // 🛒 COMPRA DIRECTA - Usar solo el producto de compra directa
-          console.log("🛒 Modo: COMPRA DIRECTA");
+          console.log("🛒 Modo: COMPRA DIRECTA (solo una vez)");
           setTipoCompra("directa");
           
           const compraDirecta = compraState.compraData;
@@ -40,11 +50,11 @@ const FormaEntrega = () => {
           setProductos(productosConSubtotal);
           setSubtotal(compraDirecta.total);
           
-          console.log("Productos compra directa:", productosConSubtotal);
-          console.log("Total compra directa:", compraDirecta.total);
+          console.log("✅ Productos compra directa (solo una vez):", productosConSubtotal);
+          console.log("✅ Total compra directa (solo una vez):", compraDirecta.total);
         } else {
           // 🛒 COMPRA DESDE CARRITO - Cargar todos los productos del carrito
-          console.log("🛒 Modo: CARRITO NORMAL");
+          console.log("🛒 Modo: CARRITO NORMAL (solo una vez)");
           setTipoCompra("carrito");
           
           // Obtener TODOS los productos del carrito
@@ -54,7 +64,7 @@ const FormaEntrega = () => {
           
           if (respuestaCarrito.ok) {
             const carrito = await respuestaCarrito.json();
-            console.log("Carrito completo obtenido:", carrito);
+            console.log("✅ Carrito completo obtenido (solo una vez):", carrito);
             
             if (carrito.length > 0) {
               const productosProcesados = await Promise.all(
@@ -86,7 +96,7 @@ const FormaEntrega = () => {
                       };
                     }
                   } catch (error) {
-                    console.error(`Error obteniendo producto ${itemCarrito.idproducto}:`, error);
+                    console.error(`❌ Error obteniendo producto ${itemCarrito.idproducto}:`, error);
                     return {
                       id: itemCarrito.idproducto,
                       nombre: itemCarrito.nombre || "Producto sin nombre",
@@ -99,7 +109,7 @@ const FormaEntrega = () => {
                 })
               );
               
-              console.log("Productos del carrito:", productosProcesados);
+              console.log("✅ Productos del carrito (solo una vez):", productosProcesados);
               setProductos(productosProcesados);
               
               const totalSubtotal = productosProcesados.reduce(
@@ -109,12 +119,12 @@ const FormaEntrega = () => {
               setSubtotal(totalSubtotal);
               
             } else {
-              console.log("Carrito vacío");
+              console.log("✅ Carrito vacío (solo una vez)");
               setProductos([]);
               setSubtotal(0);
             }
           } else {
-            console.log("Error al obtener carrito");
+            console.log("❌ Error al obtener carrito");
             setProductos([]);
             setSubtotal(0);
           }
@@ -124,23 +134,30 @@ const FormaEntrega = () => {
         const respuestaUsuario = await fetch("http://localhost:4000/api/usuario/perfil", {
           credentials: "include"
         });
-        
+
         let direccionCompleta = "No has configurado tu dirección";
-        
+        let idDireccionUsuario = null;
+
         if (respuestaUsuario.ok) {
           const datosUsuario = await respuestaUsuario.json();
-          console.log("Datos del usuario:", datosUsuario);
+          console.log("✅ Datos del usuario (solo una vez):", datosUsuario);
+
           if (datosUsuario.direccion) {
             direccionCompleta = datosUsuario.direccion;
-            if (datosUsuario.ciudad) {
-              direccionCompleta += `, ${datosUsuario.ciudad}`;
-            }
+            if (datosUsuario.ciudad) direccionCompleta += `, ${datosUsuario.ciudad}`;
           }
+
+          // 🔑 Guardar ID de la dirección
+          idDireccionUsuario = datosUsuario.iddireccion;
         }
+
         setDireccionUsuario(direccionCompleta);
+        // 🔑 Guardamos el ID de la dirección en el estado para usarlo luego
+        setIdDireccion(idDireccionUsuario);
+
         
       } catch (error) {
-        console.error("Error al cargar datos:", error);
+        console.error("❌ Error al cargar datos:", error);
         setDireccionUsuario("Error al cargar la dirección");
         setProductos([]);
         setSubtotal(0);
@@ -156,7 +173,7 @@ const FormaEntrega = () => {
     const costoEnvio = opcion === "domicilio" ? 15400 : 0;
     const total = subtotal + costoEnvio;
 
-    console.log("Datos al continuar:", {
+    console.log("🚀 Datos al continuar (solo una vez):", {
       tipoCompra,
       productos: productos.map(p => p.nombre),
       subtotal,
@@ -203,6 +220,7 @@ const FormaEntrega = () => {
             subtotal: subtotal,
             costoEnvio: costoEnvio,
             total: total,
+            iddireccion: idDireccion
           },
         });
       }

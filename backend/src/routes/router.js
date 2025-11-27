@@ -7,6 +7,7 @@ import { supabase as supabaseDB } from "../config/supabase.js";
 import busboy from "busboy";
 import dotenv from "dotenv";
 
+
 dotenv.config();
 
 const router = express.Router();
@@ -1499,6 +1500,5 @@ router.get("/admin/productos", verificarToken, async (req, res) => {
     });
   }
 });
-
 
 export default router;

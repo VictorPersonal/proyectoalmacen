@@ -689,3 +689,21 @@ footer {
 .admin-panel-btn:hover {
   background-color: #333;
 }
+
+.favoritos-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+.favoritos-icon {
+  font-size: 18px;
+  color: #c12532;
+}
+
+.favoritos-link:hover .favoritos-icon {
+  color: #cc2435;
+}
