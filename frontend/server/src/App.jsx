@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Registro from "./pages/Registro";
 import Login from "./pages/Login";
@@ -15,11 +15,16 @@ import PagoExitoso from "./pages/Checkout/PagoExitoso";
 import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";
 import ModificarDireccion from "./pages/Checkout/ModificarDireccion";
 import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
+import DescripcionProducto from "./components/DescripcionProducto";
 
-function App() {
+function AppWrapper() {
+  const location = useLocation();
+  const state = location.state;
+
   return (
-    <Router>
-      <Routes>
+    <>
+      {/* Rutas principales */}
+      <Routes location={state?.backgroundLocation || location}>
         <Route path="/" element={<Home />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
@@ -36,8 +41,25 @@ function App() {
         <Route path="/categorias" element={<Categorias />} />
         <Route path="/modificar-direccion" element={<ModificarDireccion />} />
         <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
+        {/* ✅ AGREGAR ESTA RUTA TAMBIÉN EN LAS PRINCIPALES */}
+        <Route path="/producto/:id" element={<DescripcionProducto />} />
       </Routes>
-    </Router>
+
+      {/* Modal superpuesto */}
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route path="/producto/:id" element={<DescripcionProducto />} />
+        </Routes>
+      )}
+    </>
+  );
+}
+
+function App() {
+  return (
+      <Router>
+        <AppWrapper />
+      </Router>
   );
 }
 
