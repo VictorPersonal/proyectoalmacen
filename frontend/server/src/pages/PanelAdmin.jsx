@@ -4,13 +4,13 @@ import Dashboard from "../components/dashboard";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { 
-  FaBox, 
-  FaChartBar, 
-  FaSearch, 
-  FaPlus, 
-  FaEdit, 
-  FaPowerOff, 
+import {
+  FaBox,
+  FaChartBar,
+  FaSearch,
+  FaPlus,
+  FaEdit,
+  FaPowerOff,
   FaQuestionCircle,
   FaImage,
   FaTimes,
@@ -20,7 +20,7 @@ import {
   FaSpinner,
   FaEye,
   FaEyeSlash,
-  FaShoppingBag
+  FaShoppingBag,
 } from "react-icons/fa";
 
 const PanelAdmin = () => {
@@ -35,22 +35,26 @@ const PanelAdmin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [adminInfo, setAdminInfo] = useState(null);
   const [categorias, setCategorias] = useState([]);
+  const [marcas, setMarcas] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const profileRef = useRef(null);
 
+  // 🔹 El formulario ahora usa nombre de categoría y marca, no IDs directos
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
     stock: "",
     descripcion: "",
-    idcategoria: "",
-    idmarca: "",
+    categoriaNombre: "", // texto visible para el usuario
+    marcaNombre: "", // texto visible para el usuario
     imagenes: [],
   });
 
-  // ====== BLOQUEAR BOTÓN ATRÁS SOLO EN ADMIN ======
+  /* =========================================================
+     BLOQUEAR BOTÓN ATRÁS SOLO EN ADMIN
+  ========================================================= */
   useEffect(() => {
     const bloquearNavegacion = () => {
       navigate(0);
@@ -64,7 +68,9 @@ const PanelAdmin = () => {
     };
   }, [navigate]);
 
-  // ====== CARGAR INFO ADMIN DESDE localStorage ======
+  /* =========================================================
+     CARGAR INFO ADMIN DESDE localStorage
+  ========================================================= */
   useEffect(() => {
     const stored = localStorage.getItem("usuarioInfo");
     if (stored) {
@@ -76,32 +82,34 @@ const PanelAdmin = () => {
     }
   }, []);
 
-  // ====== CERRAR SESIÓN ======
+  /* =========================================================
+     CERRAR SESIÓN
+  ========================================================= */
   const handleLogout = () => {
     Swal.fire({
-      title: '¿Cerrar sesión?',
+      title: "¿Cerrar sesión?",
       text: "¿Estás seguro de que deseas salir del panel de administración?",
-      icon: 'question',
+      icon: "question",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, cerrar sesión',
-      cancelButtonText: 'Cancelar',
-      background: '#fff',
-      color: '#333'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, cerrar sesión",
+      cancelButtonText: "Cancelar",
+      background: "#fff",
+      color: "#333",
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem("usuarioInfo");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setShowProfileMenu(false);
-        
+
         Swal.fire({
-          title: 'Sesión cerrada',
-          text: 'Has cerrado sesión correctamente',
-          icon: 'success',
+          title: "Sesión cerrada",
+          text: "Has cerrado sesión correctamente",
+          icon: "success",
           timer: 1500,
-          showConfirmButton: false
+          showConfirmButton: false,
         }).then(() => {
           window.location.href = "/";
         });
@@ -109,19 +117,21 @@ const PanelAdmin = () => {
     });
   };
 
-  // ✅ Ir al menú / home SIN cerrar sesión
+  /* =========================================================
+     IR AL HOME SIN CERRAR SESIÓN
+  ========================================================= */
   const handleGoHome = () => {
     Swal.fire({
-      title: 'Ir al inicio',
-      text: '¿Deseas ir a la página principal?',
-      icon: 'info',
+      title: "Ir al inicio",
+      text: "¿Deseas ir a la página principal?",
+      icon: "info",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, ir al inicio',
-      cancelButtonText: 'Cancelar',
-      background: '#fff',
-      color: '#333'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, ir al inicio",
+      cancelButtonText: "Cancelar",
+      background: "#fff",
+      color: "#333",
     }).then((result) => {
       if (result.isConfirmed) {
         setShowProfileMenu(false);
@@ -130,7 +140,9 @@ const PanelAdmin = () => {
     });
   };
 
-  // ====== CERRAR MENÚ DE PERFIL AL HACER CLICK AFUERA ======
+  /* =========================================================
+     CERRAR MENÚ DE PERFIL AL HACER CLICK AFUERA
+  ========================================================= */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -141,53 +153,56 @@ const PanelAdmin = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ====== TRAER PRODUCTOS ======
+  /* =========================================================
+     TRAER PRODUCTOS
+  ========================================================= */
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      
+
       const res = await axios.get("http://localhost:4000/api/admin/productos", {
-        withCredentials: true 
+        withCredentials: true,
       });
-      
+
       setProducts(res.data);
     } catch (err) {
       console.error(
         "Error al obtener productos:",
         err.response?.data || err.message
       );
-      
-      // Si falla por permisos (no es admin), mostrar mensaje específico
+
       if (err.response?.status === 403) {
         Swal.fire({
-          title: 'Acceso denegado',
-          text: 'No tienes permisos de administrador para ver todos los productos.',
-          icon: 'error',
-          confirmButtonText: 'Entendido'
+          title: "Acceso denegado",
+          text: "No tienes permisos de administrador para ver todos los productos.",
+          icon: "error",
+          confirmButtonText: "Entendido",
         });
       } else if (err.response?.status === 401) {
         Swal.fire({
-          title: 'Sesión expirada',
-          text: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
-          icon: 'warning',
-          confirmButtonText: 'Entendido'
+          title: "Sesión expirada",
+          text: "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+          icon: "warning",
+          confirmButtonText: "Entendido",
         }).then(() => {
           handleLogout();
         });
       } else {
-        // Si hay otro error, intentar con el endpoint público
         try {
           console.log("⚠️ Intentando con endpoint público...");
-          const resPublic = await axios.get("http://localhost:4000/api/productos", {
-            withCredentials: true
-          });
+          const resPublic = await axios.get(
+            "http://localhost:4000/api/productos",
+            {
+              withCredentials: true,
+            }
+          );
           setProducts(resPublic.data);
         } catch (fallbackErr) {
           Swal.fire({
-            title: 'Error',
-            text: 'No se pudieron cargar los productos',
-            icon: 'error',
-            confirmButtonText: 'Entendido'
+            title: "Error",
+            text: "No se pudieron cargar los productos",
+            icon: "error",
+            confirmButtonText: "Entendido",
           });
         }
       }
@@ -200,20 +215,26 @@ const PanelAdmin = () => {
     fetchProducts();
   }, []);
 
-  // ====== TRAER CATEGORÍAS ======
+  /* =========================================================
+     TRAER CATEGORÍAS Y MARCAS (id + descripción)
+  ========================================================= */
   useEffect(() => {
-    const fetchCategorias = async () => {
+    const fetchCatalogos = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/categorias");
-        setCategorias(res.data);
+        const [resCat, resMar] = await Promise.all([
+          axios.get("http://localhost:4000/api/categorias"),
+          axios.get("http://localhost:4000/api/marcas"),
+        ]);
+        setCategorias(resCat.data || []);
+        setMarcas(resMar.data || []);
       } catch (err) {
         console.error(
-          "Error al obtener categorías:",
+          "Error al obtener categorías/marcas:",
           err.response?.data || err.message
         );
       }
     };
-    fetchCategorias();
+    fetchCatalogos();
   }, []);
 
   // cuando cambie el término de búsqueda, volver a página 1
@@ -221,13 +242,17 @@ const PanelAdmin = () => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  // Manejar cambios de input del modal
+  /* =========================================================
+     MANEJO DE INPUTS
+  ========================================================= */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ====== MANEJAR CAMBIOS EN IMÁGENES MÚLTIPLES ======
+  /* =========================================================
+     IMÁGENES MÚLTIPLES
+  ========================================================= */
   const handleImageChange = (e, index) => {
     const files = e.target.files;
     if (files && files[0]) {
@@ -237,85 +262,199 @@ const PanelAdmin = () => {
     }
   };
 
-  // ====== ELIMINAR IMAGEN SELECCIONADA ======
   const removeImage = (index) => {
     const newImages = [...(formData.imagenes || [])];
     newImages[index] = null;
     setFormData({ ...formData, imagenes: newImages });
   };
 
-  // Búsqueda
+  /* =========================================================
+     BÚSQUEDA
+  ========================================================= */
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // ====== CREAR / EDITAR PRODUCTO ======
+  /* =========================================================
+     HELPERS CATEGORÍA / MARCA (id <-> descripción)
+  ========================================================= */
+
+  // Obtener texto legible de categoría para mostrar en tabla o al editar
+  const getNombreCategoria = (productOrId) => {
+    // Si viene el objeto producto
+    if (productOrId && typeof productOrId === "object") {
+      const p = productOrId;
+
+      // si el producto ya viene con la descripción directa
+      if (p.descripcionCategoria) return p.descripcionCategoria;
+
+      // si solo trae el idcategoria, buscamos en el arreglo categorias
+      const id = p.idcategoria;
+      const cat = categorias.find(
+        (c) => String(c.idcategoria) === String(id)
+      );
+      return cat ? cat.descripcionCategoria : id;
+    }
+
+    // Si viene solo el ID
+    const id = productOrId;
+    const cat = categorias.find(
+      (c) => String(c.idcategoria) === String(id)
+    );
+    return cat ? cat.descripcionCategoria : id;
+  };
+  
+
+  const getNombreMarca = (productOrId) => {
+    // Si viene el objeto producto completo
+    if (productOrId && typeof productOrId === "object") {
+      const p = productOrId;
+
+      // Si el producto ya trae la descripción de la marca
+      if (p.descripcionMarca) return p.descripcionMarca;
+
+      const id = p.idmarca;
+      if (!id) return "";
+
+      const m = marcas.find((mar) => String(mar.idmarca) === String(id));
+      return m ? m.descripcionMarca : String(id);
+    }
+
+    // Si viene solo el ID
+    const id = productOrId;
+    if (!id) return "";
+
+    const m = marcas.find((mar) => String(mar.idmarca) === String(id));
+    return m ? m.descripcionMarca : String(id);
+  };
+
+
+  // Buscar o crear categoría según su descripción
+  const obtenerOCrearCategoria = async (nombreCategoria) => {
+    const nombre = (nombreCategoria || "").trim();
+    if (!nombre) return null;
+
+    let existente = categorias.find((c) => {
+      const desc =
+        c.descripcionCategoria ||
+        c.descripionCategoria ||
+        c.descripcion ||
+        "";
+      return desc.toLowerCase() === nombre.toLowerCase();
+    });
+
+    if (existente) return existente.idcategoria;
+
+    // Crear nueva categoría usando la columna de descripción que manejes
+    const res = await axios.post("http://localhost:4000/api/categorias", {
+      descripcionCategoria: nombre,
+    });
+
+    const nueva = res.data;
+    setCategorias((prev) => [...prev, nueva]);
+    return nueva.idcategoria;
+  };
+
+  // Buscar o crear marca según su descripción
+  const obtenerOCrearMarca = async (nombreMarca) => {
+    const nombre = (nombreMarca || "").trim();
+    if (!nombre) return null;
+
+    let existente = marcas.find((m) => {
+      const desc = m.descripcionMarca || m.descripcion || "";
+      return desc.toLowerCase() === nombre.toLowerCase();
+    });
+
+    if (existente) return existente.idmarca;
+
+    const res = await axios.post("http://localhost:4000/api/marcas", {
+      descripcionMarca: nombre,
+    });
+
+    const nueva = res.data;
+    setMarcas((prev) => [...prev, nueva]);
+    return nueva.idmarca;
+  };
+
+  /* =========================================================
+     CREAR / EDITAR PRODUCTO
+  ========================================================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
-    const data = new FormData();
-    
-    // Agregar campos básicos
-    data.append('nombre', formData.nombre);
-    data.append('precio', formData.precio);
-    data.append('stock', formData.stock);
-    data.append('descripcion', formData.descripcion);
-    data.append('idcategoria', formData.idcategoria);
-    if (formData.idmarca) {
-      data.append('idmarca', formData.idmarca);
-    }
-    
-    // Agregar imágenes múltiples - usar el mismo nombre 'imagenes' para todas
-    if (formData.imagenes) {
-      formData.imagenes.forEach((imagen, index) => {
-        if (imagen) {
-          data.append('imagenes', imagen); // Mismo nombre para todas las imágenes
-        }
-      });
-    }
 
     try {
-      let response;
-      if (editingProduct) {
-        // Editar producto
-        response = await axios.put(
-          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
-          data,
-          { 
-            headers: { "Content-Type": "multipart/form-data" },
-            timeout: 30000 // 30 segundos timeout para subida de imágenes
+      // Resolver nombres de categoría / marca a IDs reales
+      const idCategoria = await obtenerOCrearCategoria(
+        formData.categoriaNombre
+      );
+      const idMarca = formData.marcaNombre
+        ? await obtenerOCrearMarca(formData.marcaNombre)
+        : null;
+
+      const data = new FormData();
+
+      data.append("nombre", formData.nombre);
+      data.append("precio", formData.precio);
+      data.append("stock", formData.stock);
+      data.append("descripcion", formData.descripcion || "");
+
+      if (idCategoria) data.append("idcategoria", idCategoria);
+      if (idMarca) data.append("idmarca", idMarca);
+
+      if (formData.imagenes) {
+        formData.imagenes.forEach((imagen) => {
+          if (imagen) {
+            data.append("imagenes", imagen);
           }
-        );
-        
-        Swal.fire({
-          title: '¡Éxito!',
-          text: `Producto actualizado ${response.data.message ? response.data.message.toLowerCase() : 'correctamente'}`,
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-      } else {
-        // Crear producto
-        response = await axios.post(
-          "http://localhost:4000/api/productos/con-imagen",
-          data,
-          { 
-            headers: { "Content-Type": "multipart/form-data" },
-            timeout: 30000
-          }
-        );
-        
-        Swal.fire({
-          title: '¡Producto Creado!',
-          text: `Producto creado ${response.data.message ? response.data.message.toLowerCase() : 'correctamente'}`,
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
         });
       }
 
-      // Recargar la lista de productos para mostrar las imágenes actualizadas
+      let response;
+      if (editingProduct) {
+        response = await axios.put(
+          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
+          data,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            timeout: 30000,
+          }
+        );
+
+        Swal.fire({
+          title: "¡Éxito!",
+          text: `Producto actualizado ${
+            response.data.message
+              ? response.data.message.toLowerCase()
+              : "correctamente"
+          }`,
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        response = await axios.post(
+          "http://localhost:4000/api/productos/con-imagen",
+          data,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            timeout: 30000,
+          }
+        );
+
+        Swal.fire({
+          title: "¡Producto Creado!",
+          text: `Producto creado ${
+            response.data.message
+              ? response.data.message.toLowerCase()
+              : "correctamente"
+          }`,
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+
       await fetchProducts();
 
       setModalVisible(false);
@@ -325,8 +464,8 @@ const PanelAdmin = () => {
         precio: "",
         stock: "",
         descripcion: "",
-        idcategoria: "",
-        idmarca: "",
+        categoriaNombre: "",
+        marcaNombre: "",
         imagenes: [],
       });
     } catch (err) {
@@ -334,19 +473,23 @@ const PanelAdmin = () => {
         "Error al guardar producto:",
         err.response?.data || err.message
       );
-      
+
       Swal.fire({
-        title: 'Error',
-        text: `Error al guardar producto: ${err.response?.data?.message || err.message}`,
-        icon: 'error',
-        confirmButtonText: 'Entendido'
+        title: "Error",
+        text: `Error al guardar producto: ${
+          err.response?.data?.message || err.message
+        }`,
+        icon: "error",
+        confirmButtonText: "Entendido",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  // ====== PREPARAR EDICIÓN ======
+  /* =========================================================
+     PREPARAR EDICIÓN
+  ========================================================= */
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData({
@@ -354,22 +497,23 @@ const PanelAdmin = () => {
       precio: product.precio,
       stock: product.stock,
       descripcion: product.descripcion || "",
-      idcategoria: product.idcategoria,
-      idmarca: product.idmarca || "",
+      categoriaNombre: getNombreCategoria(product),
+      marcaNombre: getNombreMarca(product),
       imagenes: [],
     });
     setModalVisible(true);
   };
 
-  // ====== ACTIVAR / DESACTIVAR PRODUCTO ======
+  /* =========================================================
+     ACTIVAR / DESACTIVAR PRODUCTO
+  ========================================================= */
   const handleToggleActive = async (product) => {
-    // si stock es 0 y está inactivo, no permitir activar
     if (product.stock === 0 && !product.activo) {
       Swal.fire({
-        title: 'Stock insuficiente',
-        text: 'Este producto no se puede activar porque su stock es 0.',
-        icon: 'warning',
-        confirmButtonText: 'Entendido'
+        title: "Stock insuficiente",
+        text: "Este producto no se puede activar porque su stock es 0.",
+        icon: "warning",
+        confirmButtonText: "Entendido",
       });
       return;
     }
@@ -377,45 +521,49 @@ const PanelAdmin = () => {
     const nuevoEstado = !product.activo;
 
     Swal.fire({
-      title: `${nuevoEstado ? 'Activar' : 'Desactivar'} producto`,
-      text: `¿Estás seguro de que deseas ${nuevoEstado ? 'activar' : 'desactivar'} "${product.nombre}"?`,
-      icon: 'question',
+      title: `${nuevoEstado ? "Activar" : "Desactivar"} producto`,
+      text: `¿Estás seguro de que deseas ${
+        nuevoEstado ? "activar" : "desactivar"
+      } "${product.nombre}"?`,
+      icon: "question",
       showCancelButton: true,
-      confirmButtonColor: nuevoEstado ? '#28a745' : '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: nuevoEstado ? 'Sí, activar' : 'Sí, desactivar',
-      cancelButtonText: 'Cancelar',
-      background: '#fff',
-      color: '#333'
+      confirmButtonColor: nuevoEstado ? "#28a745" : "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: nuevoEstado ? "Sí, activar" : "Sí, desactivar",
+      cancelButtonText: "Cancelar",
+      background: "#fff",
+      color: "#333",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           setLoading(true);
-          const res = await axios.patch(
+          await axios.patch(
             `http://localhost:4000/api/productos/${product.idproducto}/estado`,
             { activo: nuevoEstado }
           );
-          
-          await fetchProducts(); // Recargar productos después de cambiar estado
-          
+
+          await fetchProducts();
+
           Swal.fire({
-            title: '¡Estado Actualizado!',
-            text: `Producto ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`,
-            icon: 'success',
+            title: "¡Estado Actualizado!",
+            text: `Producto ${
+              nuevoEstado ? "activado" : "desactivado"
+            } correctamente`,
+            icon: "success",
             timer: 1500,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
         } catch (err) {
           console.error(
             "Error al cambiar estado del producto:",
             err.response?.data || err.message
           );
-          
+
           Swal.fire({
-            title: 'Error',
-            text: 'Error al cambiar estado del producto',
-            icon: 'error',
-            confirmButtonText: 'Entendido'
+            title: "Error",
+            text: "Error al cambiar estado del producto",
+            icon: "error",
+            confirmButtonText: "Entendido",
           });
         } finally {
           setLoading(false);
@@ -424,25 +572,16 @@ const PanelAdmin = () => {
     });
   };
 
-  // ====== OBTENER PRIMERA IMAGEN DEL PRODUCTO ======
+  /* =========================================================
+     IMÁGENES DEL PRODUCTO
+  ========================================================= */
   const getPrimeraImagen = (product) => {
-    // Verificar si hay imágenes en producto_imagen
     if (product.producto_imagen && product.producto_imagen.length > 0) {
       return product.producto_imagen[0].url;
     }
-    // Si no hay imágenes, retornar null
     return null;
   };
 
-  // ====== OBTENER TODAS LAS IMÁGENES DEL PRODUCTO ======
-  const getTodasImagenes = (product) => {
-    if (product.producto_imagen && product.producto_imagen.length > 0) {
-      return product.producto_imagen.map(img => img.url);
-    }
-    return [];
-  };
-
-  // ====== CONTAR IMÁGENES DEL PRODUCTO ======
   const contarImagenes = (product) => {
     if (product.producto_imagen && product.producto_imagen.length > 0) {
       return product.producto_imagen.length;
@@ -450,24 +589,17 @@ const PanelAdmin = () => {
     return 0;
   };
 
-  // ====== VERIFICAR SI EL PRODUCTO TIENE IMÁGENES ======
   const tieneImagenes = (product) => {
     return product.producto_imagen && product.producto_imagen.length > 0;
   };
 
-  // ====== helpers ======
-  const getNombreCategoria = (id) => {
-    const cat = categorias.find(
-      (c) => String(c.idcategoria) === String(id)
-    );
-    return cat ? cat.descripcion : id;
-  };
-
+  /* =========================================================
+     FILTRO + PAGINACIÓN
+  ========================================================= */
   const filteredProducts = products.filter((prod) =>
     prod.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Paginación
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -487,14 +619,14 @@ const PanelAdmin = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
-  // ====== PAGINACIÓN CON TECLADO (← →) ======
+  /* =========================================================
+     PAGINACIÓN CON TECLADO
+  ========================================================= */
   useEffect(() => {
     if (currentSection !== "productos") return;
 
     const handleKeyDown = (e) => {
       const tag = e.target.tagName.toLowerCase();
-
-      // Si el usuario está escribiendo en un input/textarea/select → NO paginar
       if (tag === "input" || tag === "textarea" || tag === "select") return;
 
       if (e.key === "ArrowRight") {
@@ -511,12 +643,14 @@ const PanelAdmin = () => {
     };
   }, [currentPage, totalPages, currentSection]);
 
-  // Limpiar URLs de objetos cuando el modal se cierra
+  /* =========================================================
+     LIMPIAR URLs DE OBJETOS AL CERRAR MODAL
+  ========================================================= */
   useEffect(() => {
     return () => {
       if (formData.imagenes) {
-        formData.imagenes.forEach(img => {
-          if (img && typeof img === 'object') {
+        formData.imagenes.forEach((img) => {
+          if (img && typeof img === "object") {
             URL.revokeObjectURL(URL.createObjectURL(img));
           }
         });
@@ -524,6 +658,9 @@ const PanelAdmin = () => {
     };
   }, [modalVisible]);
 
+  /* =========================================================
+     RENDER
+  ========================================================= */
   return (
     <div className="admin-panel">
       <aside className="sidebar">
@@ -587,9 +724,9 @@ const PanelAdmin = () => {
               Ayuda del Administrador
             </h3>
             <p>
-              Desde aquí puedes gestionar todos los productos del sistema. 
-              Puedes agregar hasta 4 imágenes por producto, editar información 
-              y activar/desactivar productos según la disponibilidad de stock.
+              Desde aquí puedes gestionar todos los productos del sistema.
+              Puedes agregar hasta 4 imágenes por producto, editar información y
+              activar/desactivar productos según la disponibilidad de stock.
             </p>
             <button className="btn btn--add" onClick={() => setShowHelp(false)}>
               <FaTimes className="btn-icon" />
@@ -629,8 +766,8 @@ const PanelAdmin = () => {
                     precio: "",
                     stock: "",
                     descripcion: "",
-                    idcategoria: "",
-                    idmarca: "",
+                    categoriaNombre: "",
+                    marcaNombre: "",
                     imagenes: [],
                   });
                   setModalVisible(true);
@@ -670,7 +807,9 @@ const PanelAdmin = () => {
                   {currentProducts.length === 0 ? (
                     <tr>
                       <td colSpan="9" className="no-products">
-                        {searchTerm ? 'No se encontraron productos' : 'No hay productos'}
+                        {searchTerm
+                          ? "No se encontraron productos"
+                          : "No hay productos"}
                       </td>
                     </tr>
                   ) : (
@@ -684,10 +823,13 @@ const PanelAdmin = () => {
                               alt={prod.nombre}
                               width="50"
                               height="50"
-                              style={{objectFit: 'cover', borderRadius: '4px'}}
+                              style={{
+                                objectFit: "cover",
+                                borderRadius: "4px",
+                              }}
                               onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
+                                e.target.style.display = "none";
+                                e.target.nextSibling.style.display = "flex";
                               }}
                             />
                           ) : (
@@ -699,9 +841,14 @@ const PanelAdmin = () => {
                         <td>{prod.nombre}</td>
                         <td>${Number(prod.precio).toFixed(2)}</td>
                         <td>{prod.stock}</td>
-                        <td>{getNombreCategoria(prod.idcategoria)}</td>
+                        {/* 🔹 Aquí ya mostramos la descripción, no el ID */}
+                        <td>{getNombreCategoria(prod)}</td>
                         <td>
-                          <span className={`image-count ${contarImagenes(prod) === 0 ? 'no-images' : ''}`}>
+                          <span
+                            className={`image-count ${
+                              contarImagenes(prod) === 0 ? "no-images" : ""
+                            }`}
+                          >
                             <FaImage className="count-icon" />
                             {contarImagenes(prod)} img
                           </span>
@@ -712,10 +859,15 @@ const PanelAdmin = () => {
                               prod.activo ? "status-active" : "status-inactive"
                             }`}
                           >
-                            {prod.activo ? 
-                              <><FaEye className="status-icon" /> Activo</> : 
-                              <><FaEyeSlash className="status-icon" /> Inactivo</>
-                            }
+                            {prod.activo ? (
+                              <>
+                                <FaEye className="status-icon" /> Activo
+                              </>
+                            ) : (
+                              <>
+                                <FaEyeSlash className="status-icon" /> Inactivo
+                              </>
+                            )}
                           </span>
                         </td>
 
@@ -735,7 +887,9 @@ const PanelAdmin = () => {
                                 prod.activo ? "btn--inactive" : "btn--add"
                               }`}
                               onClick={() => handleToggleActive(prod)}
-                              disabled={(prod.stock === 0 && !prod.activo) || loading}
+                              disabled={
+                                (prod.stock === 0 && !prod.activo) || loading
+                              }
                             >
                               {prod.stock === 0 && !prod.activo ? (
                                 <>
@@ -803,10 +957,15 @@ const PanelAdmin = () => {
         <div className="modal">
           <div className="modal-content">
             <h3>
-              {editingProduct ? 
-                <><FaEdit className="modal-icon" /> Editar Producto</> : 
-                <><FaPlus className="modal-icon" /> Agregar Producto</>
-              }
+              {editingProduct ? (
+                <>
+                  <FaEdit className="modal-icon" /> Editar Producto
+                </>
+              ) : (
+                <>
+                  <FaPlus className="modal-icon" /> Agregar Producto
+                </>
+              )}
             </h3>
             <form onSubmit={handleSubmit}>
               <input
@@ -847,26 +1006,50 @@ const PanelAdmin = () => {
                 rows="3"
                 disabled={loading}
               />
+
+              {/* 🔹 Categoría por nombre, con autocompletado */}
               <input
-                type="number"
-                name="idcategoria"
-                placeholder="ID Categoría"
-                min="1"
-                value={formData.idcategoria}
+                type="text"
+                name="categoriaNombre"
+                list="categoria-options"
+                placeholder="Categoría"
+                value={formData.categoriaNombre}
                 onChange={handleChange}
                 required
                 disabled={loading}
               />
+              <datalist id="categoria-options">
+                {categorias.map((cat) => (
+                  <option
+                    key={cat.idcategoria}
+                    value={
+                      cat.descripcionCategoria ||
+                      cat.descripionCategoria ||
+                      cat.descripcion
+                    }
+                  />
+                ))}
+              </datalist>
+
+              {/* 🔹 Marca por nombre, con autocompletado */}
               <input
-                type="number"
-                name="idmarca"
-                placeholder="ID Marca (opcional)"
-                min="1"
-                value={formData.idmarca}
+                type="text"
+                name="marcaNombre"
+                list="marca-options"
+                placeholder="Marca (opcional)"
+                value={formData.marcaNombre}
                 onChange={handleChange}
                 disabled={loading}
               />
-              
+              <datalist id="marca-options">
+                {marcas.map((mar) => (
+                  <option
+                    key={mar.idmarca}
+                    value={mar.descripcionMarca || mar.descripcion}
+                  />
+                ))}
+              </datalist>
+
               {/* SECCIÓN DE 4 IMÁGENES */}
               <div className="image-upload-section">
                 <h4>
@@ -874,20 +1057,25 @@ const PanelAdmin = () => {
                   Imágenes del Producto (máximo 4)
                 </h4>
                 <p className="image-upload-info">
-                  Puedes subir hasta 4 imágenes. La primera imagen será la principal.
+                  Puedes subir hasta 4 imágenes. La primera imagen será la
+                  principal.
                 </p>
                 <div className="image-grid">
                   {[0, 1, 2, 3].map((index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className={`image-upload-item ${
-                        formData.imagenes && formData.imagenes[index] ? 'has-image' : ''
+                        formData.imagenes && formData.imagenes[index]
+                          ? "has-image"
+                          : ""
                       }`}
                     >
                       {formData.imagenes && formData.imagenes[index] ? (
                         <>
-                          <img 
-                            src={URL.createObjectURL(formData.imagenes[index])} 
+                          <img
+                            src={URL.createObjectURL(
+                              formData.imagenes[index]
+                            )}
                             alt={`Vista ${index + 1}`}
                             className="image-preview"
                           />
@@ -919,8 +1107,8 @@ const PanelAdmin = () => {
               </div>
 
               <div className="modal-actions">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn btn--add"
                   disabled={loading}
                 >
@@ -932,7 +1120,7 @@ const PanelAdmin = () => {
                   ) : (
                     <>
                       <FaSave className="btn-icon" />
-                      {editingProduct ? 'Actualizar' : 'Guardar'}
+                      {editingProduct ? "Actualizar" : "Guardar"}
                     </>
                   )}
                 </button>

@@ -224,6 +224,103 @@ router.put("/usuario/perfil", verificarToken, async (req, res) => {
   }
 });
 
+// ======================= CATEGORÍAS =========================
+
+// GET /api/categorias  → lista todas las categorías
+router.get("/categorias", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("categoria")
+      .select("idcategoria, descripcionCategoria"); // 👈 nombre correcto
+
+    if (error) throw error;
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.error("❌ Error al obtener categorías:", err.message);
+    return res
+      .status(500)
+      .json({ message: "Error al obtener categorías", error: err.message });
+  }
+});
+
+// POST /api/categorias  → crea categoría nueva
+router.post("/categorias", async (req, res) => {
+  try {
+    const { descripcionCategoria } = req.body;
+
+    if (!descripcionCategoria || !descripcionCategoria.trim()) {
+      return res
+        .status(400)
+        .json({ message: "La descripción de la categoría es obligatoria" });
+    }
+
+    const { data, error } = await supabase
+      .from("categoria")
+      .insert([{ descripcionCategoria: descripcionCategoria.trim() }])
+      .select("idcategoria, descripcionCategoria")
+      .single();
+
+    if (error) throw error;
+
+    return res.status(201).json(data);
+  } catch (err) {
+    console.error("❌ Error al crear categoría:", err.message);
+    return res
+      .status(500)
+      .json({ message: "Error al crear categoría", error: err.message });
+  }
+});
+
+// ========================= MARCAS ==========================
+
+// GET /api/marcas  → lista todas las marcas
+router.get("/marcas", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("marca")
+      .select("idmarca, descripcionMarca"); // 👈 nombre correcto
+
+    if (error) throw error;
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.error("❌ Error al obtener marcas:", err.message);
+    return res
+      .status(500)
+      .json({ message: "Error al obtener marcas", error: err.message });
+  }
+});
+
+// POST /api/marcas  → crea una nueva marca
+router.post("/marcas", async (req, res) => {
+  try {
+    const { descripcionMarca } = req.body;
+
+    if (!descripcionMarca || !descripcionMarca.trim()) {
+      return res
+        .status(400)
+        .json({ message: "La descripción de la marca es obligatoria" });
+    }
+
+    const { data, error } = await supabase
+      .from("marca")
+      .insert([{ descripcionMarca: descripcionMarca.trim() }])
+      .select("idmarca, descripcionMarca")
+      .single();
+
+    if (error) throw error;
+
+    return res.status(201).json(data);
+  } catch (err) {
+    console.error("❌ Error al crear marca:", err.message);
+    return res
+      .status(500)
+      .json({ message: "Error al crear marca", error: err.message });
+  }
+});
+
+
 // ====================================================================
 // 🧾 OBTENER UN PRODUCTO POR ID
 // ====================================================================

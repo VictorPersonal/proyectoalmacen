@@ -781,3 +781,23 @@ html, body, #root {
     min-width: 50px;
   }
 }
+.modal-content textarea {
+  padding: 8px 10px;
+  border: 1px solid #b3b3b3;
+  border-radius: 3px;
+  outline: none;
+  font-size: 14px;
+  min-height: 90px;
+  resize: vertical;
+  font-family: inherit;
+  background-color: #ffffff;
+}
+
+.modal-content textarea::placeholder {
+  color: #a3a3a3;
+}
+
+.modal-content textarea:focus {
+  border-color: #7a7a7a;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
