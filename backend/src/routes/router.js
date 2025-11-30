@@ -845,26 +845,76 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
 
 router.get("/estadisticas/productos-mas-vendidos", verificarToken, async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("detallepedidomm")
-      .select("cantidad, producto:producto(nombre)");
+    console.log("🔍 Iniciando consulta de productos más vendidos...");
 
-    if (error) throw error;
+    // PRIMERO: Verificar todas las tablas relacionadas
+    const { data: productos, error: errorProductos } = await supabase
+      .from("producto")
+      .select("idproducto, nombre")
+      .limit(5);
 
-    const contador = {};
-    data.forEach((d) => {
-      const nombre = d.producto?.nombre || "Desconocido";
-      contador[nombre] = (contador[nombre] || 0) + d.cantidad;
-    });
+    console.log("📦 Productos sample:", productos);
 
-    const top = Object.entries(contador)
-      .map(([nombre, cantidad]) => ({ nombre, cantidad }))
-      .sort((a, b) => b.cantidad - a.cantidad)
-      .slice(0, 5);
+    // SEGUNDO: Verificar datos en detallepedido (probar diferentes nombres)
+    const tableNames = ["detallepedidomm", "detallepedidoMM", "detallepedido"];
+    
+    for (const tableName of tableNames) {
+      console.log(`🔎 Probando tabla: ${tableName}`);
+      
+      const { data, error } = await supabase
+        .from(tableName)
+        .select("*")
+        .limit(5);
 
-    res.json(top);
+      if (!error && data && data.length > 0) {
+        console.log(`✅ Tabla encontrada: ${tableName}`, data);
+        
+        // Si encontramos la tabla, hacemos la consulta completa
+        const { data: fullData, error: fullError } = await supabase
+          .from(tableName)
+          .select(`
+            cantidad, 
+            idproducto,
+            producto:producto(idproducto, nombre)
+          `);
+
+        if (fullError) {
+          console.error(`❌ Error en consulta de ${tableName}:`, fullError);
+          continue;
+        }
+
+        console.log(`📊 Datos completos de ${tableName}:`, fullData);
+
+        if (fullData && fullData.length > 0) {
+          const contador = {};
+          fullData.forEach((d, index) => {
+            console.log(`📦 Detalle ${index}:`, d);
+            
+            const nombre = d.producto?.nombre || `Desconocido (ID: ${d.idproducto})`;
+            contador[nombre] = (contador[nombre] || 0) + (d.cantidad || 0);
+          });
+
+          console.log("🧮 Contador final:", contador);
+
+          const top = Object.entries(contador)
+            .map(([nombre, cantidad]) => ({ nombre, cantidad }))
+            .sort((a, b) => b.cantidad - a.cantidad)
+            .slice(0, 5);
+
+          console.log("🏆 Top productos:", top);
+          return res.json(top);
+        }
+      } else {
+        console.log(`❌ Tabla ${tableName} no encontrada o vacía:`, error);
+      }
+    }
+
+    // Si llegamos aquí, no encontramos la tabla
+    console.log("📭 No se encontró la tabla de detalles de pedido");
+    return res.json([]);
+
   } catch (err) {
-    console.error("❌ Error al obtener productos más vendidos:", err.message);
+    console.error("❌ Error general:", err.message);
     res.status(500).json({ error: "Error al obtener productos más vendidos" });
   }
 });
@@ -964,10 +1014,6 @@ router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => 
 
 
 // Ruta para obtener productos con sus imágenes - SIN imagen_url
-// ========== RUTAS COMPLETAS PARA PRODUCTOS ==========
-
-// GET - Obtener todos los productos con imágenes
-// GET - Obtener todos los productos con imágenes (MODIFICAR ESTE)
 router.get("/productos", async (req, res) => {
   try {
     const { search, soloActivos } = req.query;

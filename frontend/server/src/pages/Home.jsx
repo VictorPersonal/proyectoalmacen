@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart } from "react-icons/fa";
+import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight } from "react-icons/fa";
 import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
@@ -83,6 +83,19 @@ const Home = () => {
       sessionStorage.removeItem('homeEstado');
     }
   }, [location]);
+
+  // ✅ EFECTO PARA CAMBIO AUTOMÁTICO DE SLIDES
+  useEffect(() => {
+    if (images.length <= 1) return; // No hacer nada si solo hay una imagen
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 15000); 
+
+    return () => clearInterval(interval); // Limpiar intervalo al desmontar
+  }, [images.length]);
 
   // CATEGORÍAS ACTUALIZADAS - Estructura mejorada con IDs
   const categorias = [
@@ -520,21 +533,42 @@ const Home = () => {
       {/* CONTENIDO ACTUALIZADO */}
       {mostrarCarrusel ? (
         <main id="main">
+          {/* ✅ CARRUSEL ACTUALIZADO CON NUEVA TRANSICIÓN */}
           <section className="hero-section" id="hero-section">
             <button className="carousel-btn prev" onClick={prevSlide}>
-              ‹
+              <FaChevronLeft />
             </button>
 
             <div className="carousel-container">
-              <img
-                src={images[currentIndex]}
-                alt={`slide-${currentIndex}`}
-                className="carousel-image"
-              />
+              <div className="carousel-images-container">
+                {images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`slide-${index}`}
+                    className={`carousel-image ${
+                      index === currentIndex ? 'active' : ''
+                    } ${
+                      index === (currentIndex === 0 ? images.length - 1 : currentIndex - 1) ? 'previous' : ''
+                    }`}
+                  />
+                ))}
+              </div>
+              
+              {/* Indicadores de slide */}
+              <div className="carousel-indicators">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`indicator ${index === currentIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentIndex(index)}
+                  />
+                ))}
+              </div>
             </div>
 
             <button className="carousel-btn next" onClick={nextSlide}>
-              ›
+              <FaRight />
             </button>
           </section>
 
