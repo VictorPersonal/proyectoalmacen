@@ -16,6 +16,7 @@ import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";
 import ModificarDireccion from "./pages/Checkout/ModificarDireccion";
 import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
 import DescripcionProducto from "./components/DescripcionProducto";
+import Promociones from "./pages/Promociones";
 
 function AppWrapper() {
   const location = useLocation();
@@ -40,7 +41,9 @@ function AppWrapper() {
         <Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />
         <Route path="/categorias" element={<Categorias />} />
         <Route path="/modificar-direccion" element={<ModificarDireccion />} />
+        <Route path="/promociones" element={<Promociones />} />
         <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
+        <Route path="/registro/terminosycondiciones" element={<TerminosYCondiciones />} />
         {/* ✅ AGREGAR ESTA RUTA TAMBIÉN EN LAS PRINCIPALES */}
         <Route path="/producto/:id" element={<DescripcionProducto />} />
       </Routes>

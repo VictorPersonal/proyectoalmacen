@@ -21,6 +21,8 @@ import {
   FaEye,
   FaEyeSlash,
   FaShoppingBag,
+  FaShoppingCart, 
+  FaClipboardList 
 } from "react-icons/fa";
 
 const PanelAdmin = () => {
@@ -692,6 +694,7 @@ const PanelAdmin = () => {
         </div>
 
         <nav className="sidebar-nav">
+          {/* 👇 NAVBAR ACTUALIZADO CON 3 ELEMENTOS */}
           <button
             type="button"
             className={`nav-item ${
@@ -702,6 +705,18 @@ const PanelAdmin = () => {
             <FaBox className="nav-icon" />
             Productos
           </button>
+          
+          <button
+            type="button"
+            className={`nav-item ${
+              currentSection === "pedidos" ? "active" : ""
+            }`}
+            onClick={() => setCurrentSection("pedidos")}
+          >
+            <FaShoppingCart className="nav-icon" />
+            Pedidos
+          </button>
+          
           <button
             type="button"
             className={`nav-item ${
@@ -947,6 +962,132 @@ const PanelAdmin = () => {
               </button>
             </div>
           </>
+        )}
+
+        {/* 👇 SECCIÓN DE PEDIDOS - TABLA VISUAL */}
+        {currentSection === "pedidos" && (
+          <div className="pedidos-section">
+            <div className="section-header">
+              <h2>
+                <FaClipboardList className="section-icon" />
+                Gestión de Pedidos
+              </h2>
+              <p>Visualización de todos los pedidos del sistema</p>
+            </div>
+
+            {/* Buscador de pedidos */}
+            <div className="search-wrapper">
+              <div className="search-container">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Buscar por número de pedido o cliente"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+            </div>
+
+            {/* Tabla de pedidos */}
+            <div className="table-wrapper">
+              <table className="pedidos-table">
+                <thead>
+                  <tr>
+                    <th>N° Pedido</th>
+                    <th>Cliente</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Datos de ejemplo - temporal */}
+                  {[
+                    {
+                      id: 1001,
+                      cliente: "María González",
+                      direccion: "Calle 123 #45-67, Bogotá",
+                      estado: "Entregado",
+                      total: 450000,
+                      fecha: "2024-01-15"
+                    },
+                    {
+                      id: 1002,
+                      cliente: "Carlos Rodríguez",
+                      direccion: "Av. Principal #89-12, Medellín",
+                      estado: "En camino",
+                      total: 320000,
+                      fecha: "2024-01-16"
+                    },
+                    {
+                      id: 1003,
+                      cliente: "Ana Martínez",
+                      direccion: "Carrera 56 #78-90, Cali",
+                      estado: "Procesando",
+                      total: 780000,
+                      fecha: "2024-01-17"
+                    },
+                    {
+                      id: 1004,
+                      cliente: "Pedro Sánchez",
+                      direccion: "Diagonal 34 #12-34, Barranquilla",
+                      estado: "Pendiente",
+                      total: 210000,
+                      fecha: "2024-01-18"
+                    },
+                    {
+                      id: 1005,
+                      cliente: "Laura Díaz",
+                      direccion: "Transversal 78 #56-78, Cartagena",
+                      estado: "Cancelado",
+                      total: 540000,
+                      fecha: "2024-01-14"
+                    }
+                  ].map((pedido) => (
+                    <tr key={pedido.id}>
+                      <td className="pedido-numero">#{pedido.id}</td>
+                      <td className="pedido-cliente">{pedido.cliente}</td>
+                      <td className="pedido-direccion">
+                        <span title={pedido.direccion}>
+                          {pedido.direccion.length > 30 
+                            ? `${pedido.direccion.substring(0, 30)}...` 
+                            : pedido.direccion}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`estado-pedido estado-${pedido.estado.toLowerCase().replace(' ', '-')}`}>
+                          {pedido.estado}
+                        </span>
+                      </td>
+                      <td className="pedido-total">${pedido.total.toLocaleString()}</td>
+                      <td className="pedido-fecha">{pedido.fecha}</td>
+                      <td>
+                        <div className="action-buttons">
+                          <button className="btn btn--view" title="Ver detalles">
+                            <FaEye className="btn-icon" />
+                            Ver
+                          </button>
+                          <button className="btn btn--edit" title="Editar pedido">
+                            <FaEdit className="btn-icon" />
+                            Editar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Información de desarrollo - SIN FONDO BLANCO */}
+            <div className="dev-info">
+              <div className="dev-content">
+                <p>🚧 <strong>Sección en desarrollo</strong> No sirve ni monda gracias</p>
+              </div>
+            </div>
+          </div>
         )}
 
         {currentSection === "dashboard" && <Dashboard />}

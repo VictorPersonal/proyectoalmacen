@@ -184,7 +184,7 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
 // ✅ ENDPOINT PUT - ACTUALIZA DATOS
 router.put("/usuario/perfil", verificarToken, async (req, res) => {
   const cedula = req.usuario.id; // viene del token
-  const { nombre, apellido, direccion, ciudad } = req.body;
+  const { nombre, apellido, direccion, ciudad, telefono } = req.body; 
 
   if (!nombre || !apellido) {
     return res.status(400).json({ message: "Nombre y apellido son obligatorios" });
@@ -206,9 +206,15 @@ router.put("/usuario/perfil", verificarToken, async (req, res) => {
     // Actualizar perfil
     const { data, error } = await supabase
       .from("usuario")
-      .update({ nombre, apellido, direccion, ciudad })
+      .update({ 
+        nombre, 
+        apellido, 
+        direccion, 
+        ciudad, 
+        telefono
+      })
       .eq("cedula", cedula)
-      .select("cedula, nombre, apellido, email, direccion, ciudad, rol")
+      .select("cedula, nombre, apellido, email, direccion, ciudad, rol, telefono")
       .single();
 
     if (error) throw error;
@@ -820,7 +826,7 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("usuario")
-      .select("cedula, nombre, apellido, direccion, ciudad, email, rol")
+      .select("cedula, nombre, apellido, direccion, ciudad, email, rol, telefono")
       .eq("cedula", cedula)
       .maybeSingle();
 
