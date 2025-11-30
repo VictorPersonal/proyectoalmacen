@@ -110,7 +110,7 @@ const Dashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="ventas" fill="#00C49F" />
+                <Bar dataKey="cantidad" fill="#00C49F" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
