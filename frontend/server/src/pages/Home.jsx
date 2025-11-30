@@ -436,9 +436,9 @@ const Home = () => {
               )}
             </div>
 
-            <a href="#" className="nav-link">
+            <Link to="/promociones" className="nav-link">
               Promociones
-            </a>
+            </Link>
             <a href="#" className="nav-link">
               Contacto
             </a>

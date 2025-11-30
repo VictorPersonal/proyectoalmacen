@@ -11,6 +11,7 @@ function ActualizarPerfil() {
   const [cedula, setCedula] = useState("");
   const [direccion, setDireccion] = useState("");
   const [ciudad, setCiudad] = useState("");
+  const [telefono, setTelefono] = useState(""); // 👈 NUEVO ESTADO
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
@@ -79,6 +80,7 @@ function ActualizarPerfil() {
         setCedula(data.cedula || "");
         setDireccion(data.direccion || "");
         setCiudad(data.ciudad || "");
+        setTelefono(data.telefono || ""); // 👈 CARGAR TELÉFONO
 
         // Mostrar mensaje de éxito al cargar
         Swal.fire({
@@ -111,6 +113,12 @@ function ActualizarPerfil() {
       return;
     }
 
+    // Validar teléfono (opcional pero con formato si se ingresa)
+    if (telefono && !/^\d{7,15}$/.test(telefono.replace(/\s/g, ''))) {
+      mostrarError("Por favor, ingresa un número de teléfono válido (solo números, 7-15 dígitos)");
+      return;
+    }
+
     // Mostrar confirmación antes de actualizar
     const confirmacion = await mostrarConfirmacion();
     if (!confirmacion.isConfirmed) {
@@ -125,6 +133,7 @@ function ActualizarPerfil() {
       apellido: apellido.trim(),
       direccion: direccion.trim(),
       ciudad: ciudad.trim(),
+      telefono: telefono.trim(), // 👈 ENVIAR TELÉFONO
     };
 
     try {
@@ -153,6 +162,7 @@ function ActualizarPerfil() {
       setApellido(data.usuario.apellido || "");
       setDireccion(data.usuario.direccion || "");
       setCiudad(data.usuario.ciudad || "");
+      setTelefono(data.usuario.telefono || ""); // 👈 ACTUALIZAR TELÉFONO
 
       // Mostrar mensaje de éxito
       mostrarExito("Tu perfil ha sido actualizado exitosamente");
@@ -256,6 +266,7 @@ function ActualizarPerfil() {
                 />
               </div>
 
+              {/* 👇 NUEVA FILA: Ciudad y Teléfono */}
               <div className="actualizar-form-group">
                 <label htmlFor="actualizar-ciudad">Ciudad*:</label>
                 <input
@@ -269,7 +280,38 @@ function ActualizarPerfil() {
                 />
               </div>
 
-              {/* Campos BLOQUEADOS */}
+              <div className="actualizar-form-group">
+                <label htmlFor="actualizar-telefono">Teléfono:</label>
+                <input
+                  type="tel"
+                  id="actualizar-telefono"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  disabled={cargando}
+                  placeholder="Ej: 3123456789"
+                  pattern="[0-9]{7,15}"
+                  title="Solo números, 7-15 dígitos"
+                />
+                <small className="actualizar-texto-ayuda">
+                  Solo números
+                </small>
+              </div>
+
+              {/* 👇 NUEVA FILA: Cédula y Email (BLOQUEADOS) */}
+              <div className="actualizar-form-group">
+                <label htmlFor="actualizar-cedula">Cédula:</label>
+                <input
+                  type="text"
+                  id="actualizar-cedula"
+                  value={cedula}
+                  readOnly
+                  className="actualizar-campo-bloqueado"
+                />
+                <small className="actualizar-texto-ayuda">
+                  La cédula no se puede modificar
+                </small>
+              </div>
+
               <div className="actualizar-form-group">
                 <label htmlFor="actualizar-email">Email:</label>
                 <input
@@ -282,20 +324,6 @@ function ActualizarPerfil() {
                 />
                 <small className="actualizar-texto-ayuda">
                   El email no se puede modificar
-                </small>
-              </div>
-
-              <div className="actualizar-form-group">
-                <label htmlFor="actualizar-cedula">Cédula:</label>
-                <input
-                  type="text"
-                  id="actualizar-cedula"
-                  value={cedula}
-                  readOnly
-                  className="actualizar-campo-bloqueado"
-                />
-                <small className="actualizar-texto-ayuda">
-                  La cédula no se puede modificar
                 </small>
               </div>
             </div>
@@ -325,7 +353,7 @@ function ActualizarPerfil() {
             <div className="actualizar-info-ayuda">
               <small>* Campos obligatorios</small>
               <br />
-              <small>Puedes editar tu nombre, apellido, dirección y ciudad</small>
+              <small>Puedes editar tu nombre, apellido, dirección, ciudad y teléfono</small>
             </div>
           </form>
         </div>

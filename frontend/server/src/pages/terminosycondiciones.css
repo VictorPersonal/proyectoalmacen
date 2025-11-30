@@ -1,0 +1,139 @@
+/* Estilos generales */
+.terminos-container {
+  min-height: 100vh;
+  background-color: #d0cbc8;
+  padding: 40px 20px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.terminos-container h1 {
+  text-align: center;
+  color: #D84040;
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.terminos-last-update {
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+  margin-bottom: 30px;
+  font-style: italic;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 15px;
+}
+
+/* Secciones */
+.terminos-section {
+  margin-bottom: 25px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border-left: 4px solid #D84040;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.terminos-section h2 {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.terminos-section p {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: justify;
+}
+
+.terminos-section ul {
+  margin: 10px 0 10px 20px;
+  color: #555;
+}
+
+.terminos-section li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.terminos-section strong {
+  color: #D84040;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .terminos-container {
+    padding: 20px 15px;
+  }
+
+  .terminos-container h1 {
+    font-size: 20px;
+  }
+
+  .terminos-section {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .terminos-section h2 {
+    font-size: 15px;
+  }
+
+  .terminos-section p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .terminos-container {
+    padding: 15px 10px;
+  }
+
+  .terminos-container h1 {
+    font-size: 18px;
+  }
+
+  .terminos-section {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  .terminos-section h2 {
+    font-size: 14px;
+  }
+
+  .terminos-section p {
+    font-size: 12px;
+  }
+
+  .terminos-section ul {
+    margin-left: 15px;
+  }
+
+  .terminos-section li {
+    font-size: 12px;
+  }
+}
+
+/* Efectos de scroll suave */
+.terminos-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

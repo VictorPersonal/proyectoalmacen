@@ -9,6 +9,7 @@ function Registro() {
   const [cedula, setCedula] = useState("");
   const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [aceptoTerminos, setAceptoTerminos] = useState(false);
   const [errores, setErrores] = useState({});
   const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
@@ -98,6 +99,11 @@ function Registro() {
       nuevosErrores.contrasena = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial";
     }
 
+    // Validar términos y condiciones
+    if (!aceptoTerminos) {
+      nuevosErrores.terminos = "Debes aceptar los términos y condiciones para registrarte";
+    }
+
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
@@ -131,6 +137,21 @@ function Registro() {
     if (errores.email) {
       setErrores(prev => ({ ...prev, email: "" }));
     }
+  };
+
+  // Manejar cambio de términos y condiciones
+  const handleTerminosChange = (e) => {
+    setAceptoTerminos(e.target.checked);
+    
+    // Limpiar error de términos si se está corrigiendo
+    if (errores.terminos) {
+      setErrores(prev => ({ ...prev, terminos: "" }));
+    }
+  };
+
+  // Función para navegar a la página de términos y condiciones
+  const navegarATerminos = () => {
+    navigate("/registro/terminosycondiciones");
   };
 
   const handleSubmit = async (e) => {
@@ -182,6 +203,7 @@ function Registro() {
       setCedula("");
       setNombre("");
       setContrasena("");
+      setAceptoTerminos(false);
       setErrores({});
 
       // Redirigir al login después de 2 segundos
@@ -274,10 +296,35 @@ function Registro() {
                 disabled={cargando}
                 className={errores.contrasena ? "registro-error-input" : ""}
               />
-              <small className="registro-hint">
+              
+              {/* Mensaje de sugerencia */}
+              <small className="registro-password-hint">
                 Al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)
               </small>
               {errores.contrasena && <span className="registro-error-message">{errores.contrasena}</span>}
+            </div>
+
+            {/* Checkbox de Términos y Condiciones - SEPARADO DEL GRUPO DE CONTRASEÑA */}
+            <div className="registro-terminos-group">
+              <label className="registro-terminos-label">
+                <input
+                  type="checkbox"
+                  checked={aceptoTerminos}
+                  onChange={handleTerminosChange}
+                  disabled={cargando}
+                  className="registro-terminos-checkbox"
+                />
+                <span className="registro-terminos-text">
+                  Acepto los{" "}
+                  <span 
+                    className="registro-terminos-link" 
+                    onClick={navegarATerminos}
+                  >
+                    términos y condiciones
+                  </span>
+                </span>
+              </label>
+              {errores.terminos && <span className="registro-error-message">{errores.terminos}</span>}
             </div>
 
             <button 

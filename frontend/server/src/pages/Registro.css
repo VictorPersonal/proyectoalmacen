@@ -252,6 +252,75 @@ body {
     color: #333;
 }
 
+/* === ESTILOS CORREGIDOS PARA TÉRMINOS Y CONDICIONES - CHECKBOX PERFECTAMENTE A LA IZQUIERDA === */
+.registro-terminos-group {
+    margin: 5px 0 10px 0;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+}
+
+.registro-terminos-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+    margin: 0;
+    width: 100%;
+}
+
+.registro-terminos-checkbox {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #D84040;
+    margin: 0;
+    margin-top: 2px;
+}
+
+.registro-terminos-text {
+    font-size: 14px;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.registro-terminos-link {
+    color: #D84040;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.registro-terminos-link:hover {
+    color: #b33535;
+}
+
+/* Estilo específico para errores de términos */
+.registro-terminos-group .registro-error-message {
+    margin-top: 8px;
+    margin-left: 30px;
+}
+
+/* === ESTILO PARA EL MENSAJE DE SUGERENCIA DE CONTRASEÑA === */
+.registro-password-hint {
+    color: #666;
+    font-size: 11px;
+    margin-top: 8px;
+    display: block;
+    line-height: 1.3;
+    font-style: italic;
+    padding: 8px 12px;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    border-left: 3px solid #D84040;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .registro-form-wrapper {
@@ -273,6 +342,32 @@ body {
     .registro-container {
         padding: 20px 15px;
     }
+
+    .registro-terminos-label {
+        font-size: 13px;
+    }
+    
+    .registro-terminos-text {
+        font-size: 13px;
+    }
+    
+    .registro-terminos-link {
+        font-size: 13px;
+    }
+
+    .registro-terminos-group {
+        padding: 12px;
+        margin: 5px 0 8px 0;
+    }
+
+    .registro-password-hint {
+        font-size: 10px;
+        margin-top: 6px;
+    }
+
+    .registro-terminos-group .registro-error-message {
+        margin-left: 26px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -292,11 +387,40 @@ body {
 
     .registro-form-group input {
         padding: 10px 12px;
-        font-size: 16px; /* Mejor para móviles */
+        font-size: 16px;
     }
 
     .registro-btn-registrar {
         padding: 12px 20px;
         font-size: 14px;
+    }
+
+    .registro-terminos-group {
+        padding: 10px;
+        margin: 5px 0 8px 0;
+    }
+
+    .registro-terminos-label {
+        font-size: 12px;
+        gap: 10px;
+    }
+    
+    .registro-terminos-text {
+        font-size: 12px;
+    }
+    
+    .registro-terminos-link {
+        font-size: 12px;
+    }
+
+    .registro-password-hint {
+        font-size: 10px;
+        margin-top: 6px;
+        padding: 6px 10px;
+    }
+
+    .registro-terminos-group .registro-error-message {
+        margin-left: 24px;
+        font-size: 11px;
     }
 }
