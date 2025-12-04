@@ -9,16 +9,25 @@ const FavoritoProducto = () => {
   useEffect(() => {
     const obtenerFavoritos = async () => {
       try {
+
+        console.log("🔹 Intentando obtener favoritos...");
+
         const response = await fetch("http://localhost:4000/api/favoritos", {
           method: "GET",
           credentials: "include", // ✅ Envía la cookie JWT, ayuda a identificar al usuario
         });
 
+        console.log("🔹 Response status:", response.status);
+        console.log("🔹 Response headers:", response.headers);
+
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error("❌ Error response:", errorText);
           throw new Error(`Error al obtener favoritos (status: ${response.status})`);
         }
 
         const data = await response.json();
+        console.log("🔹 Datos recibidos:", data);
         setFavoritos(data);
       } catch (error) {
         console.error("❌ Error al cargar favoritos:", error);

@@ -30,6 +30,7 @@ app.use((req, res, next) => {
 // ✅ Rutas - aplicar express.json() SOLO donde sea necesario
 app.use("/api/auth", express.json(), authRoutes);
 app.use("/api", router); // Esta ruta usa busboy para FormData
+app.use("/api/favoritos", express.json(), router); // Ruta para favoritos
 app.use("/api/stripe", express.json(), stripeRoutes);
 
 const PORT = process.env.PORT || 4000;

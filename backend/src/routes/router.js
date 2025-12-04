@@ -670,124 +670,144 @@ router.put("/carrito/actualizar", async (req, res) => {
 // ====================================================================
 // 📦 Obtener favoritos del usuario autenticado
 // ====================================================================
-router.get("/favoritos", async (req, res) => {
+router.get("/favoritos", verificarToken, async (req, res) => {
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(401).json({ message: "No autenticado" });
-    }
-
-    const decoded = jwt.verify(token, "clave_secreta_segura");
-    const cedula = decoded.id;
-
+    // 🔹 Ahora usamos req.usuario.cedula directamente
+    const cedula = req.usuario.cedula;
+    
+    console.log("🔹 Obteniendo favoritos para cédula:", cedula);
+    
     const { data, error } = await supabase
       .from("favoritoproducto")
       .select(`
         idfavorito,
         fechaagregado,
-        producto:producto (
+        producto:producto!inner (
           idproducto,
           nombre,
           precio,
           descripcion,
-          stock
+          stock,
+          producto_imagen(url)
         )
       `)
-      .eq("cedula", cedula)
+      .eq("cedula", cedula)  // ← Usamos cedula directamente
+      .eq("producto.activo", true)
       .order("fechaagregado", { ascending: false });
 
     if (error) throw error;
 
-    // Igualamos el formato que devolvía tu PostgreSQL
-    const favoritos = data.map((f) => ({
-      idfavorito: f.idfavorito,
-      fechaagregado: f.fechaagregado,
-      idproducto: f.producto?.idproducto,
-      nombre: f.producto?.nombre,
-      precio: f.producto?.precio,
-      descripcion: f.producto?.descripcion,
-      stock: f.producto?.stock,
-    }));
+    const favoritos = data.map((f) => {
+      const imagenes = f.producto.producto_imagen || [];
+      return {
+        idfavorito: f.idfavorito,
+        fechaagregado: f.fechaagregado,
+        idproducto: f.producto.idproducto,
+        nombre: f.producto.nombre,
+        precio: f.producto.precio,
+        descripcion: f.producto.descripcion,
+        stock: f.producto.stock,
+        imagen: imagenes.length > 0 ? imagenes[0].url : null
+      };
+    });
 
-    res.status(200).json(favoritos);
+    res.status(200).json({
+      success: true,
+      favoritos: favoritos
+    });
+
   } catch (error) {
-    console.error("❌ Error al obtener favoritos del usuario autenticado:", error.message);
-    res.status(500).json({ message: "Error al obtener favoritos" });
+    console.error("❌ Error en GET /favoritos:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error al obtener favoritos"
+    });
   }
 });
 
 // ====================================================================
 // ➕ Agregar producto a favoritos
 // ====================================================================
-router.post("/favoritos", async (req, res) => {
-  const { cedula, idproducto } = req.body;
-
-  if (!cedula || !idproducto) {
-    return res.status(400).json({ message: "Faltan datos obligatorios (cedula, idproducto)." });
-  }
-
+// ====================================================================
+// ➕ Agregar producto a favoritos (CORREGIDO)
+// ====================================================================
+router.post("/favoritos", verificarToken, async (req, res) => {
   try {
-    // Validar que el usuario exista
-    const { data: usuarioExiste, error: errorUsuario } = await supabase
-      .from("usuario")
-      .select("cedula")
-      .eq("cedula", cedula)
-      .maybeSingle();
+    const cedula = req.usuario.cedula;
+    const { idproducto } = req.body;
 
-    if (errorUsuario) throw errorUsuario;
-    if (!usuarioExiste) {
-      return res.status(404).json({ message: `No existe un usuario con la cédula ${cedula}.` });
+    if (!idproducto) {
+      return res.status(400).json({
+        success: false,
+        message: "Falta el ID del producto"
+      });
     }
 
-    // Validar que el producto exista
-    const { data: productoExiste, error: errorProducto } = await supabase
+    const fechaActual = new Date().toISOString().split("T")[0];
+
+    console.log(`🔹 Agregando favorito - Cédula: ${cedula}, Producto: ${idproducto}`);
+
+    // 1️⃣ Verificar si el producto existe y está activo
+    const { data: productoExiste, error: errorProd } = await supabase
       .from("producto")
       .select("idproducto")
       .eq("idproducto", idproducto)
-      .maybeSingle();
+      .eq("activo", true)
+      .single();
 
-    if (errorProducto) throw errorProducto;
-    if (!productoExiste) {
-      return res.status(404).json({ message: `No existe un producto con el ID ${idproducto}.` });
+    if (errorProd || !productoExiste) {
+      return res.status(404).json({
+        success: false,
+        message: "El producto no existe o está inactivo"
+      });
     }
 
-    // Verificar si ya está en favoritos
+    // 2️⃣ Verificar si YA está en favoritos
     const { data: existe, error: errorExiste } = await supabase
       .from("favoritoproducto")
-      .select("idfavorito")
+      .select("*")
       .eq("cedula", cedula)
-      .eq("idproducto", idproducto)
-      .maybeSingle();
+      .eq("idproducto", idproducto);
 
     if (errorExiste) throw errorExiste;
-    if (existe) {
-      return res.status(400).json({ message: "El producto ya está en favoritos." });
+
+    if (existe.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "El producto ya está en favoritos"
+      });
     }
 
-    // Insertar nuevo favorito
-    const { data: insertado, error: insertError } = await supabase
+    // 3️⃣ Insertar favorito con fecha tipo DATE
+    const { data: insertado, error: errorInsert } = await supabase
       .from("favoritoproducto")
       .insert([
         {
-          fechaagregado: new Date().toISOString().split("T")[0],
           cedula,
           idproducto,
-        },
+          fechaagregado: fechaActual
+        }
       ])
-      .select()
+      .select("*")
       .single();
 
-    if (insertError) throw insertError;
+    if (errorInsert) throw errorInsert;
 
     res.status(201).json({
-      message: "Producto agregado a favoritos correctamente.",
-      favorito: insertado,
+      success: true,
+      message: "Producto agregado a favoritos",
+      favorito: insertado
     });
+
   } catch (error) {
-    console.error("❌ Error al agregar favorito:", error.message);
-    res.status(500).json({ message: "Error interno al agregar favorito." });
+    console.error("❌ Error en POST /favoritos:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error al agregar a favoritos"
+    });
   }
 });
+
 
 // ====================================================================
 // ❌ Eliminar un producto de favoritos
