@@ -129,18 +129,21 @@ router.post("/login", async (req, res) => {
 
     // ✅ Crear token JWT
     const token = jwt.sign(
-      { id: usuario.cedula, rol: usuario.rol },
+      { cedula: usuario.cedula, rol: usuario.rol }, //Esto tiene relación con el authMiddleware.js, ya que este archivo busca la propiedad "cedula" y antes se tenia en esta linea id por lo que generaba error en la comparación
       process.env.JWT_SECRET || "clave_secreta_segura",
       { expiresIn: "1h" }
     );
 
     // ✅ Enviar cookie HTTP-only
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // Cambia a true si usas HTTPS
-      sameSite: "lax",
-      maxAge: 60 * 60 * 1000,
+      secure: isProduction,                      // true en producción
+      sameSite: isProduction ? "None" : "Lax",   // obligatorio para Netlify + Render
+      maxAge: 24 * 60 * 60 * 1000                // 1 día
     });
+
 
     res.status(200).json({
       message: "Inicio de sesión exitoso",

@@ -11,13 +11,16 @@ import stripeRoutes from "../routes/stripeRoutes.js";
 dotenv.config();
 
 const app = express();
+const isProduction = process.env.NODE_ENV === "production";
 app.use(express.json());
 
 app.use(cookieParser());
+const FRONTEND_URL = isProduction
+  ? process.env.FRONTEND_URL_PROD        // ejemplo: https://dulcehogar.netlify.app
+  : "http://localhost:5173";
+
 app.use(cors({
-  origin: [ 
-    "http://localhost:5173"              // desarrollo
-  ],
+  origin: FRONTEND_URL,
   credentials: true
 }));
 
