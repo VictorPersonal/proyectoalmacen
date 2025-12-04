@@ -5,20 +5,17 @@ const FavoritoProducto = () => {
   const [favoritos, setFavoritos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Cargar los productos favoritos del usuario autenticado
   useEffect(() => {
     const obtenerFavoritos = async () => {
       try {
-
         console.log("🔹 Intentando obtener favoritos...");
 
         const response = await fetch("http://localhost:4000/api/favoritos", {
           method: "GET",
-          credentials: "include", // ✅ Envía la cookie JWT, ayuda a identificar al usuario
+          credentials: "include",
         });
 
         console.log("🔹 Response status:", response.status);
-        console.log("🔹 Response headers:", response.headers);
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -28,9 +25,19 @@ const FavoritoProducto = () => {
 
         const data = await response.json();
         console.log("🔹 Datos recibidos:", data);
-        setFavoritos(data);
+        if (Array.isArray(data)) {
+          setFavoritos(data);
+        } else if (data && Array.isArray(data.favoritos)) {
+          setFavoritos(data.favoritos);
+        } else if (data && data.favoritos) {
+          setFavoritos([data.favoritos]);
+        } else {
+          console.warn("⚠️ La API no devolvió un array:", data);
+          setFavoritos([]); 
+        }
       } catch (error) {
         console.error("❌ Error al cargar favoritos:", error);
+        setFavoritos([]); 
       } finally {
         setLoading(false);
       }
@@ -38,6 +45,7 @@ const FavoritoProducto = () => {
 
     obtenerFavoritos();
   }, []);
+  const favoritosArray = Array.isArray(favoritos) ? favoritos : [];
 
   if (loading) {
     return <p className="mensaje-vacio">Cargando favoritos...</p>;
@@ -46,13 +54,13 @@ const FavoritoProducto = () => {
   return (
     <div className="favoritos-container">
       <h2 className="titulo-favoritos">Mis Productos Favoritos</h2>
-      {favoritos.length === 0 ? (
+      {favoritosArray.length === 0 ? (
         <p className="mensaje-vacio">No tienes productos en favoritos.</p>
       ) : (
-        favoritos.map((item) => (
-          <div key={item.idfavorito} className="favorito-item">
+        favoritosArray.map((item) => (
+          <div key={item.idfavorito || item.id || Math.random()} className="favorito-item">
             <img
-              src={item.imagen || "https://via.placeholder.com/100"} // 👈 opcional, si no tienes columna imagen
+              src={item.imagen || "https://via.placeholder.com/100"}
               alt={item.nombre}
               className="favorito-imagen"
             />
