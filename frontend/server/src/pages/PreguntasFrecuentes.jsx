@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './PreguntasFrecuentes.css';
 import { 
   FaPhone, 
   FaWhatsapp, 
@@ -13,7 +14,7 @@ import {
   FaHome,
   FaArrowRight
 } from 'react-icons/fa';
-import './PreguntasFrecuentes.css';
+
 
 const FAQPage = () => {
   const [activeIndex, setActiveIndex] = useState(null);
