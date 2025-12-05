@@ -18,6 +18,7 @@ const DescripcionProducto = () => {
   const [esFavorito, setEsFavorito] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
+  const [verificandoFavorito, setVerificandoFavorito] = useState(false);
   const ejecutadoRef = useRef(false);
 
   // 🔒 Efecto para deshabilitar el scroll cuando el modal está abierto
@@ -38,6 +39,8 @@ const DescripcionProducto = () => {
       if (location.state?.productoData) {
         setProducto(location.state.productoData);
         setCargando(false);
+        // Verificar si el producto está en favoritos
+        await verificarFavorito(location.state.productoData.id_producto || location.state.productoData.id || location.state.productoData.idproducto);
       } else {
         await cargarProductoDesdeAPI();
       }
@@ -45,6 +48,33 @@ const DescripcionProducto = () => {
 
     cargarProducto();
   }, [id, location.state]);
+
+  // Función para verificar si el producto está en favoritos
+  const verificarFavorito = async (productoId) => {
+    setVerificandoFavorito(true);
+    try {
+      const userInfo = localStorage.getItem("usuarioInfo");
+      if (!userInfo) {
+        setEsFavorito(false);
+        return;
+      }
+
+      const response = await fetch(`http://localhost:4000/api/favoritos/verificar/${productoId}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEsFavorito(data.esFavorito);
+      }
+    } catch (error) {
+      console.error("Error al verificar favorito:", error);
+      setEsFavorito(false);
+    } finally {
+      setVerificandoFavorito(false);
+    }
+  };
 
   const cargarProductoDesdeAPI = async () => {
     try {
@@ -54,6 +84,8 @@ const DescripcionProducto = () => {
       }
       const data = await response.json();
       setProducto(data);
+      // Verificar si el producto está en favoritos
+      await verificarFavorito(data.id_producto || data.id || data.idproducto);
     } catch (error) {
       console.error("Error cargando producto:", error);
       Swal.fire({
@@ -77,6 +109,121 @@ const DescripcionProducto = () => {
 
   const handleCerrarCarrito = () => {
     setMostrarCarrito(false);
+  };
+
+  // 🔹 Función para agregar/quitar de favoritos
+  const handleFavoritoClick = async () => {
+    const userInfo = localStorage.getItem("usuarioInfo");
+
+    if (!userInfo) {
+      Swal.fire({
+        icon: "warning",
+        title: "Inicia sesión",
+        text: "Debes iniciar sesión para agregar productos a favoritos.",
+        confirmButtonText: "Entendido",
+        confirmButtonColor: "#D84040",
+      });
+      return;
+    }
+
+    const productoId = producto.id_producto || producto.id || producto.idproducto;
+    const nombreProducto = producto.nombre;
+
+    if (esFavorito) {
+      // Quitar de favoritos
+      const result = await Swal.fire({
+        title: "¿Quitar de favoritos?",
+        html: `¿Estás seguro de quitar <strong>"${nombreProducto}"</strong> de favoritos?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, quitar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        reverseButtons: true,
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`http://localhost:4000/api/favoritos/${productoId}`, {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            setEsFavorito(false);
+            Swal.fire({
+              icon: "success",
+              title: "¡Quitado!",
+              text: "Producto quitado de favoritos correctamente.",
+              confirmButtonText: "Aceptar",
+              confirmButtonColor: "#D84040",
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          } else {
+            throw new Error("Error al quitar de favoritos");
+          }
+        } catch (error) {
+          console.error("Error al quitar de favoritos:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "No se pudo quitar el producto de favoritos.",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#D84040",
+          });
+        }
+      }
+    } else {
+      // Agregar a favoritos
+      try {
+        const productoFavorito = {
+          idproducto: productoId,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          descripcion: producto.descripcion || producto.descripcion_producto || producto.descripcion_text || "",
+          imagen: producto.producto_imagen?.[0]?.url || "",
+        };
+
+        const response = await fetch("http://localhost:4000/api/favoritos", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(productoFavorito),
+        });
+
+        if (response.ok) {
+          setEsFavorito(true);
+          Swal.fire({
+            icon: "success",
+            title: "¡Agregado!",
+            html: `"<strong>${nombreProducto}</strong>" fue agregado a favoritos.`,
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#D84040",
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Error al agregar a favoritos");
+        }
+      } catch (error) {
+        console.error("Error al agregar a favoritos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: `No se pudo agregar el producto a favoritos: ${error.message}`,
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#D84040",
+        });
+      }
+    }
   };
 
   const handleAgregarCarrito = async () => {
@@ -170,11 +317,6 @@ const DescripcionProducto = () => {
   const imagenes = producto?.producto_imagen || [];
   const imagenActual = imagenes[imagenSeleccionada];
 
-  const handleFavoritoClick = () => {
-    setEsFavorito(!esFavorito);
-    console.log("Producto marcado como favorito:", !esFavorito);
-  };
-
   const siguienteImagen = () => {
     if (imagenes.length > 1) {
       setImagenSeleccionada((prev) => (prev + 1) % imagenes.length);
@@ -264,11 +406,14 @@ const DescripcionProducto = () => {
 
         {/* ❤️ Corazón de favoritos */}
         <button 
-          className={`corazon-favorito ${esFavorito ? 'activo' : ''}`}
+          className={`corazon-favorito ${esFavorito ? 'activo' : ''} ${verificandoFavorito ? 'cargando' : ''}`}
           onClick={handleFavoritoClick}
           aria-label={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
+          disabled={verificandoFavorito}
+          title={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
         >
           <FaHeart />
+          {verificandoFavorito && <span className="cargando-favorito"></span>}
         </button>
 
         {/* 📦 Sección de Imágenes */}

@@ -667,20 +667,16 @@ router.put("/carrito/actualizar", async (req, res) => {
   }
 });
 
+// Aplica el middleware a TODAS las rutas de favoritos
+router.use("/favoritos", verificarToken);
+
 // ====================================================================
 // 📦 Obtener favoritos del usuario autenticado
 // ====================================================================
 router.get("/favoritos", async (req, res) => {
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(401).json({ message: "No autenticado" });
-    }
-
-    const decoded = jwt.verify(token, "clave_secreta_segura");
-    const cedula = decoded.id;
-
-    const { data, error } = await supabase
+    const cedula = req.usuario.id; 
+    const { data: favoritosData, error } = await supabase
       .from("favoritoproducto")
       .select(`
         idfavorito,
@@ -698,8 +694,37 @@ router.get("/favoritos", async (req, res) => {
 
     if (error) throw error;
 
-    // Igualamos el formato que devolvía tu PostgreSQL
-    const favoritos = data.map((f) => ({
+    // Si no hay favoritos, retornar array vacío
+    if (!favoritosData || favoritosData.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Extraemos los IDs de producto para obtener las imágenes
+    const productosIds = favoritosData
+      .map(f => f.producto?.idproducto)
+      .filter(id => id != null);
+
+    // Obtenemos las imágenes de todos los productos favoritos
+    const { data: imagenesData, error: errorImagenes } = await supabase
+      .from("producto_imagen")
+      .select("idproducto, url")
+      .in("idproducto", productosIds);
+
+    if (errorImagenes) throw errorImagenes;
+
+    // Creamos un mapa de imágenes por producto
+    const imagenesPorProducto = {};
+    if (imagenesData) {
+      imagenesData.forEach(img => {
+        if (!imagenesPorProducto[img.idproducto]) {
+          imagenesPorProducto[img.idproducto] = [];
+        }
+        imagenesPorProducto[img.idproducto].push(img.url);
+      });
+    }
+
+    // Construimos la respuesta final con el formato que espera el frontend
+    const favoritos = favoritosData.map((f) => ({
       idfavorito: f.idfavorito,
       fechaagregado: f.fechaagregado,
       idproducto: f.producto?.idproducto,
@@ -707,11 +732,13 @@ router.get("/favoritos", async (req, res) => {
       precio: f.producto?.precio,
       descripcion: f.producto?.descripcion,
       stock: f.producto?.stock,
+      imagenes: imagenesPorProducto[f.producto?.idproducto] || [], 
+      imagen: imagenesPorProducto[f.producto?.idproducto]?.[0] || null 
     }));
 
     res.status(200).json(favoritos);
   } catch (error) {
-    console.error("❌ Error al obtener favoritos del usuario autenticado:", error.message);
+    console.error("❌ Error al obtener favoritos:", error.message);
     res.status(500).json({ message: "Error al obtener favoritos" });
   }
 });
@@ -720,25 +747,14 @@ router.get("/favoritos", async (req, res) => {
 // ➕ Agregar producto a favoritos
 // ====================================================================
 router.post("/favoritos", async (req, res) => {
-  const { cedula, idproducto } = req.body;
+  const { idproducto } = req.body;
+  const cedula = req.usuario.id; 
 
-  if (!cedula || !idproducto) {
-    return res.status(400).json({ message: "Faltan datos obligatorios (cedula, idproducto)." });
+  if (!idproducto) {
+    return res.status(400).json({ message: "Falta el id del producto." });
   }
 
   try {
-    // Validar que el usuario exista
-    const { data: usuarioExiste, error: errorUsuario } = await supabase
-      .from("usuario")
-      .select("cedula")
-      .eq("cedula", cedula)
-      .maybeSingle();
-
-    if (errorUsuario) throw errorUsuario;
-    if (!usuarioExiste) {
-      return res.status(404).json({ message: `No existe un usuario con la cédula ${cedula}.` });
-    }
-
     // Validar que el producto exista
     const { data: productoExiste, error: errorProducto } = await supabase
       .from("producto")
@@ -764,12 +780,11 @@ router.post("/favoritos", async (req, res) => {
       return res.status(400).json({ message: "El producto ya está en favoritos." });
     }
 
-    // Insertar nuevo favorito
     const { data: insertado, error: insertError } = await supabase
       .from("favoritoproducto")
       .insert([
         {
-          fechaagregado: new Date().toISOString().split("T")[0],
+          fechaagregado: new Date().toISOString(),
           cedula,
           idproducto,
         },
@@ -792,8 +807,9 @@ router.post("/favoritos", async (req, res) => {
 // ====================================================================
 // ❌ Eliminar un producto de favoritos
 // ====================================================================
-router.delete("/favoritos/:cedula/:idproducto", async (req, res) => {
-  const { cedula, idproducto } = req.params;
+router.delete("/favoritos/:idproducto", async (req, res) => {
+  const { idproducto } = req.params;
+  const cedula = req.usuario.id; 
 
   try {
     const { data, error } = await supabase
@@ -814,8 +830,6 @@ router.delete("/favoritos/:cedula/:idproducto", async (req, res) => {
     res.status(500).json({ message: "Error al eliminar favorito" });
   }
 });
-
-
 
 // --------------------------------------------------------------------
 // 👤 PERFIL DE USUARIO AUTENTICADO

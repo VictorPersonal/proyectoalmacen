@@ -19,7 +19,7 @@
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  position: relative; /* Para el corazón */
+  position: relative; 
 }
 
 .producto-card:hover {
@@ -30,7 +30,7 @@
 /* Contenedor principal de la imagen - ALTURA FIJA */
 .imagen-container {
   width: 100%;
-  height: 140px; /* Reducida para ser consistente */
+  height: 140px; 
   background-color: #f0f0f0;
   border-radius: 8px;
   display: flex;
@@ -39,7 +39,7 @@
   margin-bottom: 12px;
   overflow: hidden;
   position: relative;
-  flex-shrink: 0; /* Evita que se encoja */
+  flex-shrink: 0; 
 }
 
 /* Imagen del producto - FORZAR MISMAS DIMENSIONES */
@@ -53,7 +53,7 @@
 /* Placeholder cuando no hay imagen - MISMAS DIMENSIONES */
 .imagen-placeholder {
   width: 100%;
-  height: 140px; /* Misma altura que el contenedor */
+  height: 140px; 
   background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
   border-radius: 8px;
   display: flex;
@@ -77,10 +77,10 @@
 .producto-info {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Cambiado de space-between */
+  justify-content: flex-start; 
   flex-grow: 1;
-  gap: 6px; /* Reducido un poco */
-  min-height: 80px; /* Altura mínima para info consistente */
+  gap: 6px; 
+  min-height: 80px; 
 }
 
 .producto-nombre {
@@ -94,7 +94,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 2.8em; /* Altura mínima consistente */
+  min-height: 2.8em; 
 }
 
 .precio {
@@ -102,7 +102,7 @@
   font-weight: 700;
   color: #2c5aa0;
   margin: 0;
-  margin-top: auto; /* Empuja el precio hacia abajo */
+  margin-top: auto; /
 }
 
 .btn-agregar {
@@ -175,12 +175,12 @@
   }
   
   .imagen-container {
-    height: 120px; /* Ajustada para móvil */
+    height: 120px; 
     margin-bottom: 10px;
   }
   
   .imagen-placeholder {
-    height: 120px; /* Misma altura en móvil */
+    height: 120px; 
   }
   
   .producto-nombre {
@@ -221,12 +221,12 @@
   }
   
   .imagen-container {
-    height: 100px; /* Ajustada para móvil pequeño */
+    height: 100px; 
     margin-bottom: 8px;
   }
   
   .imagen-placeholder {
-    height: 100px; /* Misma altura en móvil pequeño */
+    height: 100px;
   }
   
   .placeholder-icon {
@@ -251,3 +251,5 @@
     font-size: 18px;
   }
 }
+
+
