@@ -18,6 +18,8 @@ import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
 import DescripcionProducto from "./components/DescripcionProducto";
 import Promociones from "./pages/Promociones";
 
+
+
 function AppWrapper() {
   const location = useLocation();
   const state = location.state;

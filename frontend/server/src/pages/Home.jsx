@@ -669,11 +669,11 @@ const Home = () => {
       {/* FOOTER */}
       <footer id="footer">
         <div className="footer-links">
-          <a href="#">Preguntas frecuentes</a>
-          <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/ConsejodeSeguridad">Consejo de Seguridad</Link>
           <span>/</span>
           <Link to="/terminosycondiciones">Términos y Condiciones</Link>
+          <span>/</span>
+          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
         </div>
 
         <div className="footer-copyright">
