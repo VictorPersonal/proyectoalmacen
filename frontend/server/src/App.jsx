@@ -20,6 +20,7 @@ import Promociones from "./pages/Promociones";
 
 
 
+
 function AppWrapper() {
   const location = useLocation();
   const state = location.state;
@@ -38,7 +39,7 @@ function AppWrapper() {
         <Route path="/reset-password/:token" element={<RestablecerContrasena />} />
         <Route path="/checkout/forma-entrega" element={<FormaEntrega />} />
         <Route path="/checkout/forma-entrega/pago" element={<Pago />} />
-        <Route path="/terminosycondiciones" element={<TerminosYCondiciones />} />
+        <Route path="/terminos-y-condiciones" element={<TerminosYCondiciones />} />
         <Route path="/checkout/forma-entrega/pago/exitoso" element={<PagoExitoso />} />
         <Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />
         <Route path="/categorias" element={<Categorias />} />

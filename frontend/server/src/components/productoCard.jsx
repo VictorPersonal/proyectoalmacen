@@ -100,10 +100,10 @@ const ProductoCard = ({ producto }) => {
   const primeraImagen = producto.producto_imagen?.[0]?.url || null;
 
   return (
-    <div className="producto-card">
+    <div className="card">
       {/* ❤️ Corazón de favoritos */}
       <button 
-        className={`corazon-favorito-card ${cargando ? 'cargando' : ''}`}
+        className={`card-corazon-favorito ${cargando ? 'cargando' : ''}`}
         onClick={handleFavoritoClick}
         disabled={cargando}
         title="Agregar a favoritos"
@@ -115,30 +115,32 @@ const ProductoCard = ({ producto }) => {
 
       {/* Imagen del producto */}
       {primeraImagen ? (
-        <div className="imagen-container">
+        <div className="card-imagen-container">
           <img 
             src={primeraImagen} 
             alt={producto.nombre} 
-            className="producto-imagen"
+            className="card-imagen"
             onError={(e) => {
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div className="imagen-placeholder" style={{display: 'none'}}>
-            Sin imagen
+          <div className="card-imagen-placeholder" style={{display: 'none'}}>
+            <div className="card-placeholder-icon">📷</div>
+            <div className="card-placeholder-text">Sin imagen</div>
           </div>
         </div>
       ) : (
-        <div className="imagen-placeholder">
-          Sin imagen
+        <div className="card-imagen-placeholder">
+          <div className="card-placeholder-icon">📷</div>
+          <div className="card-placeholder-text">Sin imagen</div>
         </div>
       )}
       
       {/* Información del producto */}
-      <div className="producto-info">
-        <h3 className="producto-nombre">{producto.nombre}</h3>
-        <p className="precio"> ${Number(producto.precio).toFixed(2)}</p>
+      <div className="card-info">
+        <h3 className="card-nombre">{producto.nombre}</h3>
+        <p className="card-precio">${Number(producto.precio).toFixed(2)}</p>
       </div>
     </div>
   );

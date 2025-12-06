@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import "./ModificarDireccion.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Swal from 'sweetalert2';
 import logo from "../../assets/Logo dulce hogar.png";
 import { 
@@ -587,14 +587,14 @@ const ModificarDireccion = () => {
       {/* Footer */}
       <footer className="direccion-footer">
         <div className="direccion-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
         </div>
         <div className="direccion-footer-copyright">
-          © 2025 FHO, todos los derechos reservados
+          © 2025 FDO, todos los derechos reservados
         </div>
       </footer>
     </div>

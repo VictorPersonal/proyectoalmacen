@@ -37,7 +37,7 @@
 .imagen-cuadro {
   width: 100%;
   height: 380px;
-  background-color: #f8f8f8;
+  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
   border-radius: 15px;
   display: flex;
   justify-content: center;
@@ -47,6 +47,11 @@
   font-style: italic;
   overflow: hidden;
   position: relative;
+  /* Borde sutil con sombra interna */
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .imagen-cuadro img {
@@ -88,40 +93,69 @@
 .botones-compra {
   display: flex;
   gap: 15px;
-  margin-top: 20px;
 }
 
-/* Estilos para la navegación de imágenes */
 .flecha-navegacion {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  font-size: 20px;
-  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   z-index: 10;
+  color: #333;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  padding: 0;
 }
 
 .flecha-navegacion:hover {
   background: rgba(255, 255, 255, 1);
-  transform: translateY(-50%) scale(1.1);
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  color: #000;
+}
+
+.flecha-navegacion svg {
+  font-size: 24px !important; /* Tamaño visible con !important */
+  width: 24px !important;
+  height: 24px !important;
+  display: block !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+  color: inherit !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
 .flecha-izquierda {
-  left: 15px;
+  left: 10px;
 }
 
 .flecha-derecha {
-  right: 15px;
+  right: 10px;
+}
+
+/* Contador de imágenes */
+.contador-imagenes {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  font-weight: 500;
 }
 
 /* Contador de imágenes */
@@ -159,10 +193,8 @@
   transition: background-color 0.3s;
   font-size: 16px;
   font-weight: bold;
-  display: inline-block; /* Cambiado de flex a inline-block */
   white-space: nowrap;
-  /* Tamaño específico para este botón */
-  width: auto; /* Ancho automático según el contenido */
+  margin-top: 7px;
 }
 
 .btn-comprar:hover {
@@ -375,7 +407,6 @@
 @media all and (-webkit-min-device-pixel-ratio:0) {
   .contador-imagenes,
   .producto-cantidad select,
-  .flecha-navegacion,
   .btn-volver {
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import logo from "../../assets/Logo dulce hogar.png";
 import "./FormaEntrega.css";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const FormaEntrega = () => {
@@ -15,33 +15,27 @@ const FormaEntrega = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const ejecutadoRef = useRef(false); // 👈 Nueva referencia para prevenir doble ejecución
+  const ejecutadoRef = useRef(false);
 
-  // Obtener datos del usuario y productos según el tipo de compra
   useEffect(() => {
     const cargarDatos = async () => {
-      // 👈 Prevenir doble ejecución
       if (ejecutadoRef.current) {
         console.log("⏭️ Carga de datos ya ejecutada");
         return;
       }
 
       try {
-        ejecutadoRef.current = true; // 👈 Marcar como ejecutado
+        ejecutadoRef.current = true;
         setLoading(true);
 
-        // VERIFICAR TIPO DE COMPRA
         const compraState = location.state;
         console.log("🔄 Estado de la compra (solo una vez):", compraState);
 
         if (compraState?.compraTipo === "directa") {
-          // 🛒 COMPRA DIRECTA - Usar solo el producto de compra directa
           console.log("🛒 Modo: COMPRA DIRECTA (solo una vez)");
           setTipoCompra("directa");
 
           const compraDirecta = compraState.compraData;
-
-          // Asegurarnos de que cada producto tenga subtotal
           const productosConSubtotal = compraDirecta.productos.map(
             (producto) => ({
               ...producto,
@@ -51,21 +45,10 @@ const FormaEntrega = () => {
 
           setProductos(productosConSubtotal);
           setSubtotal(compraDirecta.total);
-
-          console.log(
-            "✅ Productos compra directa (solo una vez):",
-            productosConSubtotal
-          );
-          console.log(
-            "✅ Total compra directa (solo una vez):",
-            compraDirecta.total
-          );
         } else {
-          // 🛒 COMPRA DESDE CARRITO - Cargar todos los productos del carrito
           console.log("🛒 Modo: CARRITO NORMAL (solo una vez)");
           setTipoCompra("carrito");
 
-          // Obtener TODOS los productos del carrito
           const respuestaCarrito = await fetch(
             "http://localhost:4000/api/carrito",
             {
@@ -75,10 +58,7 @@ const FormaEntrega = () => {
 
           if (respuestaCarrito.ok) {
             const carrito = await respuestaCarrito.json();
-            console.log(
-              "✅ Carrito completo obtenido (solo una vez):",
-              carrito
-            );
+            console.log("✅ Carrito completo obtenido (solo una vez):", carrito);
 
             if (carrito.length > 0) {
               const productosProcesados = await Promise.all(
@@ -157,7 +137,6 @@ const FormaEntrega = () => {
           }
         }
 
-        // Obtener perfil del usuario (dirección) - Esto se hace en ambos casos
         const respuestaUsuario = await fetch(
           "http://localhost:4000/api/usuario/perfil",
           {
@@ -178,12 +157,10 @@ const FormaEntrega = () => {
               direccionCompleta += `, ${datosUsuario.ciudad}`;
           }
 
-          // 🔑 Guardar ID de la dirección
           idDireccionUsuario = datosUsuario.iddireccion;
         }
 
         setDireccionUsuario(direccionCompleta);
-        // 🔑 Guardamos el ID de la dirección en el estado para usarlo luego
         setIdDireccion(idDireccionUsuario);
       } catch (error) {
         console.error("❌ Error al cargar datos:", error);
@@ -210,7 +187,6 @@ const FormaEntrega = () => {
       total,
     });
 
-    // Mostrar confirmación antes de continuar
     Swal.fire({
       title: "¿Confirmar dirección de entrega?",
       html: `
@@ -254,7 +230,6 @@ const FormaEntrega = () => {
       reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        // Navegar a la página de pago con el tipo de compra
         navigate("/checkout/forma-entrega/pago", {
           state: {
             tipoCompra: tipoCompra,
@@ -269,13 +244,11 @@ const FormaEntrega = () => {
     });
   };
 
-  // Función para manejar la navegación a modificar dirección
   const handleModificarDireccion = (e) => {
     e.preventDefault();
     navigate("/modificar-direccion");
   };
 
-  // 🔙 Volver a la pantalla anterior (DescripciónProducto o carrito)
   const handleVolverProducto = () => {
     navigate(-1);
   };
@@ -346,13 +319,14 @@ const FormaEntrega = () => {
           </div>
         </div>
 
+        {/* FOOTER ACTUALIZADO */}
         <footer className="entrega-footer">
           <div className="entrega-footer-links">
-            <a href="#">Preguntas frecuentes</a>
+            <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
             <span>/</span>
-            <a href="#">Consejos de seguridad</a>
+            <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
             <span>/</span>
-            <a href="#">Términos</a>
+            <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
           </div>
           <div className="entrega-footer-copyright">
             © 2025 FHO, todos los derechos reservados
@@ -377,7 +351,6 @@ const FormaEntrega = () => {
         <div className="entrega-help-icon">?</div>
       </header>
 
-      {/* 🔙 Botón para volver al producto / pantalla anterior */}
       <div className="entrega-back-wrapper">
         <button className="entrega-btn-volver" onClick={handleVolverProducto}>
           ← 
@@ -425,7 +398,6 @@ const FormaEntrega = () => {
           <div className="entrega-resumen-compra">
             <h3>Resumen de compra</h3>
 
-            {/* Mostrar todos los productos con validación segura */}
             {productos.map((producto, index) => (
               <div key={index} className="entrega-resumen-item">
                 <span>
@@ -465,16 +437,17 @@ const FormaEntrega = () => {
         </div>
       </div>
 
+      {/* FOOTER ACTUALIZADO */}
       <footer className="entrega-footer">
         <div className="entrega-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
         </div>
         <div className="entrega-footer-copyright">
-          © 2025 FHO, todos los derechos reservados
+          © 2025 FDO, todos los derechos reservados
         </div>
       </footer>
     </div>

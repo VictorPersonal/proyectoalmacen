@@ -10,11 +10,12 @@ import {
 } from "react-icons/fa";
 import logo from "../../assets/Logo dulce hogar.png";
 import "./Pago.css";
+import { Link } from "react-router-dom";
 
 const Pago = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const ejecutadoRef = useRef(false); // 👈 Nueva referencia
+  const ejecutadoRef = useRef(false); 
 
   const {
     tipoCompra = "carrito",
@@ -172,14 +173,14 @@ const Pago = () => {
       {/* FOOTER */}
       <footer className="pago-footer">
         <div className="pago-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
         </div>
         <p className="pago-footer-copyright">
-          © 2025 FHO, todos los derechos reservados
+          © 2025 FDO, todos los derechos reservados
         </p>
       </footer>
     </div>

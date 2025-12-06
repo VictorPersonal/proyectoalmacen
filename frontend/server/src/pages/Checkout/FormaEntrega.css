@@ -38,7 +38,7 @@
   background-color: #fff;
   transition: all 0.2s ease;
   cursor: pointer;
-  min-height: 140px; /* ALTURA MÍNIMA FIJA */
+  min-height: 140px; 
   display: flex;
   min-width: 300px;
   flex-direction: column;
@@ -82,7 +82,7 @@
 
 /* CONTENEDOR DE DIRECCIÓN CON ALTURA FIJA */
 .entrega-direccion-container {
-  min-height: 50px; /* ALTURA MÍNIMA PARA LA DIRECCIÓN */
+  min-height: 50px; 
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -114,7 +114,7 @@
   text-decoration: none;
   font-size: 13px;
   display: inline-block;
-  margin-top: auto; /* EMPUJA HACIA ABAJO */
+  margin-top: auto; 
 }
 
 .entrega-modificar:hover {
@@ -150,13 +150,13 @@
 
 /* ===== LADO DERECHO (RESUMEN COMPRA - MÁS PEQUEÑO) ===== */
 .entrega-right {
-  flex: 0 0 280px; /* Más pequeño */
+  flex: 0 0 280px; 
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   position: sticky;
-  top: 80px; /* Posicionado más arriba */
+  top: 80px; 
   height: fit-content;
 }
 
@@ -222,7 +222,7 @@
   }
   
   .entrega-opcion {
-    min-height: 130px; /* ALTURA MÍNIMA MÓVIL */
+    min-height: 130px; 
   }
 }
 
@@ -235,23 +235,24 @@
 }
 
 .entrega-top-bar {
-  background-color: #b8b4b1;
-  padding: 20px 30px;
+  background-color: #c8c4c1; 
+  padding: 10px 20px; 
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  min-height: 120px; 
 }
 
 .entrega-logo-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px; 
 }
 
 .entrega-logo-img {
-  width: 80px;
-  height: auto;
+  width: 90px; 
+  height: 70px; 
 }
 
 .entrega-logo-text {
@@ -260,15 +261,16 @@
 }
 
 .entrega-logo-title {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
   color: #000;
 }
 
 .entrega-logo-subtitle {
-  font-size: 7px;
+  font-size: 10px; 
   letter-spacing: 0.5px;
   color: #000;
+  margin-top: 4px; 
 }
 
 .entrega-help-icon {
@@ -287,25 +289,27 @@
 
 .entrega-footer {
   background-color: #b8b4b1;
-  padding: 15px 30px;
+  padding: 15px 50px; 
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
+  font-size: 13px; 
   color: #333;
   width: 100%;
   margin-top: auto;
+  height: 60px; 
 }
 
 .entrega-footer-links {
   display: flex;
-  gap: 10px;
+  gap: 12px; 
   align-items: center;
 }
 
 .entrega-footer-links a {
   text-decoration: none;
   color: #333;
+  font-size: 13px; 
 }
 
 .entrega-footer-links a:hover {
@@ -314,6 +318,7 @@
 
 .entrega-footer-copyright {
   color: #333;
+  font-size: 13px; 
 }
 
 /* ===== RADIO BUTTONS ===== */
@@ -333,24 +338,47 @@
 /* ===== RESPONSIVE HEADER/FOOTER ===== */
 @media (max-width: 768px) {
   .entrega-top-bar {
-    padding: 15px 20px;
+    padding: 10px 20px; 
+    min-height: 100px; 
   }
   
   .entrega-footer {
     flex-direction: column;
     gap: 8px;
     text-align: center;
-    padding: 12px 20px;
+    padding: 15px 20px; 
+    height: auto; 
   }
   
   .entrega-logo-img {
-    width: 60px;
+    width: 80px; 
+    height: 60px; 
   }
   
   .entrega-logo-title {
-    font-size: 16px;
+    font-size: 20px; 
+  }
+  
+  .entrega-logo-subtitle {
+    font-size: 9px; 
   }
 }
+
+@media (max-width: 480px) {
+  .entrega-logo-title {
+    font-size: 18px; 
+  }
+  
+  .entrega-logo-subtitle {
+    font-size: 8px; 
+  }
+  
+  .entrega-footer {
+    gap: 10px;
+    padding: 15px 20px;
+  }
+}
+
 .entrega-back-wrapper {
   max-width: 900px;
   margin: 10px auto 0;
@@ -358,7 +386,7 @@
 
 .entrega-btn-volver {
   position: absolute;
-  top: 150;/* Ajusta si lo quieres más arriba o abajo */
+  top: 150px; /* Ajusta si lo quieres más arriba o abajo */
   left: 35px; /* Pegado al lado izquierdo como en tu captura */
   background: none;
   border: none;
@@ -372,4 +400,3 @@
 .entrega-btn-volver:hover {
   color: #000;
 }
-

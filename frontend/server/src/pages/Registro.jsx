@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Registro.css";
 import logo from "../assets/Logo dulce hogar.png";
 import Swal from "sweetalert2";
@@ -219,7 +219,7 @@ function Registro() {
   };
 
   return (
-    <>
+    <div className="registro-page-wrapper">
       <header className="registro-top-bar">
         <div className="registro-logo-section">
           <img src={logo} alt="Dulce hogar logo" className="registro-logo-img" />
@@ -345,17 +345,20 @@ function Registro() {
         </div>
       </main>
 
+      {/* Footer */}
       <footer className="registro-footer">
         <div className="registro-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/Consejo-de-Seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
         </div>
-        <div className="registro-footer-copy">© 2025 FHO, todos los derechos reservados</div>
+        <div className="registro-footer-copyright">
+          © 2025 FDO, todos los derechos reservados
+        </div>
       </footer>
-    </>
+    </div>
   );
 }
 
