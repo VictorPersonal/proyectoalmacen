@@ -1,11 +1,11 @@
-.productos-container {
+.card-container {
   display: flex;              
   flex-wrap: wrap;             
   justify-content: center;     
   gap: 15px;
 }                  
 
-.producto-card {
+.card {
   width: 180px;
   height: 260px;
   background-color: #ffffff;
@@ -20,19 +20,22 @@
   justify-content: space-between;
   overflow: hidden;
   position: relative; 
+  /* Mejora del marco de la tarjeta */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.producto-card:hover {
+.card:hover {
   transform: scale(1.03);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
 }
 
-/* Contenedor principal de la imagen - ALTURA FIJA */
-.imagen-container {
+/* Contenedor principal de la imagen - MEJORADO */
+.card-imagen-container {
   width: 100%;
   height: 140px; 
-  background-color: #f0f0f0;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,41 +43,57 @@
   overflow: hidden;
   position: relative;
   flex-shrink: 0; 
+  /* Borde sutil con sombra interna - igual que imagen-cuadro */
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Imagen del producto - FORZAR MISMAS DIMENSIONES */
-.producto-imagen {
+/* Imagen del producto - FORZAR MISMAS DIMENSIONES MEJORADO */
+.card-imagen {
   width: 100%;
   height: 100%;
   object-fit: contain;
   object-position: center;
+  /* Padding para que la imagen respire - igual que imagen-cuadro */
+  padding: 10px;
+  background: #fafafa;
 }
 
-/* Placeholder cuando no hay imagen - MISMAS DIMENSIONES */
-.imagen-placeholder {
+/* Placeholder cuando no hay imagen - MEJORADO */
+.card-imagen-placeholder {
   width: 100%;
   height: 140px; 
-  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: #777;
   font-size: 11px;
+  font-style: italic;
   flex-shrink: 0;
+  /* Borde y sombra igual que imagen-container */
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
-.placeholder-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
+.card-placeholder-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+  color: #888;
 }
 
-.placeholder-text {
+.card-placeholder-text {
   font-size: 10px;
+  color: #666;
 }
 
-.producto-info {
+.card-info {
   display: flex;
   flex-direction: column;
   justify-content: flex-start; 
@@ -83,7 +102,7 @@
   min-height: 80px; 
 }
 
-.producto-nombre {
+.card-nombre {
   font-size: 14px;
   font-weight: 600;
   color: #2c2c2c;
@@ -97,159 +116,227 @@
   min-height: 2.8em; 
 }
 
-.precio {
+.card-precio {
   font-size: 15px;
   font-weight: 700;
   color: #2c5aa0;
   margin: 0;
-  margin-top: auto; /
+  margin-top: auto;
 }
 
-.btn-agregar {
-  background-color: #007bff;
+.card-btn-agregar {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
   color: #fff;
   border: none;
   padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
   font-size: 12px;
+  font-weight: 600;
   margin-top: 8px;
+  box-shadow: 0 2px 6px rgba(78, 205, 196, 0.3);
 }
 
-.btn-agregar:hover {
-  background-color: #0056b3;
+.card-btn-agregar:hover {
+  background: linear-gradient(135deg, #44a08d 0%, #3a8c7a 100%);
+  box-shadow: 0 4px 10px rgba(78, 205, 196, 0.4);
 }
 
 /* Información adicional opcional */
-.stock-info {
+.card-stock-info {
   font-size: 10px;
   color: #666;
   margin: 0;
   margin-top: 2px;
 }
 
-/* ❤️ Estilos para el corazón de favoritos en las tarjetas */
-.corazon-favorito-card {
+/* ❤️ Estilos para el corazón de favoritos en las tarjetas - CORREGIDO */
+.card-corazon-favorito {
   position: absolute;
   top: 10px;
   right: 10px;
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
   z-index: 10;
   padding: 4px;
+  margin: 0;
+  /* Prevenir desplazamientos */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: color;
+  /* Asegurar dimensiones constantes */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.corazon-favorito-card:hover {
-  transform: scale(1.2);
+/* Eliminar transformaciones en clic que causan movimiento */
+.card-corazon-favorito:active {
+  transform: translateZ(0) scale(0.95); /* Efecto controlado sin movimiento */
 }
 
-.corazon-favorito-card svg {
+.card-corazon-favorito:focus {
+  outline: none;
+}
+
+.card-corazon-favorito svg {
   font-size: 24px;
   color: #ccc;
-  transition: all 0.3s ease;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  /* Dimensiones fijas */
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  /* Solo transición para propiedades que no afectan layout */
+  transition: color 0.2s ease, filter 0.2s ease;
 }
 
-.corazon-favorito-card.activo svg {
+.card-corazon-favorito.activo svg {
   color: #ff4757;
   filter: drop-shadow(0 1px 3px rgba(255, 71, 87, 0.3));
 }
 
-.corazon-favorito-card:hover svg {
+.card-corazon-favorito:hover svg {
   color: #ff4757;
+  transform: none; /* Evitar transform en hover */
+}
+
+/* Spinner para carga */
+.card-corazon-favorito.cargando {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.spinner-mini {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-left: 5px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .productos-container {
+  .card-container {
     gap: 12px;
   }
   
-  .producto-card {
+  .card {
     width: 160px;
     height: 220px;
     padding: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
   }
   
-  .imagen-container {
+  .card-imagen-container {
     height: 120px; 
     margin-bottom: 10px;
+    border-radius: 8px;
   }
   
-  .imagen-placeholder {
+  .card-imagen-placeholder {
     height: 120px; 
+    border-radius: 8px;
   }
   
-  .producto-nombre {
+  .card-imagen {
+    padding: 8px;
+  }
+  
+  .card-nombre {
     font-size: 12px;
     min-height: 2.6em;
   }
   
-  .precio {
+  .card-precio {
     font-size: 14px;
   }
   
-  .btn-agregar {
+  .card-btn-agregar {
     padding: 5px 8px;
     font-size: 11px;
     margin-top: 6px;
+    border-radius: 7px;
   }
   
-  .corazon-favorito-card {
+  .card-corazon-favorito {
     top: 8px;
     right: 8px;
-    padding: 3px;
+    width: 28px;
+    height: 28px;
   }
   
-  .corazon-favorito-card svg {
+  .card-corazon-favorito svg {
     font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }
 
 @media (max-width: 480px) {
-  .productos-container {
+  .card-container {
     gap: 10px;
   }
   
-  .producto-card {
+  .card {
     width: 145px;
     height: 200px;
     padding: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   }
   
-  .imagen-container {
+  .card-imagen-container {
     height: 100px; 
     margin-bottom: 8px;
+    border-radius: 7px;
   }
   
-  .imagen-placeholder {
+  .card-imagen-placeholder {
     height: 100px;
+    border-radius: 7px;
   }
   
-  .placeholder-icon {
-    font-size: 18px;
+  .card-imagen {
+    padding: 6px;
   }
   
-  .producto-info {
+  .card-placeholder-icon {
+    font-size: 20px;
+  }
+  
+  .card-info {
     gap: 4px;
     min-height: 70px;
   }
   
-  .producto-nombre {
+  .card-nombre {
     min-height: 2.4em;
   }
   
-  .corazon-favorito-card {
-    top: 6px;
-    right: 6px;
+  .card-btn-agregar {
+    border-radius: 6px;
   }
   
-  .corazon-favorito-card svg {
+  .card-corazon-favorito {
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+  }
+  
+  .card-corazon-favorito svg {
     font-size: 18px;
+    width: 18px;
+    height: 18px;
   }
 }
-
-

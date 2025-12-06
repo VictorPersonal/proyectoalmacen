@@ -372,7 +372,7 @@ const Carrito = ({ abierto, onCerrar }) => {
                 </div>
                 
                 <div className="carrito-shipping-info">
-                  <small>Envío gratuito en compras mayores a $50</small>
+                  <small>Envío gratuito en compras mayores a $50.000</small>
                 </div>
               </div>
               

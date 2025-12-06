@@ -236,17 +236,23 @@ const Home = () => {
       setMensajeCategoria("");
       return;
     }
-
     setCargando(true);
+    
+    const minLoadingTime = new Promise(resolve => setTimeout(resolve, 2000));
+    
     try {
-      const res = await fetch(
-        `http://localhost:4000/api/productos?search=${encodeURIComponent(
-          query
-        )}&soloActivos=true`
-      );
-      if (!res.ok) throw new Error("Error en la búsqueda");
+      const [_, response] = await Promise.all([
+        minLoadingTime,
+        fetch(
+          `http://localhost:4000/api/productos?search=${encodeURIComponent(
+            query
+          )}&soloActivos=true`
+        )
+      ]);
+      
+      if (!response.ok) throw new Error("Error en la búsqueda");
 
-      const data = await res.json();
+      const data = await response.json();
       const productosRecibidos = Array.isArray(data) ? data : [];
       
       // Aplicar filtro adicional en frontend
@@ -299,18 +305,23 @@ const Home = () => {
   // FUNCIÓN NUEVA PARA CARGAR PRODUCTOS POR CATEGORÍA
   const cargarProductosPorCategoria = async (idCategoria) => {
     setCategoriaSeleccionada(idCategoria);   
+    
     setCargando(true);
+    
+    const minLoadingTime = new Promise(resolve => setTimeout(resolve, 2000));
+    
     setBusqueda("");
     setMensajeCategoria("");
 
     try {
-      const res = await fetch(
-        `http://localhost:4000/api/categorias/${idCategoria}/productos`
-      );
+      const [_, response] = await Promise.all([
+        minLoadingTime,
+        fetch(`http://localhost:4000/api/categorias/${idCategoria}/productos`)
+      ]);
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (res.status === 404 || data.message === "No hay productos en esta categoría") {
+      if (response.status === 404 || data.message === "No hay productos en esta categoría") {
         setProductos([]);
         setProductosFiltrados([]);
         setMensajeCategoria("No se encontraron productos para esta categoría.");
@@ -533,7 +544,7 @@ const Home = () => {
       {/* CONTENIDO ACTUALIZADO */}
       {mostrarCarrusel ? (
         <main id="main">
-          {/* ✅ CARRUSEL ACTUALIZADO CON NUEVA TRANSICIÓN */}
+          {/* ✅ CARRUSEL ACTUALIZADO CON NUEVA TRANSICIÓN (SIN INDICADORES) */}
           <section className="hero-section" id="hero-section">
             <button className="carousel-btn prev" onClick={prevSlide}>
               <FaChevronLeft />
@@ -551,17 +562,6 @@ const Home = () => {
                     } ${
                       index === (currentIndex === 0 ? images.length - 1 : currentIndex - 1) ? 'previous' : ''
                     }`}
-                  />
-                ))}
-              </div>
-              
-              {/* Indicadores de slide */}
-              <div className="carousel-indicators">
-                {images.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`indicator ${index === currentIndex ? 'active' : ''}`}
-                    onClick={() => setCurrentIndex(index)}
                   />
                 ))}
               </div>
@@ -645,7 +645,11 @@ const Home = () => {
 
           {/*Mostrar los productos*/}    
           {cargando ? (
-            <p className="loading">Cargando productos...</p>
+            <div className="spinner-container">
+              <div className="spinner"></div>
+              <p className="loading-text">Cargando productos...</p>
+              <p className="loading-subtext">Por favor espera, esto puede tomar unos segundos</p>
+            </div>
           ) : productosFiltrados.length > 0 ? (
             <div className="productos-grid">  
               {productosFiltrados.map((prod) => (
@@ -669,15 +673,15 @@ const Home = () => {
       {/* FOOTER */}
       <footer id="footer">
         <div className="footer-links">
-          <Link to="/ConsejodeSeguridad">Consejo de Seguridad</Link>
+          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <Link to="/terminosycondiciones">Términos y Condiciones</Link>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
           <span>/</span>
           <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
         </div>
 
         <div className="footer-copyright">
-          © 2025 FHO, todos los derechos reservados
+          © 2025 FDO, todos los derechos reservados
         </div>
       </footer>
     </div>

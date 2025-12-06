@@ -5,12 +5,21 @@
   box-sizing: border-box;
 }
 
+html, body, #root, .recuperar-page-wrapper {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #c8c4c1;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 /* ===== Estructura general ===== */
@@ -23,22 +32,26 @@ body {
 
 /* ===== Header ===== */
 .recuperar-top-bar {
-  background-color: #b8b4b1;
-  padding: 30px 30px;
+  background-color: #c8c4c1; 
+  padding: 10px 20px;
+  width: 100%;
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 120px;
 }
 
 .recuperar-logo-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* LOGO */
 .recuperar-logo-img {
-  width: 80px;
-  height: auto;
+  width: 90px;
+  height: 70px; 
 }
 
 .recuperar-logo-text {
@@ -46,16 +59,19 @@ body {
   flex-direction: column;
 }
 
+/* TÍTULO */
 .recuperar-logo-title {
-  font-size: 18px;
+  font-size: 24px; 
   font-weight: bold;
   color: #000;
 }
 
+/* SUBTÍTULO */
 .recuperar-logo-subtitle {
-  font-size: 7px;
-  letter-spacing: 0.5px;
+  font-size: 10px;
+  letter-spacing: 0.5px; 
   color: #000;
+  margin-top: 4px; 
 }
 
 .recuperar-help-icon {
@@ -74,13 +90,16 @@ body {
 
 /* ===== Contenedor principal ===== */
 .recuperar-container {
-  all: unset;
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
+  flex-direction: column;
+  background-color: #edeae8; 
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: calc(100vh - 60px - 140px); 
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
-  background-color: #c8c4c1;
 }
 
 /* ===== Caja principal ===== */
@@ -211,26 +230,32 @@ body {
   text-decoration: underline;
 }
 
-/* ===== Footer ===== */
+/* ========== FOOTER ========== */
 .recuperar-footer {
   background-color: #b8b4b1;
-  padding: 20px 30px;
+  padding: 15px 50px; 
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 9px;
+  font-size: 13px; 
   color: #333;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: auto;
+  height: 60px; 
+  position: relative;
 }
 
 .recuperar-footer-links {
   display: flex;
-  gap: 8px;
+  gap: 12px; 
   align-items: center;
 }
 
 .recuperar-footer-links a {
   text-decoration: none;
   color: #333;
+  font-size: 13px; 
 }
 
 .recuperar-footer-links a:hover {
@@ -243,6 +268,7 @@ body {
 
 .recuperar-footer-copyright {
   color: #333;
+  font-size: 13px; 
 }
 
 /* ===== Responsive ===== */
@@ -261,9 +287,37 @@ body {
     flex-direction: column;
     gap: 8px;
     text-align: center;
+    padding: 15px 20px; 
+    height: auto; 
   }
 
   .recuperar-top-bar {
-    padding: 10px 20px;
+    padding: 10px 20px; 
+  }
+}
+
+@media (max-width: 480px) {
+  .recuperar-form-box {
+    padding: 25px 30px;
+    max-width: 100%;
+  }
+
+  .recuperar-form-title {
+    font-size: 16px;
+  }
+
+  .recuperar-logo-title {
+    font-size: 20px; 
+  }
+  
+  .recuperar-logo-subtitle {
+    font-size: 9px; 
+  }
+
+  .recuperar-footer {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px 20px;
+    height: auto;
   }
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./ActualizarDatos.css";
 import logo from "../assets/Logo dulce hogar.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
 function ActualizarPerfil() {
@@ -361,13 +361,15 @@ function ActualizarPerfil() {
 
       <footer className="actualizar-footer">
         <div className="actualizar-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
         </div>
-        <div className="actualizar-footer-copy">© 2025 FHO, todos los derechos reservados</div>
+        <div className="actualizar-footer-copyright">
+          © 2025 FHO, todos los derechos reservados
+        </div>
       </footer>
     </>
   );

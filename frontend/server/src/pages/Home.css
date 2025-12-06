@@ -201,7 +201,7 @@ header {
   color: #D84040;
 }
 
-/* MENÚ DESPLEGABLE DE CATEGORÍAS - ESTILO MERCADO LIBRE */
+/* MENÚ DESPLEGABLE DE CATEGORÍAS */
 .categorias-menu {
   position: relative;
   display: flex;
@@ -281,7 +281,7 @@ header {
   background-color: #f8f8f8;
 }
 
-/* SUBMENÚS - ESTILO MERCADO LIBRE */
+/* SUBMENÚS */
 .categoria-item.con-submenu {
   display: flex;
   justify-content: space-between;
@@ -450,7 +450,7 @@ main {
   width: 100%;
   margin: 0;
   padding: 0;
-  min-height: calc(100vh - 60px - 140px); /* Ajusta según tu header */
+  min-height: calc(100vh - 60px - 140px);
 }
 
 /* ========== CARRUSEL MEJORADO CON TRANSICIÓN SUAVE ========== */
@@ -584,35 +584,6 @@ main {
   color: #333;
 }
 
-/* INDICADORES DEL CARRUSEL */
-.carousel-indicators {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  z-index: 10;
-}
-
-.indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.indicator.active {
-  background: white;
-  transform: scale(1.2);
-}
-
-.indicator:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
 
 /* --- RESULTADOS DE BÚSQUEDA --- */
 .resultados {
@@ -925,4 +896,45 @@ footer {
     gap: 10px;
     height: auto;
   }
+}
+
+/* Versión sin overlay - dentro del flujo normal pero bien centrado */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh; /* Ocupa el 70% de la altura de la ventana */
+  width: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.loading-subtext {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.4;
+  max-width: 300px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
