@@ -117,19 +117,19 @@ function ActualizarPerfil() {
     }
 
 
-    // Validar que nombre solo tenga letras
+
     if (!/^[A-Za-z]+$/.test(nombre.trim())) {
       mostrarError("El nombre solo puede contener letras (A-Z)");
       return;
     }
 
-    // Validar que apellido solo tenga letras
+
     if (!/^[A-Za-z]+$/.test(apellido.trim())) {
       mostrarError("El apellido solo puede contener letras (A-Z)");
       return;
     }
 
-    // Validar que ciudad solo tenga letras
+
     if (!/^[A-Za-z]+$/.test(ciudad.trim())) {
       mostrarError("La ciudad solo puede contener letras (A-Z)");
       return;
