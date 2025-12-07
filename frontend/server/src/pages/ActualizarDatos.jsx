@@ -103,15 +103,49 @@ function ActualizarPerfil() {
     cargarPerfil();
   }, [navigate]);
 
+
   // 🔹 Enviar datos actualizados al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+///----VALIDACIONES ----///
+
     // Validar campos obligatorios
     if (!nombre.trim() || !apellido.trim() || !direccion.trim() || !ciudad.trim()) {
       mostrarError("Por favor, completa todos los campos obligatorios");
       return;
     }
+
+
+    // Validar que nombre solo tenga letras
+    if (!/^[A-Za-z]+$/.test(nombre.trim())) {
+      mostrarError("El nombre solo puede contener letras (A-Z)");
+      return;
+    }
+
+    // Validar que apellido solo tenga letras
+    if (!/^[A-Za-z]+$/.test(apellido.trim())) {
+      mostrarError("El apellido solo puede contener letras (A-Z)");
+      return;
+    }
+
+    // Validar que ciudad solo tenga letras
+    if (!/^[A-Za-z]+$/.test(ciudad.trim())) {
+      mostrarError("La ciudad solo puede contener letras (A-Z)");
+      return;
+    }
+
+
+
+
+    // Validar dirección: letras, números, espacios, guiones, puntos, comas y #
+    const regexDireccion = /^[A-Za-z0-9\s\-\#\.,]+$/;
+
+    if (!regexDireccion.test(direccion.trim())) {
+      mostrarError("La dirección contiene caracteres no válidos. Usa solo letras, números, espacios, guiones, #, comas o puntos.");
+      return;
+    }
+
 
     // Validar teléfono (opcional pero con formato si se ingresa)
     if (telefono && !/^\d{7,15}$/.test(telefono.replace(/\s/g, ''))) {
