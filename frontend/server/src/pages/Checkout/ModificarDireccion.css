@@ -75,7 +75,7 @@
 .direccion-help-icon {
   width: 26px;
   height: 26px;
-  border: 2px solid #000;
+  border: 2px solid #666;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -83,8 +83,15 @@
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  background-color: #fff;
-  color: #000;
+  background-color: #f0f0f0;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.direccion-help-icon:hover {
+  background-color: #666;
+  color: #fff;
+  transform: scale(1.05);
 }
 
 /* ===== BUSCADOR ===== */
@@ -101,94 +108,161 @@
 .direccion-buscador-input {
   flex: 1;
   padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
   font-size: 14px;
-  transition: border-color 0.2s;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
+  color: #333;
 }
 
 .direccion-buscador-input:focus {
   outline: none;
-  border-color: #1a73e8;
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.direccion-buscador-input::placeholder {
+  color: #888;
 }
 
 .direccion-buscador-btn {
-  background-color: #1a73e8;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.2s;
-  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 8px;
+  background: linear-gradient(135deg, #28a745, #28a745);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .direccion-buscador-btn:hover:not(:disabled) {
-  background-color: #0b5ed7;
+  background: linear-gradient(135deg, #28a745, #28a745);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.direccion-buscador-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .direccion-buscador-btn:disabled {
-  background-color: #ccc;
+  background: linear-gradient(135deg, #cccccc, #aaaaaa);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
 }
 
 .direccion-buscador-icon {
   font-size: 14px;
 }
 
-/* ===== BOTÓN UBICACIÓN ACTUAL ===== */
-.direccion-btn-ubicacion-actual {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
-  transition: background-color 0.2s;
+/* ===== BOTONES DE UBICACIÓN ===== */
+.direccion-botones-ubicacion {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.direccion-btn-ubicacion-precisa {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  width: fit-content;
-}
-
-.direccion-btn-ubicacion-actual:hover {
-  background-color: #218838;
-}
-
-.direccion-ubicacion-icon {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
   font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 200px;
+}
+
+.direccion-btn-ubicacion-precisa:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b71c1c, #9a0007);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.direccion-btn-ubicacion-precisa:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.direccion-btn-ubicacion-precisa:disabled {
+  background: linear-gradient(135deg, #cccccc, #aaaaaa);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.direccion-btn-ajustar-manual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #616161, #424242);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 200px;
+}
+
+.direccion-btn-ajustar-manual:hover {
+  background: linear-gradient(135deg, #424242, #212121);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(97, 97, 97, 0.3);
+}
+
+.direccion-btn-ajustar-manual:active {
+  transform: translateY(0);
+}
+
+.direccion-ubicacion-icon,
+.direccion-ajustar-icon {
+  font-size: 14px;
+}
+
+/* Spinner para botones de ubicación */
+.direccion-btn-ubicacion-precisa .spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ===== MAPA ===== */
 .direccion-mapa-container {
   margin-bottom: 25px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
-}
-
-.direccion-mapa-placeholder {
-  height: 300px;
-  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #1565c0;
-  font-weight: 500;
-}
-
-.direccion-mapa-descripcion {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #555;
-  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .direccion-mapa-leyenda {
@@ -207,8 +281,21 @@
 }
 
 .direccion-leyenda-icon {
-  color: #dc3545;
+  color: #d32f2f;
   font-size: 14px;
+}
+
+.direccion-mapa-instrucciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
 }
 
 /* ===== FORMULARIO ===== */
@@ -236,22 +323,29 @@
 
 .direccion-campo-icon {
   font-size: 16px;
-  color: #1a73e8;
+  color: #d32f2f;
 }
 
 .direccion-input {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #ddd;
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 14px;
-  transition: border-color 0.2s;
+  transition: border-color 0.3s ease;
   box-sizing: border-box;
+  background-color: #fff;
+  color: #333;
 }
 
 .direccion-input:focus {
   outline: none;
-  border-color: #1a73e8;
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.direccion-input::placeholder {
+  color: #888;
 }
 
 /* ===== TEXTO DE AYUDA ===== */
@@ -260,13 +354,16 @@
   font-size: 12px;
   margin-top: 5px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 5px;
+  line-height: 1.4;
 }
 
 .direccion-ayuda-icon {
   font-size: 12px;
-  color: #6c757d;
+  color: #d32f2f;
+  margin-top: 1px;
+  flex-shrink: 0;
 }
 
 /* ===== INSTRUCCIONES ===== */
@@ -275,7 +372,7 @@
   padding: 15px;
   border-radius: 6px;
   margin-top: 25px;
-  border-left: 4px solid #1a73e8;
+  border-left: 4px solid #d32f2f;
 }
 
 .direccion-instrucciones p {
@@ -287,7 +384,7 @@
 }
 
 .direccion-instrucciones-icon {
-  color: #ffc107;
+  color: #d32f2f;
   font-size: 16px;
 }
 
@@ -313,48 +410,109 @@
 }
 
 .direccion-btn-cancelar {
-  background-color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #6c757d, #545b62);
   color: white;
   border: none;
   padding: 12px 25px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
 }
 
 .direccion-btn-cancelar:hover {
-  background-color: #5a6268;
+  background: linear-gradient(135deg, #545b62, #4a5056);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.direccion-btn-cancelar:active {
+  transform: translateY(0);
 }
 
 .direccion-btn-confirmar {
-  background-color: #28a745;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
   color: white;
   border: none;
   padding: 12px 25px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
 }
 
 .direccion-btn-confirmar:hover:not(:disabled) {
-  background-color: #218838;
+  background: linear-gradient(135deg, #b71c1c, #9a0007);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.direccion-btn-confirmar:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .direccion-btn-confirmar:disabled {
-  background-color: #ccc;
+  background: linear-gradient(135deg, #cccccc, #aaaaaa);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
 }
 
 .direccion-btn-icon {
   font-size: 14px;
+}
+
+/* ===== INDICADOR DE PRECISIÓN ===== */
+.direccion-precision-indicador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+.precision-excelente {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.precision-buena {
+  background-color: rgba(211, 47, 47, 0.1);
+  color: #c62828;
+  border: 1px solid rgba(211, 47, 47, 0.3);
+}
+
+.precision-moderada {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ff8f00;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.precision-baja,
+.precision-aproximada {
+  background-color: rgba(121, 85, 72, 0.1);
+  color: #5d4037;
+  border: 1px solid rgba(121, 85, 72, 0.3);
+}
+
+.precision-manual {
+  background-color: rgba(97, 97, 97, 0.1);
+  color: #424242;
+  border: 1px solid rgba(97, 97, 97, 0.3);
 }
 
 /* ===== FOOTER ACTUALIZADO ===== */
@@ -381,15 +539,47 @@
   text-decoration: none;
   color: #333;
   font-size: 13px; 
+  transition: color 0.3s ease;
 }
 
 .direccion-footer-links a:hover {
+  color: #d32f2f;
   text-decoration: underline;
+}
+
+.direccion-footer-links span {
+  color: #666;
 }
 
 .direccion-footer-copyright {
   color: #333;
   font-size: 13px; 
+}
+
+/* ===== MENSAJE DE AYUDA PARA BUSCADOR ===== */
+.direccion-ayuda-buscador {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-left: 4px solid #d32f2f;
+  border-radius: 6px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.direccion-ayuda-buscador small {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.direccion-ayuda-icon-small {
+  color: #d32f2f;
+  font-size: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -411,13 +601,23 @@
     width: 100%;
   }
   
+  .direccion-botones-ubicacion {
+    flex-direction: column;
+  }
+  
+  .direccion-btn-ubicacion-precisa,
+  .direccion-btn-ajustar-manual {
+    min-width: 100%;
+  }
+  
   .direccion-botones-accion {
     flex-direction: column;
   }
   
-  .direccion-mapa-placeholder {
-    height: 200px;
-    padding: 20px;
+  .direccion-btn-cancelar,
+  .direccion-btn-confirmar {
+    width: 100%;
+    justify-content: center;
   }
   
   .direccion-top-bar {
@@ -461,7 +661,8 @@
   }
   
   .direccion-buscador-btn,
-  .direccion-btn-ubicacion-actual {
+  .direccion-btn-ubicacion-precisa,
+  .direccion-btn-ajustar-manual {
     padding: 10px 15px;
     font-size: 13px;
   }
@@ -502,8 +703,52 @@
   background-color: #fff;
   color: #333;
   border: 1px solid #ccc;
+  transition: all 0.3s ease;
 }
 
 .leaflet-control-zoom a:hover {
   background-color: #f4f4f4;
+  color: #d32f2f;
+  border-color: #d32f2f;
+}
+
+/* Asegurar que todos los elementos tengan colores consistentes */
+*:focus {
+  outline: none;
+}
+
+/* Mejoras visuales generales */
+.direccion-campo-formulario label {
+  color: #444;
+}
+
+.direccion-instrucciones li strong {
+  color: #333;
+}
+
+/* Paleta de colores rojo y gris */
+:root {
+  --rojo-principal: #d32f2f;
+  --rojo-oscuro: #b71c1c;
+  --rojo-mas-oscuro: #9a0007;
+  --gris-oscuro: #424242;
+  --gris-medio: #616161;
+  --gris-claro: #e0e0e0;
+  --gris-muy-claro: #f5f5f5;
+  --texto-oscuro: #333;
+  --texto-medio: #666;
+  --texto-claro: #888;
+}
+
+/* Estilos adicionales para consistencia */
+.direccion-buscador-btn .direccion-buscador-icon {
+  color: white;
+}
+
+.direccion-btn-confirmar .direccion-btn-icon {
+  color: white;
+}
+
+.direccion-btn-cancelar .direccion-btn-icon {
+  color: white;
 }

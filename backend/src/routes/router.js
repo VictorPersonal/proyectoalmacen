@@ -351,18 +351,16 @@ router.get("/productos/:id", async (req, res) => {
         )
       `)
       .eq("idproducto", id)
-      .eq("activo", true)  // ← ¡AGREGA ESTE FILTRO!
+      .eq("activo", true)
+      .gt('stock', 0)  
       .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
-        return res.status(404).json({ message: "Producto no encontrado" });
-      }
-      throw error;
-    }
+    if (error) throw error;
 
     if (!producto) {
-      return res.status(404).json({ message: "Producto no encontrado" });
+      return res.status(404).json({ 
+        message: "Producto no encontrado o sin stock disponible" 
+      });
     }
 
     res.json(producto);
@@ -531,7 +529,7 @@ router.get("/carrito", async (req, res) => {
 });
 
 // ====================================================================
-// ➕ Agregar o actualizar producto en el carrito
+// ➕ Agregar o actualizar producto en el carrito CON VALIDACIÓN DE STOCK
 // ====================================================================
 router.post("/carrito/agregar", async (req, res) => {
   const cedula = req.usuario.id;
@@ -542,7 +540,19 @@ router.post("/carrito/agregar", async (req, res) => {
   }
 
   try {
-    // Verificar si ya existe el producto en el carrito
+    // 1. Obtener stock actual del producto
+    const { data: productoData, error: productoError } = await supabase
+      .from("producto")
+      .select("stock, nombre")
+      .eq("idproducto", idproducto)
+      .single();
+
+    if (productoError) throw productoError;
+    if (!productoData) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    // 2. Obtener cantidad actual en el carrito
     const { data: existe, error: existeError } = await supabase
       .from("carrito")
       .select("cantidad")
@@ -552,9 +562,22 @@ router.post("/carrito/agregar", async (req, res) => {
 
     if (existeError) throw existeError;
 
+    // 3. Calcular cantidad total deseada
+    const cantidadActual = existe ? existe.cantidad : 0;
+    const cantidadTotalDeseada = cantidadActual + parseInt(cantidad);
+
+    // 4. Validar que no exceda el stock disponible
+    if (cantidadTotalDeseada > productoData.stock) {
+      return res.status(400).json({ 
+        message: `Stock insuficiente. Solo hay ${productoData.stock} unidades disponibles de "${productoData.nombre}". 
+        Ya tienes ${cantidadActual} en el carrito. 
+        Puedes agregar máximo ${productoData.stock - cantidadActual} unidades más.` 
+      });
+    }
+
+    // 5. Actualizar o insertar
     if (existe) {
-      // ✅ Si ya existe, actualizamos la cantidad
-      const nuevaCantidad = existe.cantidad + cantidad;
+      const nuevaCantidad = cantidadActual + parseInt(cantidad);
       const { error: updateError } = await supabase
         .from("carrito")
         .update({ cantidad: nuevaCantidad })
@@ -563,15 +586,17 @@ router.post("/carrito/agregar", async (req, res) => {
 
       if (updateError) throw updateError;
     } else {
-      // ✅ Si no existe, insertamos nuevo registro
       const { error: insertError } = await supabase
         .from("carrito")
-        .insert([{ cedula, idproducto, cantidad }]);
+        .insert([{ cedula, idproducto, cantidad: parseInt(cantidad) }]);
 
       if (insertError) throw insertError;
     }
 
-    res.status(200).json({ message: "Producto agregado correctamente al carrito" });
+    res.status(200).json({ 
+      message: "Producto agregado correctamente al carrito",
+      stockRestante: productoData.stock - cantidadTotalDeseada
+    });
   } catch (error) {
     console.error("❌ Error al agregar producto al carrito:", error.message);
     res.status(500).json({ message: "Error al agregar producto al carrito" });
@@ -623,36 +648,66 @@ router.delete("/carrito/vaciar", async (req, res) => {
   }
 });
 
+// ====================================================================
+// ✏️ Actualizar cantidad en el carrito CON VALIDACIÓN DE STOCK
+// ====================================================================
 router.put("/carrito/actualizar", async (req, res) => {
-  const supabase = req.supabase; // ⬅️ Asegúrate de que esto exista
   const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
 
   try {
-    if (!idproducto || cantidad < 1) {
+    if (!idproducto || cantidad < 0) {
       return res.status(400).json({
         message: "Datos inválidos"
       });
     }
 
+    // 1. Validar stock disponible
+    const { data: productoData, error: productoError } = await supabase
+      .from("producto")
+      .select("stock, nombre")
+      .eq("idproducto", idproducto)
+      .single();
+
+    if (productoError) throw productoError;
+    if (!productoData) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    // 2. Validar que la cantidad no exceda el stock
+    if (cantidad > productoData.stock) {
+      return res.status(400).json({ 
+        message: `Stock insuficiente. Solo hay ${productoData.stock} unidades disponibles de "${productoData.nombre}".` 
+      });
+    }
+
+    // 3. Si cantidad es 0, eliminar del carrito
+    if (cantidad === 0) {
+      const { error: deleteError } = await supabase
+        .from("carrito")
+        .delete()
+        .eq("idproducto", idproducto)
+        .eq("cedula", cedula);
+
+      if (deleteError) throw deleteError;
+      
+      return res.status(200).json({ 
+        message: "Producto eliminado del carrito",
+        carrito: await obtenerCarritoCompleto(cedula)
+      });
+    }
+
+    // 4. Actualizar cantidad
     const { error: errorUpdate } = await supabase
       .from("carrito")
       .update({ cantidad })
       .eq("idproducto", idproducto)
       .eq("cedula", cedula);
 
-    if (errorUpdate) {
-      return res.status(500).json({ message: "Error al actualizar" });
-    }
+    if (errorUpdate) throw errorUpdate;
 
-    const { data: carrito, error: errorCarrito } = await supabase
-      .from("carrito")
-      .select("*")
-      .eq("cedula", cedula);
-
-    if (errorCarrito) {
-      return res.status(500).json({ message: "Error cargando carrito" });
-    }
+    // 5. Obtener carrito actualizado
+    const carrito = await obtenerCarritoCompleto(cedula);
 
     return res.json({
       message: "Cantidad actualizada correctamente",
@@ -669,6 +724,36 @@ router.put("/carrito/actualizar", async (req, res) => {
 
 // Aplica el middleware a TODAS las rutas de favoritos
 router.use("/favoritos", verificarToken);
+
+// ====================================================================
+// ✅ Verificar si un producto está en favoritos
+// ====================================================================
+router.get("/favoritos/verificar/:idproducto", async (req, res) => {
+  const { idproducto } = req.params;
+  const cedula = req.usuario.id;
+
+  try {
+    const { data, error } = await supabase
+      .from("favoritoproducto")
+      .select("idfavorito")
+      .eq("cedula", cedula)
+      .eq("idproducto", idproducto)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    res.status(200).json({
+      esFavorito: !!data, 
+      idfavorito: data?.idfavorito || null
+    });
+  } catch (error) {
+    console.error("❌ Error al verificar favorito:", error.message);
+    res.status(500).json({ 
+      message: "Error al verificar favorito",
+      esFavorito: false 
+    });
+  }
+});
 
 // ====================================================================
 // 📦 Obtener favoritos del usuario autenticado
@@ -1048,11 +1133,9 @@ router.get("/productos", async (req, res) => {
           url
         )
       `);
-
-    // ✅ SIEMPRE filtrar por activo = true en endpoints públicos
-    query = query.eq('activo', true);
-
-    // Si hay búsqueda, agregar filtro de búsqueda
+    query = query
+      .eq('activo', true)
+      .gt('stock', 0);  
     if (search) {
       query = query.or(`nombre.ilike.%${search}%,descripcion.ilike.%${search}%`);
     }
@@ -1069,7 +1152,7 @@ router.get("/productos", async (req, res) => {
       });
     }
 
-    console.log(`✅ Productos activos obtenidos: ${productos?.length || 0}`);
+    console.log(`✅ Productos activos con stock obtenidos: ${productos?.length || 0}`);
     res.json(productos);
   } catch (err) {
     console.error("❌ Error al obtener productos:", err);
@@ -1590,6 +1673,7 @@ router.get("/categorias/:idcategoria/productos", async (req, res) => {
       `)
       .eq("idcategoria", idcategoria)
       .eq("activo", true)
+      .gt('stock', 0)  
       .order("nombre", { ascending: true });
 
     if (error) {
