@@ -4,12 +4,13 @@
   justify-content: center;
   align-items: flex-start;
   gap: 25px;
-  padding: 60px 20px;
+  padding: 60px 20px 60px 70px; 
   background-color: #ceccca;
   min-height: calc(100vh - 160px);
   box-sizing: border-box;
   max-width: 1100px;
   margin: 0 auto;
+  position: relative;
 }
 
 /* ===== LADO IZQUIERDO ===== */
@@ -187,6 +188,37 @@
   border-top: 1px solid #eee;
 }
 
+/* ===== BOTÓN VOLVER ===== */
+.entrega-back-wrapper {
+  display: none; /* Ocultamos el wrapper anterior */
+}
+
+.entrega-btn-volver {
+  position: absolute;
+  left: 10px; 
+  top: 60px; 
+  background-color: #ffffff; 
+  color: #000000;
+  border: none;
+  width: 45px;
+  height: 45px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.entrega-btn-volver:hover {
+  color: #000;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .entrega-container {
@@ -209,6 +241,17 @@
     max-width: 300px;
     margin: 0 auto;
   }
+  
+  /* Ajustes para responsive del botón volver */
+  .entrega-btn-volver {
+    position: absolute;
+    left: 15px;
+    top: 40px;
+  }
+  
+  .entrega-left {
+    margin-left: 40px; /* Ajuste para mantener el espacio en móvil */
+  }
 }
 
 @media (max-width: 480px) {
@@ -223,6 +266,15 @@
   
   .entrega-opcion {
     min-height: 130px; 
+  }
+  
+  .entrega-btn-volver {
+    left: 10px;
+    top: 30px;
+  }
+  
+  .entrega-left {
+    margin-left: 35px; /* Ajuste para móviles pequeños */
   }
 }
 
@@ -379,24 +431,13 @@
   }
 }
 
-.entrega-back-wrapper {
-  max-width: 900px;
-  margin: 10px auto 0;
-}
-
-.entrega-btn-volver {
-  position: absolute;
-  top: 150px; /* Ajusta si lo quieres más arriba o abajo */
-  left: 35px; /* Pegado al lado izquierdo como en tu captura */
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: #2d2d2d;
-  cursor: pointer;
-  padding: 0;
-  margin: 0;
-}
-
-.entrega-btn-volver:hover {
-  color: #000;
+@media (max-width: 900px) {
+  .entrega-container {
+    padding: 60px 15px 60px 60px;
+  }
+  
+  .entrega-btn-volver {
+    left: 10px;
+    top: 40px;
+  }
 }

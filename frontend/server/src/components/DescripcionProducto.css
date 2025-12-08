@@ -599,3 +599,78 @@
 .corazon-favorito:hover svg {
   color: #ff4757;
 }
+
+/* Estilos para stock */
+.stock-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  margin: 10px 0;
+  animation: pulse 1.5s infinite;
+}
+
+.stock-alert-icon {
+  color: #856404;
+  font-size: 16px;
+}
+
+.stock-alert-text {
+  color: #856404;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stock-out-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+.stock-out-alert-icon {
+  color: #721c24;
+  font-size: 16px;
+}
+
+.stock-out-alert-text {
+  color: #721c24;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stock-bajo {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.stock-normal {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.btn-comprar:disabled,
+.btn-agregar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Selector de cantidad deshabilitado */
+#cantidad:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
