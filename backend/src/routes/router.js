@@ -648,6 +648,39 @@ router.delete("/carrito/vaciar", async (req, res) => {
   }
 });
 
+async function obtenerCarritoCompleto(cedula) {
+  try {
+    const { data, error } = await supabase
+      .from("carrito")
+      .select(`
+        idproducto,
+        cantidad,
+        producto:producto (
+          nombre,
+          precio,
+          stock
+        )
+      `)
+      .eq("cedula", cedula);
+
+    if (error) throw error;
+
+    const carritoConSubtotal = data.map(item => ({
+      idproducto: item.idproducto,
+      cantidad: item.cantidad,
+      nombre: item.producto?.nombre || "Producto no encontrado",
+      precio: item.producto?.precio || 0,
+      stock: item.producto?.stock || 0,
+      subtotal: (item.producto?.precio || 0) * item.cantidad
+    }));
+
+    return carritoConSubtotal;
+  } catch (error) {
+    console.error("Error obteniendo carrito completo:", error);
+    throw error;
+  }
+}
+
 // ====================================================================
 // ✏️ Actualizar cantidad en el carrito CON VALIDACIÓN DE STOCK
 // ====================================================================
@@ -656,68 +689,140 @@ router.put("/carrito/actualizar", async (req, res) => {
   const { idproducto, cantidad } = req.body;
 
   try {
-    if (!idproducto || cantidad < 0) {
+    // Validación básica
+    if (!idproducto || cantidad === undefined || cantidad < 0) {
       return res.status(400).json({
-        message: "Datos inválidos"
+        message: "Datos inválidos. Se requiere idproducto y cantidad válida."
       });
     }
 
-    // 1. Validar stock disponible
+    console.log(`📝 Actualizando carrito: Usuario ${cedula}, Producto ${idproducto}, Cantidad ${cantidad}`);
+
+    // 1. Validar que el producto existe y obtener stock
     const { data: productoData, error: productoError } = await supabase
       .from("producto")
-      .select("stock, nombre")
+      .select("stock, nombre, precio")
       .eq("idproducto", idproducto)
       .single();
 
-    if (productoError) throw productoError;
-    if (!productoData) {
-      return res.status(404).json({ message: "Producto no encontrado" });
+    if (productoError || !productoData) {
+      console.error("❌ Producto no encontrado:", productoError);
+      return res.status(404).json({ 
+        message: "Producto no encontrado en la base de datos" 
+      });
     }
 
-    // 2. Validar que la cantidad no exceda el stock
-    if (cantidad > productoData.stock) {
-      return res.status(400).json({ 
-        message: `Stock insuficiente. Solo hay ${productoData.stock} unidades disponibles de "${productoData.nombre}".` 
-      });
+    // 2. Validar stock disponible si se está incrementando
+    if (cantidad > 0) {
+      // Obtener cantidad actual en carrito
+      const { data: carritoActual, error: carritoError } = await supabase
+        .from("carrito")
+        .select("cantidad")
+        .eq("idproducto", idproducto)
+        .eq("cedula", cedula)
+        .single();
+
+      const cantidadActual = carritoActual?.cantidad || 0;
+      
+      // Si estamos incrementando la cantidad, verificar stock
+      if (cantidad > cantidadActual) {
+        const incremento = cantidad - cantidadActual;
+        if (productoData.stock < incremento) {
+          return res.status(400).json({ 
+            message: `Stock insuficiente. Solo hay ${productoData.stock} unidades disponibles de "${productoData.nombre}".`,
+            stockDisponible: productoData.stock
+          });
+        }
+      }
     }
 
     // 3. Si cantidad es 0, eliminar del carrito
     if (cantidad === 0) {
+      console.log(`🗑️ Eliminando producto ${idproducto} del carrito`);
+      
       const { error: deleteError } = await supabase
         .from("carrito")
         .delete()
         .eq("idproducto", idproducto)
         .eq("cedula", cedula);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error("Error eliminando producto:", deleteError);
+        throw deleteError;
+      }
+      
+      const carrito = await obtenerCarritoCompleto(cedula);
       
       return res.status(200).json({ 
         message: "Producto eliminado del carrito",
-        carrito: await obtenerCarritoCompleto(cedula)
+        carrito,
+        stockRestante: productoData.stock
       });
     }
 
-    // 4. Actualizar cantidad
-    const { error: errorUpdate } = await supabase
+    // 4. Verificar si el producto ya está en el carrito
+    const { data: existeEnCarrito, error: checkError } = await supabase
       .from("carrito")
-      .update({ cantidad })
+      .select("*")
       .eq("idproducto", idproducto)
-      .eq("cedula", cedula);
+      .eq("cedula", cedula)
+      .single();
 
-    if (errorUpdate) throw errorUpdate;
+    let result;
+
+    if (existeEnCarrito) {
+      // Actualizar cantidad existente
+      console.log(`✏️ Actualizando cantidad a ${cantidad}`);
+      
+      const { data: updateData, error: updateError } = await supabase
+        .from("carrito")
+        .update({ 
+          cantidad,
+        })
+        .eq("idproducto", idproducto)
+        .eq("cedula", cedula)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+      result = updateData;
+    } else {
+      // Agregar nuevo producto al carrito
+      console.log(`🛒 Agregando nuevo producto ${idproducto}`);
+      
+      const { data: insertData, error: insertError } = await supabase
+        .from("carrito")
+        .insert({
+          cedula,
+          idproducto,
+          cantidad
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+      result = insertData;
+    }
 
     // 5. Obtener carrito actualizado
     const carrito = await obtenerCarritoCompleto(cedula);
 
-    return res.json({
+    console.log(`✅ Carrito actualizado correctamente. Productos: ${carrito.length}`);
+
+    return res.status(200).json({
       message: "Cantidad actualizada correctamente",
-      carrito
+      carrito,
+      stockRestante: productoData.stock - cantidad
     });
 
   } catch (error) {
     console.error("❌ Error al actualizar carrito:", error);
-    res.status(500).json({
-      message: "Error interno del servidor"
+    
+    // Detallar el error para debugging
+    return res.status(500).json({
+      message: "Error interno del servidor al actualizar el carrito",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      hint: "Verifica la conexión con la base de datos y los datos enviados"
     });
   }
 });
