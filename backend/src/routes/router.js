@@ -648,6 +648,41 @@ router.delete("/carrito/vaciar", async (req, res) => {
   }
 });
 
+// Agrega esta función ANTES de tu ruta PUT
+async function obtenerCarritoCompleto(cedula) {
+  try {
+    const { data, error } = await supabase
+      .from("carrito")
+      .select(`
+        idproducto,
+        cantidad,
+        producto:producto (
+          nombre,
+          precio,
+          stock
+        )
+      `)
+      .eq("cedula", cedula);
+
+    if (error) throw error;
+
+    // Calcular subtotales
+    const carritoConSubtotal = data.map(item => ({
+      idproducto: item.idproducto,
+      cantidad: item.cantidad,
+      nombre: item.producto?.nombre || "Producto no encontrado",
+      precio: item.producto?.precio || 0,
+      stock: item.producto?.stock || 0,
+      subtotal: (item.producto?.precio || 0) * item.cantidad
+    }));
+
+    return carritoConSubtotal;
+  } catch (error) {
+    console.error("Error obteniendo carrito completo:", error);
+    throw error;
+  }
+}
+
 // ====================================================================
 // ✏️ Actualizar cantidad en el carrito CON VALIDACIÓN DE STOCK
 // ====================================================================
