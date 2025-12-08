@@ -709,9 +709,6 @@ router.put("/carrito/actualizar", async (req, res) => {
     // 5. Obtener carrito actualizado
     const carrito = await obtenerCarritoCompleto(cedula);
 
-    // 5. Obtener carrito actualizado
-    const carrito = await obtenerCarritoCompleto(cedula);
-
     console.log(`✅ Carrito actualizado correctamente. Productos: ${carrito.length}`);
 
     return res.status(200).json({
