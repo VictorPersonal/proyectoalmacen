@@ -658,7 +658,7 @@ router.put("/carrito/actualizar", async (req, res) => {
   try {
     if (!idproducto || cantidad < 0) {
       return res.status(400).json({
-        message: "Datos inválidos"
+        message: "Datos inválidos. Se requiere idproducto y cantidad válida."
       });
     }
 
@@ -709,15 +709,25 @@ router.put("/carrito/actualizar", async (req, res) => {
     // 5. Obtener carrito actualizado
     const carrito = await obtenerCarritoCompleto(cedula);
 
-    return res.json({
+    // 5. Obtener carrito actualizado
+    const carrito = await obtenerCarritoCompleto(cedula);
+
+    console.log(`✅ Carrito actualizado correctamente. Productos: ${carrito.length}`);
+
+    return res.status(200).json({
       message: "Cantidad actualizada correctamente",
-      carrito
+      carrito,
+      stockRestante: productoData.stock - cantidad
     });
 
   } catch (error) {
     console.error("❌ Error al actualizar carrito:", error);
-    res.status(500).json({
-      message: "Error interno del servidor"
+    
+    // Detallar el error para debugging
+    return res.status(500).json({
+      message: "Error interno del servidor al actualizar el carrito",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      hint: "Verifica la conexión con la base de datos y los datos enviados"
     });
   }
 });
