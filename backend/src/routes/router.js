@@ -648,39 +648,6 @@ router.delete("/carrito/vaciar", async (req, res) => {
   }
 });
 
-async function obtenerCarritoCompleto(cedula) {
-  try {
-    const { data, error } = await supabase
-      .from("carrito")
-      .select(`
-        idproducto,
-        cantidad,
-        producto:producto (
-          nombre,
-          precio,
-          stock
-        )
-      `)
-      .eq("cedula", cedula);
-
-    if (error) throw error;
-
-    const carritoConSubtotal = data.map(item => ({
-      idproducto: item.idproducto,
-      cantidad: item.cantidad,
-      nombre: item.producto?.nombre || "Producto no encontrado",
-      precio: item.producto?.precio || 0,
-      stock: item.producto?.stock || 0,
-      subtotal: (item.producto?.precio || 0) * item.cantidad
-    }));
-
-    return carritoConSubtotal;
-  } catch (error) {
-    console.error("Error obteniendo carrito completo:", error);
-    throw error;
-  }
-}
-
 // ====================================================================
 // ✏️ Actualizar cantidad en el carrito CON VALIDACIÓN DE STOCK
 // ====================================================================
@@ -689,120 +656,58 @@ router.put("/carrito/actualizar", async (req, res) => {
   const { idproducto, cantidad } = req.body;
 
   try {
-    // Validación básica
-    if (!idproducto || cantidad === undefined || cantidad < 0) {
+    if (!idproducto || cantidad < 0) {
       return res.status(400).json({
         message: "Datos inválidos. Se requiere idproducto y cantidad válida."
       });
     }
 
-    console.log(`📝 Actualizando carrito: Usuario ${cedula}, Producto ${idproducto}, Cantidad ${cantidad}`);
-
-    // 1. Validar que el producto existe y obtener stock
+    // 1. Validar stock disponible
     const { data: productoData, error: productoError } = await supabase
       .from("producto")
-      .select("stock, nombre, precio")
+      .select("stock, nombre")
       .eq("idproducto", idproducto)
       .single();
 
-    if (productoError || !productoData) {
-      console.error("❌ Producto no encontrado:", productoError);
-      return res.status(404).json({ 
-        message: "Producto no encontrado en la base de datos" 
-      });
+    if (productoError) throw productoError;
+    if (!productoData) {
+      return res.status(404).json({ message: "Producto no encontrado" });
     }
 
-    // 2. Validar stock disponible si se está incrementando
-    if (cantidad > 0) {
-      // Obtener cantidad actual en carrito
-      const { data: carritoActual, error: carritoError } = await supabase
-        .from("carrito")
-        .select("cantidad")
-        .eq("idproducto", idproducto)
-        .eq("cedula", cedula)
-        .single();
-
-      const cantidadActual = carritoActual?.cantidad || 0;
-      
-      // Si estamos incrementando la cantidad, verificar stock
-      if (cantidad > cantidadActual) {
-        const incremento = cantidad - cantidadActual;
-        if (productoData.stock < incremento) {
-          return res.status(400).json({ 
-            message: `Stock insuficiente. Solo hay ${productoData.stock} unidades disponibles de "${productoData.nombre}".`,
-            stockDisponible: productoData.stock
-          });
-        }
-      }
+    // 2. Validar que la cantidad no exceda el stock
+    if (cantidad > productoData.stock) {
+      return res.status(400).json({ 
+        message: `Stock insuficiente. Solo hay ${productoData.stock} unidades disponibles de "${productoData.nombre}".` 
+      });
     }
 
     // 3. Si cantidad es 0, eliminar del carrito
     if (cantidad === 0) {
-      console.log(`🗑️ Eliminando producto ${idproducto} del carrito`);
-      
       const { error: deleteError } = await supabase
         .from("carrito")
         .delete()
         .eq("idproducto", idproducto)
         .eq("cedula", cedula);
 
-      if (deleteError) {
-        console.error("Error eliminando producto:", deleteError);
-        throw deleteError;
-      }
-      
-      const carrito = await obtenerCarritoCompleto(cedula);
+      if (deleteError) throw deleteError;
       
       return res.status(200).json({ 
         message: "Producto eliminado del carrito",
-        carrito,
-        stockRestante: productoData.stock
+        carrito: await obtenerCarritoCompleto(cedula)
       });
     }
 
-    // 4. Verificar si el producto ya está en el carrito
-    const { data: existeEnCarrito, error: checkError } = await supabase
+    // 4. Actualizar cantidad
+    const { error: errorUpdate } = await supabase
       .from("carrito")
-      .select("*")
+      .update({ cantidad })
       .eq("idproducto", idproducto)
-      .eq("cedula", cedula)
-      .single();
+      .eq("cedula", cedula);
 
-    let result;
+    if (errorUpdate) throw errorUpdate;
 
-    if (existeEnCarrito) {
-      // Actualizar cantidad existente
-      console.log(`✏️ Actualizando cantidad a ${cantidad}`);
-      
-      const { data: updateData, error: updateError } = await supabase
-        .from("carrito")
-        .update({ 
-          cantidad,
-        })
-        .eq("idproducto", idproducto)
-        .eq("cedula", cedula)
-        .select()
-        .single();
-
-      if (updateError) throw updateError;
-      result = updateData;
-    } else {
-      // Agregar nuevo producto al carrito
-      console.log(`🛒 Agregando nuevo producto ${idproducto}`);
-      
-      const { data: insertData, error: insertError } = await supabase
-        .from("carrito")
-        .insert({
-          cedula,
-          idproducto,
-          cantidad
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-      result = insertData;
-    }
+    // 5. Obtener carrito actualizado
+    const carrito = await obtenerCarritoCompleto(cedula);
 
     // 5. Obtener carrito actualizado
     const carrito = await obtenerCarritoCompleto(cedula);
