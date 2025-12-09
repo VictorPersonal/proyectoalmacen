@@ -21,9 +21,11 @@ import {
   FaEye,
   FaEyeSlash,
   FaShoppingBag,
-  FaShoppingCart, 
-  FaClipboardList 
+  FaShoppingCart,
+  FaClipboardList,
 } from "react-icons/fa";
+
+const ESTADOS_PEDIDO = ["Pendiente", "Pagado", "En camino", "Entregado", "Cancelado"];
 
 const PanelAdmin = () => {
   const [currentSection, setCurrentSection] = useState("productos");
@@ -39,6 +41,13 @@ const PanelAdmin = () => {
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // 🔹 ESTADO PARA PEDIDOS (ADMIN)
+  const [pedidos, setPedidos] = useState([]);
+  const [pedidosLoading, setPedidosLoading] = useState(false);
+  const [selectedPedido, setSelectedPedido] = useState(null);
+  const [estadoEditando, setEstadoEditando] = useState("");
+  const [showPedidoModal, setShowPedidoModal] = useState(false);
 
   const navigate = useNavigate();
   const profileRef = useRef(null);
@@ -244,6 +253,11 @@ const PanelAdmin = () => {
     setCurrentPage(1);
   }, [searchTerm]);
 
+  // limpiar el buscador cuando cambias de sección
+  useEffect(() => {
+    setSearchTerm("");
+  }, [currentSection]);
+
   /* =========================================================
      MANEJO DE INPUTS
   ========================================================= */
@@ -305,7 +319,6 @@ const PanelAdmin = () => {
     );
     return cat ? cat.descripcionCategoria : id;
   };
-  
 
   const getNombreMarca = (productOrId) => {
     // Si viene el objeto producto completo
@@ -329,7 +342,6 @@ const PanelAdmin = () => {
     const m = marcas.find((mar) => String(mar.idmarca) === String(id));
     return m ? m.descripcionMarca : String(id);
   };
-
 
   // Buscar o crear categoría según su descripción
   const obtenerOCrearCategoria = async (nombreCategoria) => {
@@ -596,7 +608,7 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     FILTRO + PAGINACIÓN
+     FILTRO + PAGINACIÓN PRODUCTOS
   ========================================================= */
   const filteredProducts = products.filter((prod) =>
     prod.nombre.toLowerCase().includes(searchTerm.toLowerCase())
@@ -622,7 +634,7 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     PAGINACIÓN CON TECLADO
+     PAGINACIÓN CON TECLADO (PRODUCTOS)
   ========================================================= */
   useEffect(() => {
     if (currentSection !== "productos") return;
@@ -659,6 +671,137 @@ const PanelAdmin = () => {
       }
     };
   }, [modalVisible]);
+
+  /* =========================================================
+     PEDIDOS - FETCH & HELPERS
+  ========================================================= */
+  const fetchPedidos = async () => {
+    try {
+      setPedidosLoading(true);
+      const res = await axios.get(
+        "http://localhost:4000/api/admin/pedidos",
+        {
+          withCredentials: true,
+        }
+      );
+      setPedidos(res.data || []);
+    } catch (err) {
+      console.error(
+        "Error al obtener pedidos:",
+        err.response?.data || err.message
+      );
+      Swal.fire({
+        title: "Error",
+        text: "No se pudieron cargar los pedidos",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    } finally {
+      setPedidosLoading(false);
+    }
+  };
+
+  // cargar pedidos al entrar a la sección
+  useEffect(() => {
+    if (currentSection === "pedidos" && pedidos.length === 0) {
+      fetchPedidos();
+    }
+  }, [currentSection, pedidos.length]);
+
+  // filtro de pedidos (por número o cliente)
+  const filteredPedidos = pedidos.filter((p) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      p.numero?.toLowerCase().includes(term) ||
+      p.cliente?.toLowerCase().includes(term)
+    );
+  });
+
+  const getEstadoBadgeClass = (estado) => {
+    if (!estado) return "estado-pedido estado-desconocido";
+    const key = estado.toLowerCase().trim().replace(/\s+/g, "-");
+    return `estado-pedido estado-${key}`;
+  };
+
+  const handleVerPedido = async (idpedido) => {
+    try {
+      setPedidosLoading(true);
+      const res = await axios.get(
+        `http://localhost:4000/api/admin/pedidos/${idpedido}`,
+        { withCredentials: true }
+      );
+      setSelectedPedido(res.data);
+      setEstadoEditando(res.data.estado || "");
+      setShowPedidoModal(true);
+    } catch (err) {
+      console.error(
+        "Error al obtener detalle de pedido:",
+        err.response?.data || err.message
+      );
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo cargar el detalle del pedido",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    } finally {
+      setPedidosLoading(false);
+    }
+  };
+
+  const handleGuardarEstadoPedido = async () => {
+    if (!selectedPedido) return;
+    if (!estadoEditando) {
+      Swal.fire({
+        title: "Estado requerido",
+        text: "Selecciona un estado antes de guardar.",
+        icon: "warning",
+      });
+      return;
+    }
+
+    try {
+      setPedidosLoading(true);
+      await axios.patch(
+        `http://localhost:4000/api/admin/pedidos/${selectedPedido.idpedido}/estado`,
+        { estado: estadoEditando },
+        { withCredentials: true }
+      );
+
+      // actualizar en la tabla
+      setPedidos((prev) =>
+        prev.map((p) =>
+          p.idpedido === selectedPedido.idpedido
+            ? { ...p, estado: estadoEditando }
+            : p
+        )
+      );
+
+      Swal.fire({
+        title: "Estado actualizado",
+        text: `El pedido ${selectedPedido.numero} ahora está en estado "${estadoEditando}".`,
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setShowPedidoModal(false);
+      setSelectedPedido(null);
+    } catch (err) {
+      console.error(
+        "Error al actualizar estado del pedido:",
+        err.response?.data || err.message
+      );
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo actualizar el estado del pedido",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    } finally {
+      setPedidosLoading(false);
+    }
+  };
 
   /* =========================================================
      RENDER
@@ -705,7 +848,7 @@ const PanelAdmin = () => {
             <FaBox className="nav-icon" />
             Productos
           </button>
-          
+
           <button
             type="button"
             className={`nav-item ${
@@ -716,7 +859,7 @@ const PanelAdmin = () => {
             <FaShoppingCart className="nav-icon" />
             Pedidos
           </button>
-          
+
           <button
             type="button"
             className={`nav-item ${
@@ -758,6 +901,9 @@ const PanelAdmin = () => {
           </button>
         </div>
 
+        {/* =====================================================
+            SECCIÓN PRODUCTOS
+        ===================================================== */}
         {currentSection === "productos" && (
           <>
             {/* Buscador + agregar */}
@@ -964,7 +1110,9 @@ const PanelAdmin = () => {
           </>
         )}
 
-        {/* 👇 SECCIÓN DE PEDIDOS - TABLA VISUAL */}
+        {/* =====================================================
+            SECCIÓN DE PEDIDOS (REAL)
+        ===================================================== */}
         {currentSection === "pedidos" && (
           <div className="pedidos-section">
             <div className="section-header">
@@ -972,7 +1120,7 @@ const PanelAdmin = () => {
                 <FaClipboardList className="section-icon" />
                 Gestión de Pedidos
               </h2>
-              <p>Visualización de todos los pedidos del sistema</p>
+              <p>Visualiza y administra todos los pedidos del sistema.</p>
             </div>
 
             {/* Buscador de pedidos */}
@@ -987,6 +1135,14 @@ const PanelAdmin = () => {
                 />
               </div>
             </div>
+
+            {/* Loading */}
+            {pedidosLoading && (
+              <div className="loading-indicator">
+                <FaSpinner className="loading-spinner" />
+                <span>Cargando pedidos...</span>
+              </div>
+            )}
 
             {/* Tabla de pedidos */}
             <div className="table-wrapper">
@@ -1003,89 +1159,56 @@ const PanelAdmin = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Datos de ejemplo - temporal */}
-                  {[
-                    {
-                      id: 1001,
-                      cliente: "María González",
-                      direccion: "Calle 123 #45-67, Bogotá",
-                      estado: "Entregado",
-                      total: 450000,
-                      fecha: "2024-01-15"
-                    },
-                    {
-                      id: 1002,
-                      cliente: "Carlos Rodríguez",
-                      direccion: "Av. Principal #89-12, Medellín",
-                      estado: "En camino",
-                      total: 320000,
-                      fecha: "2024-01-16"
-                    },
-                    {
-                      id: 1003,
-                      cliente: "Ana Martínez",
-                      direccion: "Carrera 56 #78-90, Cali",
-                      estado: "Procesando",
-                      total: 780000,
-                      fecha: "2024-01-17"
-                    },
-                    {
-                      id: 1004,
-                      cliente: "Pedro Sánchez",
-                      direccion: "Diagonal 34 #12-34, Barranquilla",
-                      estado: "Pendiente",
-                      total: 210000,
-                      fecha: "2024-01-18"
-                    },
-                    {
-                      id: 1005,
-                      cliente: "Laura Díaz",
-                      direccion: "Transversal 78 #56-78, Cartagena",
-                      estado: "Cancelado",
-                      total: 540000,
-                      fecha: "2024-01-14"
-                    }
-                  ].map((pedido) => (
-                    <tr key={pedido.id}>
-                      <td className="pedido-numero">#{pedido.id}</td>
-                      <td className="pedido-cliente">{pedido.cliente}</td>
-                      <td className="pedido-direccion">
-                        <span title={pedido.direccion}>
-                          {pedido.direccion.length > 30 
-                            ? `${pedido.direccion.substring(0, 30)}...` 
-                            : pedido.direccion}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`estado-pedido estado-${pedido.estado.toLowerCase().replace(' ', '-')}`}>
-                          {pedido.estado}
-                        </span>
-                      </td>
-                      <td className="pedido-total">${pedido.total.toLocaleString()}</td>
-                      <td className="pedido-fecha">{pedido.fecha}</td>
-                      <td>
-                        <div className="action-buttons">
-                          <button className="btn btn--view" title="Ver detalles">
-                            <FaEye className="btn-icon" />
-                            Ver
-                          </button>
-                          <button className="btn btn--edit" title="Editar pedido">
-                            <FaEdit className="btn-icon" />
-                            Editar
-                          </button>
-                        </div>
+                  {filteredPedidos.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="no-products">
+                        {searchTerm
+                          ? "No se encontraron pedidos con ese criterio."
+                          : "No hay pedidos registrados."}
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredPedidos.map((pedido) => (
+                      <tr key={pedido.idpedido}>
+                        <td className="pedido-numero">{pedido.numero}</td>
+                        <td className="pedido-cliente">{pedido.cliente}</td>
+                        <td className="pedido-direccion">
+                          <span title={pedido.direccion}>
+                            {pedido.direccion &&
+                            pedido.direccion.length > 30
+                              ? `${pedido.direccion.substring(0, 30)}...`
+                              : pedido.direccion || "Sin dirección"}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            className={getEstadoBadgeClass(pedido.estado)}
+                          >
+                            {pedido.estado}
+                          </span>
+                        </td>
+                        <td className="pedido-total">
+                          $
+                          {Number(pedido.total || 0).toLocaleString("es-CO")}
+                        </td>
+                        <td className="pedido-fecha">{pedido.fecha}</td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn btn--view"
+                              title="Ver detalles"
+                              onClick={() => handleVerPedido(pedido.idpedido)}
+                            >
+                              <FaEye className="btn-icon" />
+                              Ver
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
-            </div>
-
-            {/* Información de desarrollo - SIN FONDO BLANCO */}
-            <div className="dev-info">
-              <div className="dev-content">
-                <p>🚧 <strong>Sección en desarrollo</strong> No sirve ni monda gracias</p>
-              </div>
             </div>
           </div>
         )}
@@ -1093,7 +1216,7 @@ const PanelAdmin = () => {
         {currentSection === "dashboard" && <Dashboard />}
       </main>
 
-      {/* MODAL CREAR / EDITAR CON 4 IMÁGENES */}
+      {/* MODAL CREAR / EDITAR PRODUCTO CON 4 IMÁGENES */}
       {modalVisible && (
         <div className="modal">
           <div className="modal-content">
@@ -1279,6 +1402,97 @@ const PanelAdmin = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DETALLE PEDIDO */}
+      {showPedidoModal && selectedPedido && (
+        <div className="modal">
+          <div className="modal-content pedido-modal">
+            <h3>
+              <FaClipboardList className="modal-icon" />
+              Detalle del Pedido {selectedPedido.numero}
+            </h3>
+
+            <div className="pedido-detalle-grid">
+              <div className="pedido-detalle-col">
+                <h4>Cliente</h4>
+                <p><strong>Nombre:</strong> {selectedPedido.cliente}</p>
+                <p><strong>Correo:</strong> {selectedPedido.correo || "N/D"}</p>
+                <p><strong>Teléfono:</strong> {selectedPedido.telefono || "N/D"}</p>
+              </div>
+              <div className="pedido-detalle-col">
+                <h4>Envío</h4>
+                <p><strong>Dirección:</strong> {selectedPedido.direccion || "Sin dirección"}</p>
+                <p><strong>Ciudad:</strong> {selectedPedido.ciudad || "N/D"}</p>
+                <p><strong>Fecha:</strong> {selectedPedido.fecha}</p>
+              </div>
+              <div className="pedido-detalle-col">
+                <h4>Resumen</h4>
+                <p>
+                  <strong>Total:</strong>{" "}
+                  ${Number(selectedPedido.total || 0).toLocaleString("es-CO")}
+                </p>
+                <p>
+                  <strong>Estado actual:</strong>{" "}
+                  <span className={getEstadoBadgeClass(selectedPedido.estado)}>
+                    {selectedPedido.estado}
+                  </span>
+                </p>
+                <div className="estado-selector">
+                  <label htmlFor="estadoPedido">
+                    Cambiar estado:
+                  </label>
+                  <select
+                    id="estadoPedido"
+                    value={estadoEditando}
+                    onChange={(e) => setEstadoEditando(e.target.value)}
+                    disabled={pedidosLoading}
+                  >
+                    <option value="">Selecciona un estado</option>
+                    {ESTADOS_PEDIDO.map((estado) => (
+                      <option key={estado} value={estado}>
+                        {estado}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn btn--add"
+                onClick={handleGuardarEstadoPedido}
+                disabled={pedidosLoading}
+              >
+                {pedidosLoading ? (
+                  <>
+                    <FaSpinner className="btn-icon spinning" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="btn-icon" />
+                    Guardar cambios
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                className="btn btn--delete"
+                onClick={() => {
+                  setShowPedidoModal(false);
+                  setSelectedPedido(null);
+                }}
+                disabled={pedidosLoading}
+              >
+                <FaTimes className="btn-icon" />
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}

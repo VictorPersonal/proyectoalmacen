@@ -1,59 +1,77 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { supabase } from "../config/db.js";
+import { supabase } from "../config/db.js";      // BD (tablas)
+import { supabase as supabaseDB } from "../config/supabase.js"; // Storage/imágenes
 import { verificarToken } from "../controller/authMiddleware.js";
-import { supabase as supabaseDB } from "../config/supabase.js";
 import busboy from "busboy";
 import dotenv from "dotenv";
-
 
 dotenv.config();
 
 const router = express.Router();
 
-/*router.post("/upload", upload.single("image"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No se subió ninguna imagen" });
-    }
+/* =========================================================
+   HELPERS GENERALES
+========================================================= */
 
-    // 🔹 Subir imagen al folder de productos
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "productos_tienda",
-    });
+const traducirEstado = (idEstado) => {
+  const estados = {
+    1: "Pendiente",
+    2: "Pagado",
+    3: "En camino",
+    4: "Entregado",
+    5: "Cancelado",
+  };
+  return estados[idEstado] || "Desconocido";
+};
 
-    // 🔹 Eliminar el archivo temporal local
-    fs.unlinkSync(req.file.path);
+const estadoTextoAId = (estadoTexto) => {
+  if (typeof estadoTexto === "number") return estadoTexto;
+  if (!estadoTexto) return null;
 
-    res.status(200).json({
-      message: "Imagen subida correctamente",
-      secure_url: result.secure_url,
-    });
-  } catch (error) {
-    console.error("❌ Error al subir imagen:", error);
-    res.status(500).json({
-      message: "Error al subir imagen",
-      error: error.message || error,
-    });
-  }
-});*/
+  const mapa = {
+    pendiente: 1,
+    pagado: 2,
+    "en camino": 3,
+    entregado: 4,
+    cancelado: 5,
+  };
 
+  const clave = estadoTexto.toString().trim().toLowerCase();
+  return mapa[clave] || null;
+};
 
-// ====================================================================
-// 🧾 REGISTRO DE USUARIO
-// ====================================================================
+// Test router
+router.get("/ping", (req, res) => {
+  res.json({ ok: true, mensaje: "Router principal funcionando" });
+});
+
+/* =========================================================
+   AUTENTICACIÓN Y USUARIOS
+========================================================= */
+
+// Registro
 router.post("/usuario", async (req, res) => {
-  const { cedula, nombre, apellido, direccion, email, ciudad, contrasena, rol } = req.body;
+  const {
+    cedula,
+    nombre,
+    apellido,
+    direccion,
+    email,
+    ciudad,
+    contrasena,
+    rol,
+  } = req.body;
 
   if (!cedula || !nombre || !email || !contrasena) {
-    return res
-      .status(400)
-      .json({ message: "Faltan datos obligatorios (cédula, nombre, email, contraseña)." });
+    return res.status(400).json({
+      message:
+        "Faltan datos obligatorios (cédula, nombre, email, contraseña).",
+    });
   }
 
   try {
-    // 1️⃣ Validar si la cédula ya existe
     const { data: cedulaExistente, error: errorCedula } = await supabase
       .from("usuario")
       .select("cedula")
@@ -64,10 +82,8 @@ router.post("/usuario", async (req, res) => {
       return res.status(409).json({ message: "La cédula ya está registrada" });
     }
 
-    // 2️⃣ Cifrar la contraseña
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
-    // 3️⃣ Insertar usuario nuevo
     const { data, error } = await supabase
       .from("usuario")
       .insert([
@@ -97,14 +113,14 @@ router.post("/usuario", async (req, res) => {
   }
 });
 
-// ====================================================================
-// 🔑 INICIAR SESIÓN
-// ====================================================================
+// Login
 router.post("/login", async (req, res) => {
   const { email, contrasena } = req.body;
 
   if (!email || !contrasena) {
-    return res.status(400).json({ message: "Correo y contraseña son obligatorios" });
+    return res
+      .status(400)
+      .json({ message: "Correo y contraseña son obligatorios" });
   }
 
   try {
@@ -121,23 +137,20 @@ router.post("/login", async (req, res) => {
 
     const usuario = usuarios[0];
 
-    // ✅ Comparar contraseña cifrada
     const validPassword = await bcrypt.compare(contrasena, usuario.password);
     if (!validPassword) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // ✅ Crear token JWT
     const token = jwt.sign(
       { id: usuario.cedula, rol: usuario.rol },
       process.env.JWT_SECRET || "clave_secreta_segura",
       { expiresIn: "1h" }
     );
 
-    // ✅ Enviar cookie HTTP-only
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // Cambia a true si usas HTTPS
+      secure: false,
       sameSite: "lax",
       maxAge: 60 * 60 * 1000,
     });
@@ -146,8 +159,8 @@ router.post("/login", async (req, res) => {
       message: "Inicio de sesión exitoso",
       usuario: {
         nombre: usuario.nombre,
-        rol: usuario.rol
-      }
+        rol: usuario.rol,
+      },
     });
   } catch (error) {
     console.error("❌ Error en el login:", error.message);
@@ -155,43 +168,44 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ====================================================================
-// ✏️ ACTUALIZAR PERFIL DEL USUARIO
-// ====================================================================
+// Perfil (GET)
 router.get("/usuario/perfil", verificarToken, async (req, res) => {
-  const cedula = req.usuario.id; // viene del token
+  const cedula = req.usuario.id;
 
   try {
     const { data, error } = await supabase
       .from("usuario")
-      .select("cedula, nombre, apellido, email, direccion, ciudad, rol")
+      .select(
+        "cedula, nombre, apellido, direccion, ciudad, email, rol, telefono"
+      )
       .eq("cedula", cedula)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+
     if (!data) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    console.log("✅ Perfil obtenido para cédula:", cedula);
     res.status(200).json(data);
   } catch (error) {
     console.error("❌ Error al obtener perfil:", error.message);
-    res.status(500).json({ message: "Error al obtener el perfil del usuario" });
+    res.status(500).json({ message: "Error al obtener perfil" });
   }
 });
 
-// ✅ ENDPOINT PUT - ACTUALIZA DATOS
+// Perfil (PUT)
 router.put("/usuario/perfil", verificarToken, async (req, res) => {
-  const cedula = req.usuario.id; // viene del token
-  const { nombre, apellido, direccion, ciudad, telefono } = req.body; 
+  const cedula = req.usuario.id;
+  const { nombre, apellido, direccion, ciudad, telefono } = req.body;
 
   if (!nombre || !apellido) {
-    return res.status(400).json({ message: "Nombre y apellido son obligatorios" });
+    return res
+      .status(400)
+      .json({ message: "Nombre y apellido son obligatorios" });
   }
 
   try {
-    // Verificar que el usuario exista
     const { data: usuarioExistente, error: errorSelect } = await supabase
       .from("usuario")
       .select("cedula")
@@ -203,54 +217,57 @@ router.put("/usuario/perfil", verificarToken, async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Actualizar perfil
     const { data, error } = await supabase
       .from("usuario")
-      .update({ 
-        nombre, 
-        apellido, 
-        direccion, 
-        ciudad, 
-        telefono
+      .update({
+        nombre,
+        apellido,
+        direccion,
+        ciudad,
+        telefono,
       })
       .eq("cedula", cedula)
-      .select("cedula, nombre, apellido, email, direccion, ciudad, rol, telefono")
+      .select(
+        "cedula, nombre, apellido, email, direccion, ciudad, rol, telefono"
+      )
       .single();
 
     if (error) throw error;
 
-    console.log("✅ Perfil actualizado para cédula:", cedula);
     res.status(200).json({
       message: "Perfil actualizado correctamente",
       usuario: data,
     });
   } catch (error) {
     console.error("❌ Error al actualizar perfil:", error.message);
-    res.status(500).json({ message: "Error al actualizar el perfil del usuario" });
+    res
+      .status(500)
+      .json({ message: "Error al actualizar el perfil del usuario" });
   }
 });
 
-// ======================= CATEGORÍAS =========================
+/* =========================================================
+   CATEGORÍAS Y MARCAS
+========================================================= */
 
-// GET /api/categorias  → lista todas las categorías
+// CATEGORÍAS (única versión, usando descripcionCategoria)
 router.get("/categorias", async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("categoria")
-      .select("idcategoria, descripcionCategoria"); // 👈 nombre correcto
+      .select("idcategoria, descripcionCategoria")
+      .order("descripcionCategoria", { ascending: true });
 
     if (error) throw error;
-
-    return res.status(200).json(data);
+    res.status(200).json(data);
   } catch (err) {
     console.error("❌ Error al obtener categorías:", err.message);
-    return res
+    res
       .status(500)
       .json({ message: "Error al obtener categorías", error: err.message });
   }
 });
 
-// POST /api/categorias  → crea categoría nueva
 router.post("/categorias", async (req, res) => {
   try {
     const { descripcionCategoria } = req.body;
@@ -278,27 +295,24 @@ router.post("/categorias", async (req, res) => {
   }
 });
 
-// ========================= MARCAS ==========================
-
-// GET /api/marcas  → lista todas las marcas
+// MARCAS
 router.get("/marcas", async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("marca")
-      .select("idmarca, descripcionMarca"); // 👈 nombre correcto
+      .select("idmarca, descripcionMarca")
+      .order("descripcionMarca", { ascending: true });
 
     if (error) throw error;
-
-    return res.status(200).json(data);
+    res.status(200).json(data);
   } catch (err) {
     console.error("❌ Error al obtener marcas:", err.message);
-    return res
+    res
       .status(500)
       .json({ message: "Error al obtener marcas", error: err.message });
   }
 });
 
-// POST /api/marcas  → crea una nueva marca
 router.post("/marcas", async (req, res) => {
   try {
     const { descripcionMarca } = req.body;
@@ -326,17 +340,19 @@ router.post("/marcas", async (req, res) => {
   }
 });
 
+/* =========================================================
+   PRODUCTOS (PÚBLICO + ADMIN + IMÁGENES)
+========================================================= */
 
-// ====================================================================
-// 🧾 OBTENER UN PRODUCTO POR ID
-// ====================================================================
-router.get("/productos/:id", async (req, res) => {
-  const { id } = req.params;
-  
+// Lista pública (solo activos, con imágenes)
+router.get("/productos", async (req, res) => {
   try {
-    const { data: producto, error } = await supabaseDB
+    const { search } = req.query;
+
+    let query = supabaseDB
       .from("producto")
-      .select(`
+      .select(
+        `
         idproducto,
         nombre,
         precio,
@@ -349,9 +365,62 @@ router.get("/productos/:id", async (req, res) => {
           idimagen,
           url
         )
-      `)
+      `
+      )
+      .eq("activo", true)
+      .order("idproducto", { ascending: false });
+
+    if (search) {
+      query = query.or(
+        `nombre.ilike.%${search}%,descripcion.ilike.%${search}%`
+      );
+    }
+
+    const { data: productos, error } = await query;
+
+    if (error) {
+      console.error("❌ Error de Supabase:", error);
+      return res.status(500).json({
+        message: "Error al obtener productos",
+        error: error.message,
+      });
+    }
+
+    res.json(productos);
+  } catch (err) {
+    console.error("❌ Error al obtener productos:", err);
+    res.status(500).json({
+      message: "Error al obtener productos",
+      error: err.message,
+    });
+  }
+});
+
+// Obtener producto por ID (público)
+router.get("/productos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { data: producto, error } = await supabaseDB
+      .from("producto")
+      .select(
+        `
+        idproducto,
+        nombre,
+        precio,
+        stock,
+        descripcion,
+        idcategoria,
+        idmarca,
+        activo,
+        producto_imagen (
+          idimagen,
+          url
+        )
+      `
+      )
       .eq("idproducto", id)
-      .eq("activo", true)  // ← ¡AGREGA ESTE FILTRO!
+      .eq("activo", true)
       .single();
 
     if (error) {
@@ -361,10 +430,6 @@ router.get("/productos/:id", async (req, res) => {
       throw error;
     }
 
-    if (!producto) {
-      return res.status(404).json({ message: "Producto no encontrado" });
-    }
-
     res.json(producto);
   } catch (err) {
     console.error("❌ Error al obtener producto:", err);
@@ -372,106 +437,414 @@ router.get("/productos/:id", async (req, res) => {
   }
 });
 
-// ====================================================================
-// ➕ CREAR PRODUCTO
-// ====================================================================
-router.post("/productos", async (req, res) => {
+// Productos por categoría
+router.get("/categorias/:idcategoria/productos", async (req, res) => {
+  const { idcategoria } = req.params;
+
   try {
-    const { nombre, precio, stock, categoria } = req.body;
-
-    if (!nombre || !precio || !stock || !categoria) {
-      return res
-        .status(400)
-        .json({ message: "Faltan campos obligatorios (nombre, precio, stock, categoría)." });
-    }
-
     const { data, error } = await supabase
       .from("producto")
-      .insert([{ nombre, precio, stock, idcategoria: categoria }])
-      .select("idproducto, nombre, precio, stock, idcategoria")
+      .select(
+        `
+        idproducto,
+        nombre,
+        precio,
+        stock,
+        descripcion,
+        idcategoria,
+        activo,
+        producto_imagen(url)
+      `
+      )
+      .eq("idcategoria", idcategoria)
+      .eq("activo", true)
+      .order("nombre", { ascending: true });
+
+    if (error) throw error;
+
+    const productos = (data || []).map((p) => ({
+      idproducto: p.idproducto,
+      nombre: p.nombre,
+      precio: p.precio,
+      stock: p.stock,
+      descripcion: p.descripcion,
+      idcategoria: p.idcategoria,
+      producto_imagen: p.producto_imagen || [],
+      activo: p.activo,
+    }));
+
+    res.status(200).json(productos);
+  } catch (err) {
+    console.log("❌ Error servidor:", err);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+});
+
+// ADMIN: obtener todos los productos (incluyendo inactivos)
+router.get("/admin/productos", verificarToken, async (req, res) => {
+  try {
+    const { data: productos, error } = await supabaseDB
+      .from("producto")
+      .select(
+        `
+        idproducto,
+        nombre,
+        precio,
+        stock,
+        descripcion,
+        idcategoria,
+        idmarca,
+        activo,
+        producto_imagen (
+          idimagen,
+          url
+        )
+      `
+      )
+      .order("idproducto", { ascending: false });
+
+    if (error) {
+      console.error("❌ [ADMIN] Error al obtener productos:", error);
+      return res.status(500).json({
+        message: "Error al obtener productos",
+        error: error.message,
+      });
+    }
+
+    res.json(productos);
+  } catch (err) {
+    console.error("❌ [ADMIN] Error al obtener productos:", err);
+    res.status(500).json({
+      message: "Error al obtener productos",
+      error: err.message,
+    });
+  }
+});
+
+// CREAR producto con imágenes
+router.post("/productos/con-imagen", (req, res) => {
+  const bb = busboy({ headers: req.headers });
+  const campos = {};
+  const files = [];
+
+  bb.on("file", (name, file, info) => {
+    const { filename, mimeType } = info;
+    const chunks = [];
+
+    file.on("data", (chunk) => chunks.push(chunk));
+    file.on("end", () => {
+      const fileBuffer = Buffer.concat(chunks);
+      files.push({ name, filename, mimeType, buffer: fileBuffer });
+    });
+  });
+
+  bb.on("field", (name, val) => {
+    campos[name] = val;
+  });
+
+  bb.on("close", async () => {
+    try {
+      const imageUrls = [];
+
+      for (const file of files) {
+        if (file.buffer) {
+          const { data: uploadData, error: uploadError } = await supabaseDB
+            .storage.from("productos")
+            .upload(`productos/${Date.now()}_${file.filename}`, file.buffer, {
+              contentType: file.mimeType,
+              upsert: true,
+            });
+
+          if (uploadError) throw uploadError;
+
+          const publicURL = supabaseDB.storage
+            .from("productos")
+            .getPublicUrl(uploadData.path).data.publicUrl;
+
+          imageUrls.push(publicURL);
+        }
+      }
+
+      const { data: productoCreado, error: errorInsert } = await supabaseDB
+        .from("producto")
+        .insert([
+          {
+            nombre: campos.nombre,
+            descripcion: campos.descripcion || "",
+            precio: Number(campos.precio),
+            stock: Number(campos.stock),
+            idcategoria: Number(campos.idcategoria),
+            idmarca: campos.idmarca ? Number(campos.idmarca) : null,
+          },
+        ])
+        .select(
+          `
+          idproducto,
+          nombre,
+          precio,
+          stock,
+          descripcion,
+          idcategoria,
+          idmarca,
+          activo
+        `
+        )
+        .single();
+
+      if (errorInsert) throw errorInsert;
+
+      if (imageUrls.length > 0) {
+        const imagenesData = imageUrls.map((url) => ({
+          idproducto: productoCreado.idproducto,
+          url,
+        }));
+
+        const { data: imagenesCreadas, error: errorImagenes } = await supabaseDB
+          .from("producto_imagen")
+          .insert(imagenesData)
+          .select();
+
+        if (errorImagenes) throw errorImagenes;
+
+        productoCreado.producto_imagen = imagenesCreadas;
+      }
+
+      res.status(201).json({
+        producto: productoCreado,
+        message: `Producto creado con ${imageUrls.length} imágenes`,
+      });
+    } catch (err) {
+      console.error("❌ Error al crear producto:", err);
+      res.status(500).json({
+        message: err.message || "Error desconocido al crear producto",
+        stack: err.stack,
+      });
+    }
+  });
+
+  req.pipe(bb);
+});
+
+// EDITAR producto con imágenes
+router.put("/productos/:id/con-imagen", (req, res) => {
+  const { id } = req.params;
+  const bb = busboy({ headers: req.headers });
+  const campos = {};
+  const files = [];
+
+  bb.on("file", (name, file, info) => {
+    const { filename, mimeType } = info;
+    const chunks = [];
+
+    file.on("data", (chunk) => chunks.push(chunk));
+    file.on("end", () => {
+      const fileBuffer = Buffer.concat(chunks);
+      files.push({ name, filename, mimeType, buffer: fileBuffer });
+    });
+  });
+
+  bb.on("field", (name, val) => {
+    campos[name] = val;
+  });
+
+  bb.on("close", async () => {
+    try {
+      const imageUrls = [];
+
+      for (const file of files) {
+        if (file.buffer) {
+          const { data: uploadData, error: uploadError } = await supabaseDB
+            .storage.from("productos")
+            .upload(`productos/${Date.now()}_${file.filename}`, file.buffer, {
+              contentType: file.mimeType,
+              upsert: true,
+            });
+
+          if (uploadError) throw uploadError;
+
+          const publicURL = supabaseDB.storage
+            .from("productos")
+            .getPublicUrl(uploadData.path).data.publicUrl;
+
+          imageUrls.push(publicURL);
+        }
+      }
+
+      const { data: productoActualizado, error: errorUpdate } = await supabaseDB
+        .from("producto")
+        .update({
+          nombre: campos.nombre,
+          descripcion: campos.descripcion,
+          precio: Number(campos.precio),
+          stock: Number(campos.stock),
+          idcategoria: Number(campos.idcategoria),
+          idmarca: campos.idmarca ? Number(campos.idmarca) : null,
+        })
+        .eq("idproducto", id)
+        .select(
+          `
+          idproducto,
+          nombre,
+          precio,
+          stock,
+          descripcion,
+          idcategoria,
+          idmarca,
+          activo
+        `
+        )
+        .single();
+
+      if (errorUpdate) throw errorUpdate;
+
+      if (imageUrls.length > 0) {
+        const { error: deleteError } = await supabaseDB
+          .from("producto_imagen")
+          .delete()
+          .eq("idproducto", id);
+
+        if (deleteError) throw deleteError;
+
+        const imagenesData = imageUrls.map((url) => ({
+          idproducto: id,
+          url,
+        }));
+
+        const { data: imagenesCreadas, error: errorImagenes } = await supabaseDB
+          .from("producto_imagen")
+          .insert(imagenesData)
+          .select();
+
+        if (errorImagenes) throw errorImagenes;
+
+        productoActualizado.producto_imagen = imagenesCreadas;
+      } else {
+        const { data: imagenesExistentes } = await supabaseDB
+          .from("producto_imagen")
+          .select("*")
+          .eq("idproducto", id);
+
+        productoActualizado.producto_imagen = imagenesExistentes || [];
+      }
+
+      res.status(200).json({
+        producto: productoActualizado,
+        message:
+          imageUrls.length > 0
+            ? `Producto actualizado con ${imageUrls.length} nuevas imágenes`
+            : "Producto actualizado (sin cambios en imágenes)",
+      });
+    } catch (err) {
+      console.error("❌ Error al editar producto:", err);
+      res.status(500).json({ message: "Error al editar producto" });
+    }
+  });
+
+  req.pipe(bb);
+});
+
+// Cambiar estado activo/inactivo
+router.patch("/productos/:id/estado", async (req, res) => {
+  const { id } = req.params;
+  const { activo } = req.body;
+
+  try {
+    const { data: productoActualizado, error } = await supabaseDB
+      .from("producto")
+      .update({ activo })
+      .eq("idproducto", id)
+      .select(
+        `
+        idproducto,
+        nombre,
+        precio,
+        stock,
+        descripcion,
+        idcategoria,
+        idmarca,
+        activo
+      `
+      )
       .single();
 
     if (error) throw error;
 
-    res.status(201).json({
-      message: "Producto creado exitosamente",
-      producto: data,
+    res.json({
+      producto: productoActualizado,
+      message: `Producto ${activo ? "activado" : "desactivado"} correctamente`,
     });
-  } catch (error) {
-    console.error("❌ Error al crear producto:", error.message);
-    res.status(500).json({ message: "Error al crear producto", error: error.message });
+  } catch (err) {
+    console.error("❌ Error al cambiar estado del producto:", err);
+    res.status(500).json({ message: "Error al cambiar estado del producto" });
   }
 });
 
-// ====================================================================
-// ✏️ ACTUALIZAR PRODUCTO
-// ====================================================================
-router.put("/productos/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { nombre, precio, stock, categoria } = req.body;
-
-    if (!nombre || !precio || !stock || !categoria) {
-      return res
-        .status(400)
-        .json({ message: "Faltan campos obligatorios (nombre, precio, stock, categoría)." });
-    }
-
-    const { data, error } = await supabase
-      .from("producto")
-      .update({ nombre, precio, stock, idcategoria: categoria })
-      .eq("idproducto", id)
-      .select();
-
-    if (error) throw error;
-
-    if (data.length === 0) {
-      return res.status(404).json({ message: "Producto no encontrado." });
-    }
-
-    res.status(200).json({ message: `Producto con ID ${id} actualizado correctamente.` });
-  } catch (error) {
-    console.error("❌ Error al actualizar producto:", error.message);
-    res.status(500).json({ message: "Error al actualizar producto", error: error.message });
-  }
-});
-
-// ====================================================================
-// ❌ ELIMINAR PRODUCTO
-// ====================================================================
+// Eliminar producto + imágenes
 router.delete("/productos/:id", async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const { id } = req.params;
+    const { data: imagenes } = await supabaseDB
+      .from("producto_imagen")
+      .select("url")
+      .eq("idproducto", id);
 
-    const { error, count } = await supabase
-      .from("producto")
-      .delete()
-      .eq("idproducto", id)
-      .select("idproducto", { count: "exact" });
+    if (imagenes && imagenes.length > 0) {
+      const filePaths = imagenes.map((img) => {
+        const urlParts = img.url.split("/");
+        return `productos/${urlParts[urlParts.length - 1]}`;
+      });
 
-    if (error) throw error;
-    if (count === 0) {
-      return res.status(404).json({ message: "Producto no encontrado." });
+      const { error: storageError } = await supabaseDB.storage
+        .from("productos")
+        .remove(filePaths);
+
+      if (storageError) {
+        console.error("Error al eliminar imágenes del storage:", storageError);
+      }
     }
 
-    res.status(200).json({ message: `Producto con ID ${id} eliminado correctamente.` });
-  } catch (error) {
-    console.error("❌ Error al eliminar producto:", error.message);
-    res.status(500).json({ message: "Error al eliminar producto", error: error.message });
+    await supabaseDB.from("producto_imagen").delete().eq("idproducto", id);
+    await supabaseDB.from("producto").delete().eq("idproducto", id);
+
+    res.status(200).json({
+      message: "Producto e imágenes eliminados correctamente",
+    });
+  } catch (err) {
+    console.error("❌ Error al eliminar producto:", err);
+    res.status(500).json({ message: "Error al eliminar producto" });
   }
 });
 
-// 🔐 Aplicar middleware de autenticación para todas las rutas del carrito
+// Solo imágenes de un producto
+router.get("/productos/:id/imagenes", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { data: imagenes, error } = await supabaseDB
+      .from("producto_imagen")
+      .select("*")
+      .eq("idproducto", id);
+
+    if (error) throw error;
+
+    res.json(imagenes);
+  } catch (err) {
+    console.error("❌ Error al obtener imágenes del producto:", err);
+    res.status(500).json({ message: "Error al obtener imágenes" });
+  }
+});
+
+/* =========================================================
+   CARRITO
+========================================================= */
+
 router.use("/carrito", verificarToken);
 
-// ====================================================================
-// 📦 Obtener productos del carrito del usuario autenticado
-// ====================================================================
 router.get("/carrito", async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
-    // 1️⃣ Obtener items del carrito
     const { data: carritoItems, error: errCarrito } = await supabase
       .from("carrito")
       .select("idproducto, cantidad")
@@ -482,9 +855,8 @@ router.get("/carrito", async (req, res) => {
       return res.status(200).json([]);
     }
 
-    const ids = carritoItems.map(i => i.idproducto);
+    const ids = carritoItems.map((i) => i.idproducto);
 
-    // 2️⃣ Traer productos (SIN imagen_url)
     const { data: productos, error: errProductos } = await supabase
       .from("producto")
       .select("idproducto, nombre, precio, descripcion, stock")
@@ -492,7 +864,6 @@ router.get("/carrito", async (req, res) => {
 
     if (errProductos) throw errProductos;
 
-    // 3️⃣ Traer imágenes desde producto_imagen
     const { data: imagenes, error: errImagenes } = await supabase
       .from("producto_imagen")
       .select("idproducto, url")
@@ -500,49 +871,44 @@ router.get("/carrito", async (req, res) => {
 
     if (errImagenes) throw errImagenes;
 
-    // 4️⃣ Unir imágenes con productos
-    const prodConImagenes = productos.map(p => {
-      const imgs = imagenes.filter(i => i.idproducto === p.idproducto);
+    const prodConImagenes = productos.map((p) => {
+      const imgs = imagenes.filter((i) => i.idproducto === p.idproducto);
       return {
         ...p,
-        imagenes: imgs.map(i => i.url)
+        imagenes: imgs.map((i) => i.url),
       };
     });
 
-    // 5️⃣ Construir respuesta final
-    const carrito = carritoItems.map(item => {
-      const prod = prodConImagenes.find(p => p.idproducto === item.idproducto);
+    const carrito = carritoItems.map((item) => {
+      const prod = prodConImagenes.find((p) => p.idproducto === item.idproducto);
       return {
         idproducto: item.idproducto,
         nombre: prod?.nombre,
         precio: prod?.precio,
         cantidad: item.cantidad,
         subtotal: prod?.precio * item.cantidad,
-        imagen_url: prod?.imagenes?.[0] || null // ✅ Usamos la primera imagen
+        imagen_url: prod?.imagenes?.[0] || null,
       };
     });
 
     return res.status(200).json(carrito);
-
   } catch (error) {
     console.error("❌ Error al obtener carrito:", error);
     res.status(500).json({ message: "Error al obtener carrito" });
   }
 });
 
-// ====================================================================
-// ➕ Agregar o actualizar producto en el carrito
-// ====================================================================
 router.post("/carrito/agregar", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
 
   if (!idproducto || !cantidad) {
-    return res.status(400).json({ message: "Faltan datos: idproducto o cantidad" });
+    return res
+      .status(400)
+      .json({ message: "Faltan datos: idproducto o cantidad" });
   }
 
   try {
-    // Verificar si ya existe el producto en el carrito
     const { data: existe, error: existeError } = await supabase
       .from("carrito")
       .select("cantidad")
@@ -553,7 +919,6 @@ router.post("/carrito/agregar", async (req, res) => {
     if (existeError) throw existeError;
 
     if (existe) {
-      // ✅ Si ya existe, actualizamos la cantidad
       const nuevaCantidad = existe.cantidad + cantidad;
       const { error: updateError } = await supabase
         .from("carrito")
@@ -563,7 +928,6 @@ router.post("/carrito/agregar", async (req, res) => {
 
       if (updateError) throw updateError;
     } else {
-      // ✅ Si no existe, insertamos nuevo registro
       const { error: insertError } = await supabase
         .from("carrito")
         .insert([{ cedula, idproducto, cantidad }]);
@@ -571,16 +935,17 @@ router.post("/carrito/agregar", async (req, res) => {
       if (insertError) throw insertError;
     }
 
-    res.status(200).json({ message: "Producto agregado correctamente al carrito" });
+    res
+      .status(200)
+      .json({ message: "Producto agregado correctamente al carrito" });
   } catch (error) {
     console.error("❌ Error al agregar producto al carrito:", error.message);
-    res.status(500).json({ message: "Error al agregar producto al carrito" });
+    res
+      .status(500)
+      .json({ message: "Error al agregar producto al carrito" });
   }
 });
 
-// ====================================================================
-// ❌ Eliminar un producto específico del carrito
-// ====================================================================
 router.delete("/carrito/eliminar/:idproducto", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto } = req.params;
@@ -595,24 +960,30 @@ router.delete("/carrito/eliminar/:idproducto", async (req, res) => {
 
     if (error) throw error;
     if (count === 0) {
-      return res.status(404).json({ message: "Producto no encontrado en el carrito" });
+      return res
+        .status(404)
+        .json({ message: "Producto no encontrado en el carrito" });
     }
 
-    res.status(200).json({ message: "Producto eliminado correctamente del carrito" });
+    res
+      .status(200)
+      .json({ message: "Producto eliminado correctamente del carrito" });
   } catch (error) {
     console.error("❌ Error al eliminar producto del carrito:", error.message);
-    res.status(500).json({ message: "Error al eliminar producto del carrito" });
+    res
+      .status(500)
+      .json({ message: "Error al eliminar producto del carrito" });
   }
 });
 
-// ====================================================================
-// 🧹 Vaciar completamente el carrito del usuario autenticado
-// ====================================================================
 router.delete("/carrito/vaciar", async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
-    const { error } = await supabase.from("carrito").delete().eq("cedula", cedula);
+    const { error } = await supabase
+      .from("carrito")
+      .delete()
+      .eq("cedula", cedula);
 
     if (error) throw error;
 
@@ -624,14 +995,13 @@ router.delete("/carrito/vaciar", async (req, res) => {
 });
 
 router.put("/carrito/actualizar", async (req, res) => {
-  const supabase = req.supabase; // ⬅️ Asegúrate de que esto exista
   const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
 
   try {
     if (!idproducto || cantidad < 1) {
       return res.status(400).json({
-        message: "Datos inválidos"
+        message: "Datos inválidos",
       });
     }
 
@@ -656,29 +1026,29 @@ router.put("/carrito/actualizar", async (req, res) => {
 
     return res.json({
       message: "Cantidad actualizada correctamente",
-      carrito
+      carrito,
     });
-
   } catch (error) {
     console.error("❌ Error al actualizar carrito:", error);
     res.status(500).json({
-      message: "Error interno del servidor"
+      message: "Error interno del servidor",
     });
   }
 });
 
-// Aplica el middleware a TODAS las rutas de favoritos
+/* =========================================================
+   FAVORITOS
+========================================================= */
+
 router.use("/favoritos", verificarToken);
 
-// ====================================================================
-// 📦 Obtener favoritos del usuario autenticado
-// ====================================================================
 router.get("/favoritos", async (req, res) => {
   try {
-    const cedula = req.usuario.id; 
+    const cedula = req.usuario.id;
     const { data: favoritosData, error } = await supabase
       .from("favoritoproducto")
-      .select(`
+      .select(
+        `
         idfavorito,
         fechaagregado,
         producto:producto (
@@ -688,23 +1058,21 @@ router.get("/favoritos", async (req, res) => {
           descripcion,
           stock
         )
-      `)
+      `
+      )
       .eq("cedula", cedula)
       .order("fechaagregado", { ascending: false });
 
     if (error) throw error;
 
-    // Si no hay favoritos, retornar array vacío
     if (!favoritosData || favoritosData.length === 0) {
       return res.status(200).json([]);
     }
 
-    // Extraemos los IDs de producto para obtener las imágenes
     const productosIds = favoritosData
-      .map(f => f.producto?.idproducto)
-      .filter(id => id != null);
+      .map((f) => f.producto?.idproducto)
+      .filter((id) => id != null);
 
-    // Obtenemos las imágenes de todos los productos favoritos
     const { data: imagenesData, error: errorImagenes } = await supabase
       .from("producto_imagen")
       .select("idproducto, url")
@@ -712,10 +1080,9 @@ router.get("/favoritos", async (req, res) => {
 
     if (errorImagenes) throw errorImagenes;
 
-    // Creamos un mapa de imágenes por producto
     const imagenesPorProducto = {};
     if (imagenesData) {
-      imagenesData.forEach(img => {
+      imagenesData.forEach((img) => {
         if (!imagenesPorProducto[img.idproducto]) {
           imagenesPorProducto[img.idproducto] = [];
         }
@@ -723,7 +1090,6 @@ router.get("/favoritos", async (req, res) => {
       });
     }
 
-    // Construimos la respuesta final con el formato que espera el frontend
     const favoritos = favoritosData.map((f) => ({
       idfavorito: f.idfavorito,
       fechaagregado: f.fechaagregado,
@@ -732,8 +1098,9 @@ router.get("/favoritos", async (req, res) => {
       precio: f.producto?.precio,
       descripcion: f.producto?.descripcion,
       stock: f.producto?.stock,
-      imagenes: imagenesPorProducto[f.producto?.idproducto] || [], 
-      imagen: imagenesPorProducto[f.producto?.idproducto]?.[0] || null 
+      imagenes: imagenesPorProducto[f.producto?.idproducto] || [],
+      imagen:
+        imagenesPorProducto[f.producto?.idproducto]?.[0] || null,
     }));
 
     res.status(200).json(favoritos);
@@ -743,19 +1110,15 @@ router.get("/favoritos", async (req, res) => {
   }
 });
 
-// ====================================================================
-// ➕ Agregar producto a favoritos
-// ====================================================================
 router.post("/favoritos", async (req, res) => {
   const { idproducto } = req.body;
-  const cedula = req.usuario.id; 
+  const cedula = req.usuario.id;
 
   if (!idproducto) {
     return res.status(400).json({ message: "Falta el id del producto." });
   }
 
   try {
-    // Validar que el producto exista
     const { data: productoExiste, error: errorProducto } = await supabase
       .from("producto")
       .select("idproducto")
@@ -764,10 +1127,11 @@ router.post("/favoritos", async (req, res) => {
 
     if (errorProducto) throw errorProducto;
     if (!productoExiste) {
-      return res.status(404).json({ message: `No existe un producto con el ID ${idproducto}.` });
+      return res.status(404).json({
+        message: `No existe un producto con el ID ${idproducto}.`,
+      });
     }
 
-    // Verificar si ya está en favoritos
     const { data: existe, error: errorExiste } = await supabase
       .from("favoritoproducto")
       .select("idfavorito")
@@ -777,7 +1141,9 @@ router.post("/favoritos", async (req, res) => {
 
     if (errorExiste) throw errorExiste;
     if (existe) {
-      return res.status(400).json({ message: "El producto ya está en favoritos." });
+      return res
+        .status(400)
+        .json({ message: "El producto ya está en favoritos." });
     }
 
     const { data: insertado, error: insertError } = await supabase
@@ -804,12 +1170,9 @@ router.post("/favoritos", async (req, res) => {
   }
 });
 
-// ====================================================================
-// ❌ Eliminar un producto de favoritos
-// ====================================================================
 router.delete("/favoritos/:idproducto", async (req, res) => {
   const { idproducto } = req.params;
-  const cedula = req.usuario.id; 
+  const cedula = req.usuario.id;
 
   try {
     const { data, error } = await supabase
@@ -821,159 +1184,107 @@ router.delete("/favoritos/:idproducto", async (req, res) => {
 
     if (error) throw error;
     if (!data || data.length === 0) {
-      return res.status(404).json({ message: "El producto no estaba en favoritos." });
+      return res
+        .status(404)
+        .json({ message: "El producto no estaba en favoritos." });
     }
 
-    res.status(200).json({ message: "Producto eliminado de favoritos correctamente." });
+    res
+      .status(200)
+      .json({ message: "Producto eliminado de favoritos correctamente." });
   } catch (error) {
     console.error("❌ Error al eliminar favorito:", error.message);
     res.status(500).json({ message: "Error al eliminar favorito" });
   }
 });
 
-// --------------------------------------------------------------------
-// 👤 PERFIL DE USUARIO AUTENTICADO
-// --------------------------------------------------------------------
-router.get("/usuario/perfil", verificarToken, async (req, res) => {
-  const cedula = req.usuario.id; // 👈 viene del token JWT
+/* =========================================================
+   ESTADÍSTICAS (DASHBOARD)
+========================================================= */
 
-  try {
-    const { data, error } = await supabase
-      .from("usuario")
-      .select("cedula, nombre, apellido, direccion, ciudad, email, rol, telefono")
-      .eq("cedula", cedula)
-      .maybeSingle();
+router.get(
+  "/estadisticas/productos-mas-vendidos",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const { data: detalles, error } = await supabase
+        .from("detallepedidomm")
+        .select(
+          `
+          cantidad,
+          idproducto,
+          producto:producto(idproducto, nombre)
+        `
+        );
 
-    if (error) throw error;
+      if (error) throw error;
 
-    if (!data) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      const contador = {};
+      (detalles || []).forEach((d) => {
+        const nombre =
+          d.producto?.nombre || `Desconocido (ID: ${d.idproducto})`;
+        contador[nombre] = (contador[nombre] || 0) + (d.cantidad || 0);
+      });
+
+      const top = Object.entries(contador)
+        .map(([nombre, cantidad]) => ({ nombre, cantidad }))
+        .sort((a, b) => b.cantidad - a.cantidad)
+        .slice(0, 5);
+
+      res.json(top);
+    } catch (err) {
+      console.error("❌ Error general:", err.message);
+      res
+        .status(500)
+        .json({ error: "Error al obtener productos más vendidos" });
     }
-
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("❌ Error al obtener perfil:", error.message);
-    res.status(500).json({ message: "Error al obtener perfil" });
   }
-});
+);
 
-router.get("/estadisticas/productos-mas-vendidos", verificarToken, async (req, res) => {
-  try {
-    console.log("🔍 Iniciando consulta de productos más vendidos...");
+router.get(
+  "/estadisticas/ventas-mensuales",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const { data: detalles, error: errorDetalles } = await supabase
+        .from("detallepedidomm")
+        .select("idpedido, subtotal");
 
-    // PRIMERO: Verificar todas las tablas relacionadas
-    const { data: productos, error: errorProductos } = await supabase
-      .from("producto")
-      .select("idproducto, nombre")
-      .limit(5);
+      if (errorDetalles) throw errorDetalles;
 
-    console.log("📦 Productos sample:", productos);
+      const { data: pedidos, error: errorPedidos } = await supabase
+        .from("pedido")
+        .select("idpedido, fechaelaboracionpedido");
 
-    // SEGUNDO: Verificar datos en detallepedido (probar diferentes nombres)
-    const tableNames = ["detallepedidomm", "detallepedidoMM", "detallepedido"];
-    
-    for (const tableName of tableNames) {
-      console.log(`🔎 Probando tabla: ${tableName}`);
-      
-      const { data, error } = await supabase
-        .from(tableName)
-        .select("*")
-        .limit(5);
+      if (errorPedidos) throw errorPedidos;
 
-      if (!error && data && data.length > 0) {
-        console.log(`✅ Tabla encontrada: ${tableName}`, data);
-        
-        // Si encontramos la tabla, hacemos la consulta completa
-        const { data: fullData, error: fullError } = await supabase
-          .from(tableName)
-          .select(`
-            cantidad, 
-            idproducto,
-            producto:producto(idproducto, nombre)
-          `);
+      const ventasPorMes = {};
 
-        if (fullError) {
-          console.error(`❌ Error en consulta de ${tableName}:`, fullError);
-          continue;
-        }
-
-        console.log(`📊 Datos completos de ${tableName}:`, fullData);
-
-        if (fullData && fullData.length > 0) {
-          const contador = {};
-          fullData.forEach((d, index) => {
-            console.log(`📦 Detalle ${index}:`, d);
-            
-            const nombre = d.producto?.nombre || `Desconocido (ID: ${d.idproducto})`;
-            contador[nombre] = (contador[nombre] || 0) + (d.cantidad || 0);
+      detalles.forEach((detalle) => {
+        const pedido = pedidos.find((p) => p.idpedido === detalle.idpedido);
+        if (pedido) {
+          const fecha = new Date(pedido.fechaelaboracionpedido);
+          const mes = fecha.toLocaleString("es-ES", {
+            month: "short",
+            year: "numeric",
           });
-
-          console.log("🧮 Contador final:", contador);
-
-          const top = Object.entries(contador)
-            .map(([nombre, cantidad]) => ({ nombre, cantidad }))
-            .sort((a, b) => b.cantidad - a.cantidad)
-            .slice(0, 5);
-
-          console.log("🏆 Top productos:", top);
-          return res.json(top);
+          ventasPorMes[mes] = (ventasPorMes[mes] || 0) + Number(detalle.subtotal);
         }
-      } else {
-        console.log(`❌ Tabla ${tableName} no encontrada o vacía:`, error);
-      }
+      });
+
+      const resultado = Object.entries(ventasPorMes).map(([mes, total]) => ({
+        mes,
+        total,
+      }));
+
+      res.json(resultado);
+    } catch (err) {
+      console.error("❌ Error al obtener ventas mensuales:", err);
+      res.status(500).json({ error: "Error al obtener ventas mensuales" });
     }
-
-    // Si llegamos aquí, no encontramos la tabla
-    console.log("📭 No se encontró la tabla de detalles de pedido");
-    return res.json([]);
-
-  } catch (err) {
-    console.error("❌ Error general:", err.message);
-    res.status(500).json({ error: "Error al obtener productos más vendidos" });
   }
-});
+);
 
-
-router.get("/estadisticas/ventas-mensuales", verificarToken, async (req, res) => {
-  try {
-    // Traer todos los detalles con el id del pedido y subtotal
-    const { data: detalles, error: errorDetalles } = await supabase
-      .from("detallepedidomm")
-      .select("idpedido, subtotal");
-
-    if (errorDetalles) throw errorDetalles;
-
-    // Traer todos los pedidos con fecha
-    const { data: pedidos, error: errorPedidos } = await supabase
-      .from("pedido")
-      .select("idpedido, fechaelaboracionpedido");
-
-    if (errorPedidos) throw errorPedidos;
-
-    // Combinar pedidos y detalles
-    const ventasPorMes = {};
-
-    detalles.forEach(detalle => {
-      const pedido = pedidos.find(p => p.idpedido === detalle.idpedido);
-      if (pedido) {
-        const fecha = new Date(pedido.fechaelaboracionpedido);
-        const mes = fecha.toLocaleString("es-ES", { month: "short", year: "numeric" });
-        ventasPorMes[mes] = (ventasPorMes[mes] || 0) + Number(detalle.subtotal);
-      }
-    });
-
-    const resultado = Object.entries(ventasPorMes).map(([mes, total]) => ({ mes, total }));
-
-    res.json(resultado);
-  } catch (err) {
-    console.error("❌ Error al obtener ventas mensuales:", err);
-    res.status(500).json({ error: "Error al obtener ventas mensuales" });
-  }
-});
-
-// ====================================================================
-// 👥 Usuarios por tipo (rol)
-// ====================================================================
 router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
   try {
     const { data: usuarios, error } = await supabase
@@ -988,7 +1299,10 @@ router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
       return acc;
     }, {});
 
-    const resultado = Object.entries(conteo).map(([tipo, cantidad]) => ({ tipo, cantidad }));
+    const resultado = Object.entries(conteo).map(([tipo, cantidad]) => ({
+      tipo,
+      cantidad,
+    }));
 
     res.json(resultado);
   } catch (err) {
@@ -997,671 +1311,246 @@ router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
   }
 });
 
-// ====================================================================
-// 📦 Estados de pedido
-// ====================================================================
-router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => {
+router.get(
+  "/estadisticas/estados-pedidos",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const { data: pedidos, error: errorPedidos } = await supabase
+        .from("pedido")
+        .select("idestadopedido");
+
+      if (errorPedidos) throw errorPedidos;
+
+      const { data: estados, error: errorEstados } = await supabase
+        .from("estadopedido")
+        .select("idestadopedido, descripcion");
+
+      if (errorEstados) throw errorEstados;
+
+      const conteo = estados.map((e) => ({
+        estado: e.descripcion,
+        cantidad: pedidos.filter(
+          (p) => p.idestadopedido === e.idestadopedido
+        ).length,
+      }));
+
+      res.json(conteo);
+    } catch (err) {
+      console.error("Error al obtener estados de pedido:", err);
+      res.status(500).json({ error: "Error al obtener estados de pedido" });
+    }
+  }
+);
+
+/* =========================================================
+   ADMIN – GESTIÓN DE PEDIDOS
+========================================================= */
+
+// Listar todos los pedidos
+router.get("/admin/pedidos", async (req, res) => {
   try {
-    const { data: pedidos, error: errorPedidos } = await supabase
+    const { data: pedidosRaw, error: pedidosError } = await supabase
       .from("pedido")
-      .select("idestadopedido");
+      .select(
+        "idpedido, total, fechaelaboracionpedido, idestadopedido, cedula, iddireccion"
+      )
+      .order("fechaelaboracionpedido", { ascending: false });
 
-    if (errorPedidos) throw errorPedidos;
+    if (pedidosError) throw pedidosError;
 
-    const { data: estados, error: errorEstados } = await supabase
-      .from("estadopedido")
-      .select("idestadopedido, descripcion");
-
-    if (errorEstados) throw errorEstados;
-
-    const conteo = estados.map(e => ({
-      estado: e.descripcion,
-      cantidad: pedidos.filter(p => p.idestadopedido === e.idestadopedido).length,
-    }));
-
-    res.json(conteo);
-  } catch (err) {
-    console.error("Error al obtener estados de pedido:", err);
-    res.status(500).json({ error: "Error al obtener estados de pedido" });
-  }
-});
-
-
-// Ruta para obtener productos con sus imágenes - SIN imagen_url
-router.get("/productos", async (req, res) => {
-  try {
-    const { search, soloActivos } = req.query;
-    
-    let query = supabaseDB
-      .from("producto")
-      .select(`
-        idproducto,
-        nombre,
-        precio,
-        stock,
-        descripcion,
-        idcategoria,
-        idmarca,
-        activo,
-        producto_imagen (
-          idimagen,
-          url
-        )
-      `);
-
-    // ✅ SIEMPRE filtrar por activo = true en endpoints públicos
-    query = query.eq('activo', true);
-
-    // Si hay búsqueda, agregar filtro de búsqueda
-    if (search) {
-      query = query.or(`nombre.ilike.%${search}%,descripcion.ilike.%${search}%`);
+    if (!pedidosRaw || pedidosRaw.length === 0) {
+      return res.status(200).json([]);
     }
 
-    query = query.order('idproducto', { ascending: false });
+    const cedulas = [
+      ...new Set(pedidosRaw.map((p) => p.cedula).filter(Boolean)),
+    ];
 
-    const { data: productos, error } = await query;
+    let mapaUsuarios = {};
+    if (cedulas.length > 0) {
+      const { data: usuarios, error: usuariosError } = await supabase
+        .from("usuario")
+        .select("cedula, nombre, apellido, email")
+        .in("cedula", cedulas);
 
-    if (error) {
-      console.error("❌ Error de Supabase:", error);
-      return res.status(500).json({ 
-        message: "Error al obtener productos",
-        error: error.message 
-      });
+      if (usuariosError) throw usuariosError;
+
+      mapaUsuarios = (usuarios || []).reduce((acc, u) => {
+        acc[u.cedula] = u;
+        return acc;
+      }, {});
     }
 
-    console.log(`✅ Productos activos obtenidos: ${productos?.length || 0}`);
-    res.json(productos);
-  } catch (err) {
-    console.error("❌ Error al obtener productos:", err);
-    res.status(500).json({ 
-      message: "Error al obtener productos",
-      error: err.message 
+    const pedidos = pedidosRaw.map((p) => {
+      const user = mapaUsuarios[p.cedula] || {};
+      const nombreCompleto = `${user.nombre || ""} ${
+        user.apellido || ""
+      }`.trim();
+
+      return {
+        idpedido: p.idpedido,
+        numero: `#${p.idpedido}`,
+        cliente: nombreCompleto || "Sin nombre",
+        direccion: p.iddireccion || "Sin dirección registrada",
+        estado: traducirEstado(p.idestadopedido),
+        total: Number(p.total || 0),
+        fecha: p.fechaelaboracionpedido || "",
+      };
     });
+
+    res.status(200).json(pedidos);
+  } catch (err) {
+    console.error("❌ Error al obtener pedidos admin:", err);
+    res.status(500).json({ message: "Error al obtener pedidos" });
   }
 });
 
-// GET - Obtener un producto específico por ID
-router.get("/productos/:id", async (req, res) => {
-  const { id } = req.params;
-  
+// Detalle de un pedido
+router.get("/admin/pedidos/:id", async (req, res) => {
   try {
-    const { data: producto, error } = await supabaseDB
-      .from("producto")
-      .select(`
-        idproducto,
-        nombre,
-        precio,
-        stock,
-        descripcion,
-        idcategoria,
-        idmarca,
-        activo,
-        producto_imagen (
-          idimagen,
-          url
-        )
-      `)
-      .eq("idproducto", id)
-      .eq("activo", true)
+    const { id } = req.params;
+
+    const { data: pedidoRaw, error: pedidoError } = await supabase
+      .from("pedido")
+      .select(
+        "idpedido, total, fechaelaboracionpedido, idestadopedido, cedula, iddireccion"
+      )
+      .eq("idpedido", id)
       .single();
 
-    if (error) throw error;
-
-    if (!producto) {
-      return res.status(404).json({ message: "Producto no encontrado" });
+    if (pedidoError) {
+      if (pedidoError.code === "PGRST116") {
+        return res.status(404).json({ message: "Pedido no encontrado" });
+      }
+      throw pedidoError;
     }
 
-    res.json(producto);
-  } catch (err) {
-    console.error("❌ Error al obtener producto:", err);
-    res.status(500).json({ message: "Error al obtener producto" });
-  }
-});
-
-// POST - Crear producto con imágenes
-router.post("/productos/con-imagen", (req, res) => {
-  const bb = busboy({ headers: req.headers });
-  const campos = {};
-  const files = [];
-
-  bb.on("file", (name, file, info) => {
-    const { filename, mimeType } = info;
-    const chunks = [];
-    
-    file.on("data", (chunk) => chunks.push(chunk));
-    file.on("end", () => {
-      const fileBuffer = Buffer.concat(chunks);
-      files.push({
-        name: name,
-        filename: filename,
-        mimeType: mimeType,
-        buffer: fileBuffer
-      });
-      console.log("Archivo recibido:", filename, "tamaño:", fileBuffer.length);
-    });
-  });
-
-  bb.on("field", (name, val) => {
-    campos[name] = val;
-  });
-
-  bb.on("close", async () => {
-    try {
-      const imageUrls = [];
-
-      // Subir cada imagen a Supabase Storage
-      for (const file of files) {
-        if (file.buffer) {
-          const { data: uploadData, error: uploadError } = await supabaseDB.storage
-            .from("productos")
-            .upload(`productos/${Date.now()}_${file.filename}`, file.buffer, { 
-              contentType: file.mimeType, 
-              upsert: true 
-            });
-
-          if (uploadError) {
-            console.error("Error al subir a Supabase:", uploadError);
-            throw uploadError;
-          }
-
-          const publicURL = supabaseDB.storage
-            .from("productos")
-            .getPublicUrl(uploadData.path).data.publicUrl;
-
-          imageUrls.push(publicURL);
-          console.log("Archivo subido a Supabase, URL pública:", publicURL);
-        }
-      }
-
-      // Insertar producto en la tabla producto
-      const { data: productoCreado, error: errorInsert } = await supabaseDB
-        .from("producto")
-        .insert([{
-          nombre: campos.nombre,
-          descripcion: campos.descripcion || "",
-          precio: Number(campos.precio),
-          stock: Number(campos.stock),
-          idcategoria: Number(campos.idcategoria),
-          idmarca: campos.idmarca ? Number(campos.idmarca) : null,
-        }])
-        .select(`
-          idproducto,
-          nombre,
-          precio,
-          stock,
-          descripcion,
-          idcategoria,
-          idmarca,
-          activo
-        `)
+    let usuario = null;
+    if (pedidoRaw.cedula) {
+      const { data: userData, error: userError } = await supabase
+        .from("usuario")
+        .select(
+          "cedula, nombre, apellido, email, direccion, ciudad, telefono"
+        )
+        .eq("cedula", pedidoRaw.cedula)
         .single();
 
-      if (errorInsert) {
-        console.error("Error al insertar producto en DB:", errorInsert);
-        throw errorInsert;
+      if (userError && userError.code !== "PGRST116") {
+        throw userError;
       }
 
-      // Insertar imágenes en la tabla producto_imagen
-      if (imageUrls.length > 0) {
-        const imagenesData = imageUrls.map((url) => ({
-          idproducto: productoCreado.idproducto,
-          url: url
-        }));
-
-        const { data: imagenesCreadas, error: errorImagenes } = await supabaseDB
-          .from("producto_imagen")
-          .insert(imagenesData)
-          .select();
-
-        if (errorImagenes) {
-          console.error("Error al insertar imágenes en DB:", errorImagenes);
-          throw errorImagenes;
-        }
-
-        // Agregar las imágenes al producto que retornamos
-        productoCreado.producto_imagen = imagenesCreadas;
-      }
-
-      res.status(201).json({ 
-        producto: productoCreado,
-        message: `Producto creado con ${imageUrls.length} imágenes`
-      });
-    } catch (err) {
-      console.error("❌ Error al crear producto:", err);
-      res.status(500).json({ 
-        message: err.message || "Error desconocido al crear producto", 
-        stack: err.stack 
-      });
-    }
-  });
-
-  req.pipe(bb);
-});
-
-// PUT - Editar producto con imágenes
-router.put("/productos/:id/con-imagen", (req, res) => {
-  const { id } = req.params;
-  const bb = busboy({ headers: req.headers });
-  const campos = {};
-  const files = [];
-
-  bb.on("file", (name, file, info) => {
-    const { filename, mimeType } = info;
-    const chunks = [];
-    
-    file.on("data", (chunk) => chunks.push(chunk));
-    file.on("end", () => {
-      const fileBuffer = Buffer.concat(chunks);
-      files.push({
-        name: name,
-        filename: filename,
-        mimeType: mimeType,
-        buffer: fileBuffer
-      });
-    });
-  });
-
-  bb.on("field", (name, val) => {
-    campos[name] = val;
-  });
-
-  bb.on("close", async () => {
-    try {
-      const imageUrls = [];
-
-      // Subir nuevas imágenes a Supabase Storage
-      for (const file of files) {
-        if (file.buffer) {
-          const { data: uploadData, error: uploadError } = await supabaseDB.storage
-            .from("productos")
-            .upload(`productos/${Date.now()}_${file.filename}`, file.buffer, { 
-              contentType: file.mimeType, 
-              upsert: true 
-            });
-
-          if (uploadError) throw uploadError;
-
-          const publicURL = supabaseDB.storage
-            .from("productos")
-            .getPublicUrl(uploadData.path).data.publicUrl;
-
-          imageUrls.push(publicURL);
-        }
-      }
-
-      // Actualizar producto en la tabla producto
-      const { data: productoActualizado, error: errorUpdate } = await supabaseDB
-        .from("producto")
-        .update({
-          nombre: campos.nombre,
-          descripcion: campos.descripcion,
-          precio: Number(campos.precio),
-          stock: Number(campos.stock),
-          idcategoria: Number(campos.idcategoria),
-          idmarca: campos.idmarca ? Number(campos.idmarca) : null,
-        })
-        .eq("idproducto", id)
-        .select(`
-          idproducto,
-          nombre,
-          precio,
-          stock,
-          descripcion,
-          idcategoria,
-          idmarca,
-          activo
-        `)
-        .single();
-
-      if (errorUpdate) throw errorUpdate;
-
-      // Si hay nuevas imágenes, eliminar las antiguas y agregar las nuevas
-      if (imageUrls.length > 0) {
-        // Eliminar imágenes existentes del producto
-        const { error: deleteError } = await supabaseDB
-          .from("producto_imagen")
-          .delete()
-          .eq("idproducto", id);
-
-        if (deleteError) throw deleteError;
-
-        // Insertar nuevas imágenes
-        const imagenesData = imageUrls.map((url) => ({
-          idproducto: id,
-          url: url
-        }));
-
-        const { data: imagenesCreadas, error: errorImagenes } = await supabaseDB
-          .from("producto_imagen")
-          .insert(imagenesData)
-          .select();
-
-        if (errorImagenes) throw errorImagenes;
-
-        // Agregar las imágenes al producto que retornamos
-        productoActualizado.producto_imagen = imagenesCreadas;
-      } else {
-        // Si no hay nuevas imágenes, obtener las existentes
-        const { data: imagenesExistentes } = await supabaseDB
-          .from("producto_imagen")
-          .select("*")
-          .eq("idproducto", id);
-
-        productoActualizado.producto_imagen = imagenesExistentes || [];
-      }
-
-      res.status(200).json({ 
-        producto: productoActualizado,
-        message: imageUrls.length > 0 ? `Producto actualizado con ${imageUrls.length} nuevas imágenes` : 'Producto actualizado (sin cambios en imágenes)'
-      });
-    } catch (err) {
-      console.error("❌ Error al editar producto:", err);
-      res.status(500).json({ message: "Error al editar producto" });
-    }
-  });
-
-  req.pipe(bb);
-});
-
-// PATCH - Activar/Desactivar producto
-router.patch("/productos/:id/estado", async (req, res) => {
-  const { id } = req.params;
-  const { activo } = req.body;
-
-  try {
-    const { data: productoActualizado, error } = await supabaseDB
-      .from("producto")
-      .update({ activo: activo })
-      .eq("idproducto", id)
-      .select(`
-        idproducto,
-        nombre,
-        precio,
-        stock,
-        descripcion,
-        idcategoria,
-        idmarca,
-        activo
-      `)
-      .single();
-
-    if (error) throw error;
-
-    res.json({ 
-      producto: productoActualizado,
-      message: `Producto ${activo ? 'activado' : 'desactivado'} correctamente`
-    });
-  } catch (err) {
-    console.error("❌ Error al cambiar estado del producto:", err);
-    res.status(500).json({ message: "Error al cambiar estado del producto" });
-  }
-});
-
-// DELETE - Eliminar producto
-router.delete("/productos/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Obtener imágenes del producto para eliminarlas del storage
-    const { data: imagenes } = await supabaseDB
-      .from("producto_imagen")
-      .select("url")
-      .eq("idproducto", id);
-
-    // Eliminar imágenes del storage (opcional)
-    if (imagenes && imagenes.length > 0) {
-      const filePaths = imagenes.map(img => {
-        const urlParts = img.url.split('/');
-        return `productos/${urlParts[urlParts.length - 1]}`;
-      });
-
-      const { error: storageError } = await supabaseDB.storage
-        .from("productos")
-        .remove(filePaths);
-
-      if (storageError) {
-        console.error("Error al eliminar imágenes del storage:", storageError);
-        // No lanzamos error aquí para no impedir la eliminación del producto
-      }
+      usuario = userData || null;
     }
 
-    // Primero eliminar las imágenes de la tabla producto_imagen
-    const { error: deleteImagenesError } = await supabaseDB
-      .from("producto_imagen")
-      .delete()
-      .eq("idproducto", id);
+    const nombreCompleto = usuario
+      ? `${usuario.nombre || ""} ${usuario.apellido || ""}`.trim()
+      : "Sin nombre";
 
-    if (deleteImagenesError) throw deleteImagenesError;
+    const pedido = {
+      idpedido: pedidoRaw.idpedido,
+      numero: `#${pedidoRaw.idpedido}`,
+      cliente: nombreCompleto,
+      correo: usuario?.email || "",
+      direccion: usuario?.direccion || pedidoRaw.iddireccion || "",
+      ciudad: usuario?.ciudad || "",
+      telefono: usuario?.telefono || "",
+      estado: traducirEstado(pedidoRaw.idestadopedido),
+      total: Number(pedidoRaw.total || 0),
+      fecha: pedidoRaw.fechaelaboracionpedido || "",
+    };
 
-    // Luego eliminar el producto
-    const { error: deleteError } = await supabaseDB
-      .from("producto")
-      .delete()
-      .eq("idproducto", id);
-
-    if (deleteError) throw deleteError;
-
-    res.status(200).json({ message: "Producto e imágenes eliminados correctamente" });
+    res.status(200).json(pedido);
   } catch (err) {
-    console.error("❌ Error al eliminar producto:", err);
-    res.status(500).json({ message: "Error al eliminar producto" });
+    console.error("❌ Error al obtener pedido:", err);
+    res.status(500).json({ message: "Error al obtener pedido" });
   }
 });
 
-// GET - Obtener solo las imágenes de un producto específico
-router.get("/productos/:id/imagenes", async (req, res) => {
-  const { id } = req.params;
-  
+// 👉 ACTUALIZAR ESTADO DE UN PEDIDO (idestadopedido)
+router.patch("/admin/pedidos/:id/estado", async (req, res) => {
   try {
-    const { data: imagenes, error } = await supabaseDB
-      .from("producto_imagen")
-      .select("*")
-      .eq("idproducto", id);
+    const { id } = req.params;
+    let { estado } = req.body; // puede venir como texto o número
 
-    if (error) throw error;
-
-    res.json(imagenes);
-  } catch (err) {
-    console.error("❌ Error al obtener imágenes del producto:", err);
-    res.status(500).json({ message: "Error al obtener imágenes" });
-  }
-});
-
-// POST - Crear producto sin imágenes (opcional)
-router.post("/productos", async (req, res) => {
-  try {
-    const { nombre, precio, stock, descripcion, idcategoria, idmarca } = req.body;
-
-    const { data: productoCreado, error } = await supabaseDB
-      .from("producto")
-      .insert([{
-        nombre,
-        descripcion: descripcion || "",
-        precio: Number(precio),
-        stock: Number(stock),
-        idcategoria: Number(idcategoria),
-        idmarca: idmarca ? Number(idmarca) : null,
-      }])
-      .select(`
-        idproducto,
-        nombre,
-        precio,
-        stock,
-        descripcion,
-        idcategoria,
-        idmarca,
-        activo
-      `)
-      .single();
-
-    if (error) throw error;
-
-    res.status(201).json({ 
-      producto: productoCreado,
-      message: "Producto creado correctamente"
+    console.log("📦 PATCH /admin/pedidos/:id/estado", {
+      id,
+      estado,
+      tipo: typeof estado,
     });
-  } catch (err) {
-    console.error("❌ Error al crear producto:", err);
-    res.status(500).json({ message: "Error al crear producto" });
-  }
-});
 
-// PUT - Editar producto sin imágenes (opcional)
-router.put("/productos/:id", async (req, res) => {
-  const { id } = req.params;
-  const { nombre, precio, stock, descripcion, idcategoria, idmarca } = req.body;
+    // 1️⃣ Validar que venga algo
+    if (estado === undefined || estado === null || estado === "") {
+      return res.status(400).json({ message: "El estado es obligatorio" });
+    }
 
-  try {
-    const { data: productoActualizado, error } = await supabaseDB
-      .from("producto")
-      .update({
-        nombre,
-        descripcion,
-        precio: Number(precio),
-        stock: Number(stock),
-        idcategoria: Number(idcategoria),
-        idmarca: idmarca ? Number(idmarca) : null,
-      })
-      .eq("idproducto", id)
-      .select(`
-        idproducto,
-        nombre,
-        precio,
-        stock,
-        descripcion,
-        idcategoria,
-        idmarca,
-        activo
-      `)
-      .single();
+    // 2️⃣ Convertir a idestadopedido
+    let nuevoIdEstado;
 
-    if (error) throw error;
+    // Si ya viene como número (ej: 1,2,3...)
+    if (typeof estado === "number") {
+      nuevoIdEstado = estado;
+    } else {
+      // Si viene como string (ej: "Pendiente", "Pagado", "En camino"...)
+      estado = estado.toString();
+      nuevoIdEstado = estadoTextoAId(estado);
+    }
 
-    res.json({ 
-      producto: productoActualizado,
-      message: "Producto actualizado correctamente"
-    });
-  } catch (err) {
-    console.error("❌ Error al editar producto:", err);
-    res.status(500).json({ message: "Error al editar producto" });
-  }
-});
+    console.log("🔎 nuevoIdEstado calculado:", nuevoIdEstado);
 
-// ================================================================
-// 📦 RUTAS DE CATEGORÍAS Y PRODUCTOS POR CATEGORÍA
-// ================================================================
+    if (nuevoIdEstado === null) {
+      return res
+        .status(400)
+        .json({ message: `Estado no válido: ${estado}` });
+    }
 
-// ✅ Obtener todas las categorías
-router.get("/categorias", async (req, res) => {
-  try {
+    // 3️⃣ Actualizar en la tabla pedido
     const { data, error } = await supabase
-      .from("categoria")
-      .select("idcategoria, descripcion")
-      .order("descripcion", { ascending: true });
+      .from("pedido")
+      .update({ idestadopedido: nuevoIdEstado })
+      .eq("idpedido", id)
+      .select("idpedido, idestadopedido")
+      .maybeSingle();
 
     if (error) {
-      console.error("❌ Error Supabase:", error);
-      return res.status(500).json({ message: "Error al obtener categorías" });
-    }
-
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("❌ Error servidor:", error);
-    res.status(500).json({ message: "Error al obtener categorías" });
-  }
-});
-
-// ✅ Obtener productos de una categoría específica
-router.get("/categorias/:idcategoria/productos", async (req, res) => {
-  const { idcategoria } = req.params;
-
-  try {
-    const { data, error } = await supabase
-      .from("producto")
-      .select(`
-        idproducto,
-        nombre,
-        precio,
-        stock,
-        descripcion,
-        idcategoria,
-        activo,
-        producto_imagen(url)
-      `)
-      .eq("idcategoria", idcategoria)
-      .eq("activo", true)
-      .order("nombre", { ascending: true });
-
-    if (error) {
-      console.log("❌ Error supabase:", error);
-      return res.status(500).json({ message: "Error al obtener productos" });
-    }
-
-    if (!data || data.length === 0) {
-      return res.status(404).json([]);
-    }
-
-    const productos = data.map((p) => ({
-      idproducto: p.idproducto,
-      nombre: p.nombre,
-      precio: p.precio,
-      stock: p.stock,
-      descripcion: p.descripcion,
-      idcategoria: p.idcategoria,
-      producto_imagen: p.producto_imagen || [],
-      activo: p.activo,
-    }));
-
-    res.status(200).json(productos);
-  } catch (err) {
-    console.log("❌ Error servidor:", err);
-    res.status(500).json({ message: "Error interno del servidor" });
-  }
-});
-
-// ====================================================================
-// 📋 OBTENER TODOS LOS PRODUCTOS (INCLUYENDO DESACTIVADOS) - SOLO ADMIN
-// ====================================================================
-router.get("/admin/productos", verificarToken, async (req, res) => {
-  try {
-    console.log("🔍 [ADMIN] Obteniendo todos los productos (incluyendo desactivados)...");
-    
-    const { data: productos, error } = await supabaseDB
-      .from("producto")
-      .select(`
-        idproducto,
-        nombre,
-        precio,
-        stock,
-        descripcion,
-        idcategoria,
-        idmarca,
-        activo,
-        producto_imagen (
-          idimagen,
-          url
-        )
-      `)
-      .order('idproducto', { ascending: false });
-
-    if (error) {
-      console.error("❌ [ADMIN] Error al obtener productos:", error);
-      return res.status(500).json({ 
-        message: "Error al obtener productos",
-        error: error.message 
+      console.error("❌ Supabase error al actualizar pedido:", error);
+      return res.status(500).json({
+        message: "Error al actualizar estado en la base de datos",
+        detalle: error.message || error,
       });
     }
 
-    console.log(`✅ [ADMIN] Productos obtenidos: ${productos?.length || 0}`);
-    
-    res.json(productos);
+    if (!data) {
+      return res.status(404).json({ message: "Pedido no encontrado" });
+    }
+
+    const estadoTexto = traducirEstado(data.idestadopedido);
+
+    console.log("✅ Pedido actualizado:", {
+      idpedido: data.idpedido,
+      idestadopedido: data.idestadopedido,
+      estadoTexto,
+    });
+
+    return res.status(200).json({
+      message: "Estado actualizado correctamente",
+      pedido: {
+        idpedido: data.idpedido,
+        idestadopedido: data.idestadopedido,
+        estadoTexto,
+      },
+    });
   } catch (err) {
-    console.error("❌ [ADMIN] Error al obtener productos:", err);
-    res.status(500).json({ 
-      message: "Error al obtener productos",
-      error: err.message 
+    console.error(
+      "❌ Error general PATCH /admin/pedidos/:id/estado:",
+      err
+    );
+    return res.status(500).json({
+      message: "Error al actualizar estado de pedido",
+      detalle: err.message || err,
     });
   }
 });
+
 
 export default router;
