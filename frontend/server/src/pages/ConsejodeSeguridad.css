@@ -1,0 +1,59 @@
+:root{
+  --bg: #f7f8fb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --border: #e6e9ef;
+}
+
+.cs-wrapper{
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  font-family: Inter, sans-serif;
+  background: transparent; /* o simplemente eliminar la línea */
+}
+
+.cs-card{
+  width: 100%;
+  max-width: 700px;
+  background: var(--card);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.cs-title{
+  margin: 0 0 12px 0;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.cs-list{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-item{
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.cs-item-title{
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.cs-item-desc{
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
