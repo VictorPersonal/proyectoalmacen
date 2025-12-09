@@ -23,6 +23,7 @@ import {
   FaShoppingBag,
   FaShoppingCart,
   FaClipboardList,
+  FaBell,
 } from "react-icons/fa";
 
 const ESTADOS_PEDIDO = ["Pendiente", "Pagado", "En camino", "Entregado", "Cancelado"];
@@ -51,6 +52,11 @@ const PanelAdmin = () => {
 
   const navigate = useNavigate();
   const profileRef = useRef(null);
+
+   // 🔔 NOTIFICACIONES
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
 
   // 🔹 El formulario ahora usa nombre de categoría y marca, no IDs directos
   const [formData, setFormData] = useState({
@@ -163,6 +169,48 @@ const PanelAdmin = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+
+    // =========================================================
+  // 🔔 NOTIFICACIONES (pedidos en estado Pendiente)
+  // =========================================================
+  const fetchNotifications = async () => {
+    try {
+      setNotificationsLoading(true);
+
+      const res = await axios.get(
+        "http://localhost:4000/api/admin/pedidos",
+        { withCredentials: true }
+      );
+
+      const pedidosData = res.data || [];
+
+      // Notificamos solo pedidos en estado "Pendiente"
+      const pendientes = pedidosData.filter(
+        (p) => p.estado === "Pendiente"
+      );
+
+      setNotifications(pendientes);
+    } catch (err) {
+      console.error("Error al obtener notificaciones:", err.response?.data || err.message);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudieron cargar las notificaciones",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
+
+  const toggleNotifications = () => {
+    // Cuando se abre el panel, recargamos las notificaciones
+    if (!showNotifications) {
+      fetchNotifications();
+    }
+    setShowNotifications((prev) => !prev);
+  };
 
   /* =========================================================
      TRAER PRODUCTOS
@@ -896,10 +944,85 @@ const PanelAdmin = () => {
 
       <main className="main-content">
         <div className="top-buttons">
-          <button className="help-btn" onClick={() => setShowHelp(true)}>
-            <FaQuestionCircle size={18} />
-          </button>
-        </div>
+          {/* 🔔 Botón de notificaciones */}
+          <button
+              className="notif-btn"
+              onClick={toggleNotifications}
+              title="Notificaciones"
+            >
+              <FaBell size={18} />
+              {notifications.length > 0 && (
+                <span className="notif-badge">
+                  {notifications.length}
+                </span>
+              )}
+            </button>
+
+            {/* Botón de ayuda existente */}
+            <button className="help-btn" onClick={() => setShowHelp(true)}>
+              <FaQuestionCircle size={18} />
+            </button>
+          </div>
+
+        {/* Panel de notificaciones */}
+        {showNotifications && (
+          <div className="notifications-panel">
+            <div className="notifications-header">
+              <h4>Notificaciones</h4>
+              <button
+                className="notifications-close"
+                onClick={() => setShowNotifications(false)}
+              >
+                <FaTimes size={12} />
+              </button>
+            </div>
+
+            {notificationsLoading ? (
+              <div className="notifications-loading">
+                <FaSpinner className="loading-spinner" />
+                <span>Cargando notificaciones...</span>
+              </div>
+            ) : notifications.length === 0 ? (
+              <p className="notifications-empty">
+                No hay pedidos pendientes.
+              </p>
+            ) : (
+              <ul className="notifications-list">
+                {notifications.map((pedido) => (
+                  <li key={pedido.idpedido} className="notification-item">
+                    <div className="notification-main">
+                      <span className="notification-title">
+                        Pedido {pedido.numero}
+                      </span>
+                      <span className="notification-client">
+                        {pedido.cliente}
+                      </span>
+                    </div>
+                    <div className="notification-meta">
+                      <span className="notification-total">
+                        ${pedido.total.toLocaleString()}
+                      </span>
+                      <span className="notification-date">
+                        {pedido.fecha}
+                      </span>
+                    </div>
+                    <button
+                      className="notification-btn"
+                      onClick={() => {
+                        setCurrentSection("pedidos");
+                        setShowNotifications(false);
+                      }}
+                    >
+                      Ver en pedidos
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+
 
         {/* =====================================================
             SECCIÓN PRODUCTOS
