@@ -53,6 +53,13 @@ function Registro() {
   };
 
   // Validaciones
+  const validarNombreCompleto = (nombre) => {
+  // Acepta letras, espacios y acentos
+    const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    return regex.test(nombre.trim());
+  };
+
+
   const validarEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -71,6 +78,7 @@ function Registro() {
   const validarFormulario = () => {
     const nuevosErrores = {};
 
+
     // Validar email
     if (!email) {
       nuevosErrores.email = "El email es requerido";
@@ -85,12 +93,17 @@ function Registro() {
       nuevosErrores.cedula = "La cédula debe tener máximo 10 dígitos numéricos";
     }
 
-    // Validar nombre
+
+    // Validar nombre completo
     if (!nombre.trim()) {
-      nuevosErrores.nombre = "El nombre es requerido";
+      nuevosErrores.nombre = "El nombre completo es requerido";
     } else if (nombre.trim().length < 2) {
       nuevosErrores.nombre = "El nombre debe tener al menos 2 caracteres";
+    } else if (!validarNombreCompleto(nombre)) {
+      nuevosErrores.nombre = "El nombre solo puede contener letras y espacios";
     }
+
+    
 
     // Validar contraseña
     if (!contrasena) {

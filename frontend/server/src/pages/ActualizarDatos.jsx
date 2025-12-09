@@ -118,22 +118,24 @@ function ActualizarPerfil() {
 
 
 
-    if (!/^[A-Za-z]+$/.test(nombre.trim())) {
-      mostrarError("El nombre solo puede contener letras (A-Z)");
+    // Regex para nombres y textos con espacios
+    const regexTexto = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+
+    if (!regexTexto.test(nombre.trim())) {
+      mostrarError("El nombre solo puede contener letras y espacios");
       return;
     }
 
-
-    if (!/^[A-Za-z]+$/.test(apellido.trim())) {
-      mostrarError("El apellido solo puede contener letras (A-Z)");
+    if (!regexTexto.test(apellido.trim())) {
+      mostrarError("El apellido solo puede contener letras y espacios");
       return;
     }
 
-
-    if (!/^[A-Za-z]+$/.test(ciudad.trim())) {
-      mostrarError("La ciudad solo puede contener letras (A-Z)");
+    if (!regexTexto.test(ciudad.trim())) {
+      mostrarError("La ciudad solo puede contener letras y espacios");
       return;
     }
+
 
 
 
