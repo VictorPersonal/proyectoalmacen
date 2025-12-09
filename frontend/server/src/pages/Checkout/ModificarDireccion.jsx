@@ -15,7 +15,9 @@ import {
   FaLightbulb,
   FaTimes,
   FaCheck,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaCrosshairs,
+  FaMapPin
 } from 'react-icons/fa';
 
 // Fix para los iconos de Leaflet en React
@@ -34,6 +36,30 @@ function UpdateMapCenter({ center }) {
   }, [center, map]);
   return null;
 }
+
+// Función para hacer peticiones a través de un proxy CORS
+const fetchWithCorsProxy = async (url) => {
+  // Usar un proxy público de CORS
+  const proxyUrl = 'https://api.allorigins.win/get?url=';
+  
+  try {
+    const response = await fetch(`${proxyUrl}${encodeURIComponent(url)}`);
+    let data = await response.json();
+    data = JSON.parse(data.contents);
+    return data;
+  } catch (error) {
+    console.error('Error con proxy:', error);
+    
+    // Intentar con proxy alternativo
+    try {
+      const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+      return await response.json();
+    } catch (error2) {
+      console.error('Error con proxy alternativo:', error2);
+      throw error2;
+    }
+  }
+};
 
 // Función mejorada para formatear la dirección en formato colombiano
 const formatearDireccionColombiana = (address, busquedaOriginal = "") => {
@@ -121,6 +147,7 @@ const ModificarDireccion = () => {
   const [coordenadas, setCoordenadas] = useState([4.6097, -74.0817]); // Bogotá por defecto
   const [loading, setLoading] = useState(false);
   const [markerPosition, setMarkerPosition] = useState([4.6097, -74.0817]);
+  const [precision, setPrecision] = useState(null);
   const navigate = useNavigate();
   const mapRef = useRef();
 
@@ -145,7 +172,7 @@ const ModificarDireccion = () => {
     cargarDireccionActual();
   }, []);
 
-  // Función mejorada para buscar dirección
+  // Función mejorada para buscar dirección usando proxy CORS
   const buscarDireccion = async () => {
     if (!busqueda.trim()) {
       Swal.fire({
@@ -160,19 +187,15 @@ const ModificarDireccion = () => {
 
     setLoading(true);
     try {
-      // Primero intentar una búsqueda más específica
-      let response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}&limit=1&addressdetails=1`
-      );
+      // Usar proxy CORS para evitar bloqueos
+      let searchUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}&limit=1&addressdetails=1`;
       
-      let data = await response.json();
+      let data = await fetchWithCorsProxy(searchUrl);
       
       // Si no encuentra resultados, intentar agregando "Colombia"
       if (!data || data.length === 0) {
-        response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda + ', Colombia')}&limit=1&addressdetails=1`
-        );
-        data = await response.json();
+        const searchUrlWithCountry = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda + ', Colombia')}&limit=1&addressdetails=1`;
+        data = await fetchWithCorsProxy(searchUrlWithCountry);
       }
       
       if (data && data.length > 0) {
@@ -186,9 +209,9 @@ const ModificarDireccion = () => {
         const direccionFormateada = formatearDireccionColombiana(result.address, busqueda);
         const city = extraerCiudad(result.address, busqueda);
         
-        console.log("Resultado raw:", result);
-        console.log("Address components:", result.address);
+        console.log("Resultado encontrado:", result);
         console.log("Dirección formateada:", direccionFormateada);
+        console.log("Ciudad:", city);
         
         setDireccion(direccionFormateada);
         setCiudad(city);
@@ -225,8 +248,8 @@ const ModificarDireccion = () => {
       
       Swal.fire({
         icon: 'warning',
-        title: 'Búsqueda manual',
-        text: 'Dirección guardada. Por favor verifica la ubicación en el mapa.',
+        title: 'Modo manual',
+        text: 'Usando dirección ingresada. Por favor ajusta manualmente la ubicación en el mapa.',
         confirmButtonText: 'Entendido',
         confirmButtonColor: '#1a73e8'
       });
@@ -235,18 +258,18 @@ const ModificarDireccion = () => {
     }
   };
 
-  // Función para geocodificación inversa
+  // Función para geocodificación inversa usando proxy CORS
   const reverseGeocode = async (lat, lng) => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
-      );
+      const reverseUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18`;
       
-      const data = await response.json();
+      const data = await fetchWithCorsProxy(reverseUrl);
       
       if (data && data.address) {
         const direccionFormateada = formatearDireccionColombiana(data.address, busqueda);
         const city = extraerCiudad(data.address, busqueda);
+        
+        console.log("Reverse geocode result:", data);
         
         if (direccionFormateada) {
           setDireccion(direccionFormateada);
@@ -258,6 +281,7 @@ const ModificarDireccion = () => {
       }
     } catch (error) {
       console.error("Error en geocodificación inversa:", error);
+      // No mostrar error al usuario para no interrumpir
     }
   };
 
@@ -271,13 +295,15 @@ const ModificarDireccion = () => {
     reverseGeocode(lat, lng);
   };
 
-  // Función para usar mi ubicación actual
+  // Función MEJORADA para usar mi ubicación actual
   const usarMiUbicacion = () => {
+    console.log("Botón 'Usar mi ubicación' clickeado");
+    
     if (!navigator.geolocation) {
       Swal.fire({
         icon: 'error',
         title: 'Geolocalización no soportada',
-        text: 'Tu navegador no soporta la geolocalización',
+        text: 'Tu navegador no soporta la geolocalización. Actualiza tu navegador o usa Chrome/Firefox/Edge.',
         confirmButtonText: 'Entendido',
         confirmButtonColor: '#dc3545'
       });
@@ -285,6 +311,26 @@ const ModificarDireccion = () => {
     }
 
     setLoading(true);
+    
+    // Mostrar mensaje de solicitud de permisos
+    Swal.fire({
+      title: 'Obteniendo ubicación precisa',
+      text: 'Estamos buscando tu ubicación exacta. Por favor espera...',
+      icon: 'info',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // Opciones mejoradas para mayor precisión
+    const options = {
+      enableHighAccuracy: true, // Forzar alta precisión
+      timeout: 30000, // 30 segundos para dar tiempo a obtener señal GPS
+      maximumAge: 0 // No usar datos cacheados
+    };
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const userCoords = [
@@ -292,50 +338,177 @@ const ModificarDireccion = () => {
           position.coords.longitude
         ];
 
+        // Calcular precisión estimada (en metros)
+        const accuracy = position.coords.accuracy; // En metros
+        console.log("Ubicación obtenida:", userCoords);
+        console.log("Precisión:", accuracy, "metros");
+        
+        // Convertir precisión a mensaje entendible
+        let precisionMsg = "";
+        if (accuracy < 10) {
+          precisionMsg = "Precisión excelente (menos de 10 metros)";
+          setPrecision("excelente");
+        } else if (accuracy < 50) {
+          precisionMsg = "Precisión buena (menos de 50 metros)";
+          setPrecision("buena");
+        } else if (accuracy < 100) {
+          precisionMsg = "Precisión moderada (menos de 100 metros)";
+          setPrecision("moderada");
+        } else {
+          precisionMsg = `Precisión baja (aproximadamente ${Math.round(accuracy)} metros)`;
+          setPrecision("baja");
+        }
+
         setCoordenadas(userCoords);
         setMarkerPosition(userCoords);
+        
+        // Calcular zoom apropiado basado en la precisión
+        let zoomLevel = 18; // Zoom por defecto muy cercano
+        if (accuracy > 100) zoomLevel = 16;
+        if (accuracy > 500) zoomLevel = 15;
+        if (accuracy > 1000) zoomLevel = 14;
+        
+        // Actualizar el mapa con el nuevo zoom
+        if (mapRef.current) {
+          mapRef.current.setView(userCoords, zoomLevel);
+        }
+
+        // Hacer reverse geocode
         reverseGeocode(userCoords[0], userCoords[1]);
+        
         setLoading(false);
 
         Swal.fire({
           icon: 'success',
           title: 'Ubicación detectada',
-          text: 'Tu ubicación actual se ha establecido en el mapa',
-          confirmButtonText: 'Continuar',
-          confirmButtonColor: '#28a745'
+          html: `
+            <div style="text-align: left; font-size: 14px;">
+              <p><strong>Coordenadas:</strong><br>
+              Latitud: ${userCoords[0].toFixed(6)}<br>
+              Longitud: ${userCoords[1].toFixed(6)}</p>
+              <p><strong>${precisionMsg}</strong></p>
+              <p><em>Si la ubicación no es exacta, puedes ajustar el marcador arrastrándolo.</em></p>
+            </div>
+          `,
+          confirmButtonText: 'Entendido',
+          confirmButtonColor: '#28a745',
+          width: '500px'
         });
       },
       (error) => {
         setLoading(false);
+        console.error("Error de geolocalización:", error);
+        
         let errorMessage = "Error al obtener la ubicación";
+        let icon = 'error';
+        let title = 'Error de ubicación';
+        
         switch(error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "Permiso de ubicación denegado. Por favor habilita la ubicación en tu navegador.";
+            errorMessage = `
+              <div style="text-align: left; font-size: 14px;">
+                <p><strong>Permiso de ubicación denegado</strong></p>
+                <p>Para habilitar la ubicación:</p>
+                <ol>
+                  <li>Haz clic en el ícono de candado (🔒) en la barra de direcciones</li>
+                  <li>Busca "Ubicación" o "Permisos de ubicación"</li>
+                  <li>Cambia a "Permitir"</li>
+                  <li>Recarga la página</li>
+                </ol>
+                <p><em>También puedes usar el buscador de direcciones manualmente.</em></p>
+              </div>
+            `;
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "Información de ubicación no disponible.";
+            errorMessage = "Información de ubicación no disponible. Verifica que tu dispositivo tenga GPS activado y estés en un área con buena señal.";
             break;
           case error.TIMEOUT:
-            errorMessage = "Tiempo de espera agotado para obtener la ubicación.";
+            errorMessage = "Tiempo de espera agotado. El GPS está tardando mucho en obtener una señal precisa. Intenta en un área abierta o usa el buscador de direcciones.";
+            icon = 'warning';
+            title = 'Tiempo agotado';
             break;
           default:
-            errorMessage = "Error desconocido al obtener la ubicación.";
+            errorMessage = "Error desconocido al obtener la ubicación. Intenta nuevamente o usa el buscador manual.";
         }
 
         Swal.fire({
-          icon: 'error',
-          title: 'Error de ubicación',
-          text: errorMessage,
+          icon: icon,
+          title: title,
+          html: `<div style="white-space: pre-line;">${errorMessage}</div>`,
           confirmButtonText: 'Entendido',
-          confirmButtonColor: '#dc3545'
+          confirmButtonColor: '#dc3545',
+          width: '500px'
         });
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
-      }
+      options
     );
+  };
+
+  // Función alternativa: Usar ubicación aproximada basada en IP
+  const usarUbicacionAproximada = async () => {
+    setLoading(true);
+    
+    try {
+      // Usar un servicio para obtener ubicación aproximada por IP
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      
+      if (data.latitude && data.longitude) {
+        const approxCoords = [data.latitude, data.longitude];
+        
+        setCoordenadas(approxCoords);
+        setMarkerPosition(approxCoords);
+        setPrecision("aproximada");
+        
+        Swal.fire({
+          icon: 'info',
+          title: 'Ubicación aproximada',
+          html: `
+            <div style="text-align: left; font-size: 14px;">
+              <p>Ubicación aproximada basada en tu conexión a internet.</p>
+              <p><strong>Ciudad detectada:</strong> ${data.city || 'Desconocida'}</p>
+              <p><em>Esta ubicación puede no ser exacta. Ajusta el marcador manualmente si es necesario.</em></p>
+            </div>
+          `,
+          confirmButtonText: 'Entendido',
+          confirmButtonColor: '#1a73e8'
+        });
+        
+        reverseGeocode(approxCoords[0], approxCoords[1]);
+      }
+    } catch (error) {
+      console.error("Error al obtener ubicación aproximada:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'No se pudo obtener ubicación',
+        text: 'Intenta usar el buscador de direcciones manualmente.',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#dc3545'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función para ajustar manualmente la ubicación
+  const ajustarUbicacionManual = () => {
+    Swal.fire({
+      title: 'Ajustar ubicación manualmente',
+      html: `
+        <div style="text-align: left; font-size: 14px;">
+          <p><strong>Instrucciones:</strong></p>
+          <ol>
+            <li>Haz clic en cualquier parte del mapa para colocar el marcador</li>
+            <li>O arrastra el marcador existente a la posición correcta</li>
+            <li>La dirección se actualizará automáticamente</li>
+          </ol>
+          <p><em>También puedes usar el buscador de direcciones arriba.</em></p>
+        </div>
+      `,
+      icon: 'info',
+      confirmButtonText: 'Entendido',
+      confirmButtonColor: '#1a73e8'
+    });
   };
 
   // Función para confirmar y guardar la dirección
@@ -464,21 +637,54 @@ const ModificarDireccion = () => {
                 {loading ? "Buscando..." : "Buscar"}
               </button>
             </div>
-            <button 
-              onClick={usarMiUbicacion}
-              className="direccion-btn-ubicacion-actual"
-            >
-              <FaMapMarkerAlt className="direccion-ubicacion-icon" />
-              Usar mi ubicación actual
-            </button>
+            
+            {/* Botones de ubicación */}
+            <div className="direccion-botones-ubicacion">
+              <button 
+                onClick={usarMiUbicacion}
+                className={`direccion-btn-ubicacion-precisa ${loading ? 'loading' : ''}`}
+                disabled={loading}
+                title="Usar GPS para ubicación precisa"
+              >
+                <FaCrosshairs className="direccion-ubicacion-icon" />
+                {loading ? (
+                  <>
+                    <span className="spinner"></span>
+                    Detectando...
+                  </>
+                ) : (
+                  "Ubicación precisa (GPS)"
+                )}
+              </button>
+              
+              <button 
+                onClick={ajustarUbicacionManual}
+                className="direccion-btn-ajustar-manual"
+                title="Ajustar ubicación manualmente en el mapa"
+              >
+                <FaMapPin className="direccion-ajustar-icon" />
+                Ajustar manualmente
+              </button>
+            </div>
+            
+            {precision && (
+              <div className={`direccion-precision-indicador precision-${precision}`}>
+                <FaExclamationCircle />
+                {precision === 'excelente' && 'Ubicación muy precisa'}
+                {precision === 'buena' && 'Ubicación precisa'}
+                {precision === 'moderada' && 'Ubicación aproximada'}
+                {precision === 'baja' && 'Ubicación de baja precisión'}
+                {precision === 'aproximada' && 'Ubicación aproximada por IP'}
+              </div>
+            )}
           </div>
 
           {/* Mapa de OpenStreetMap */}
           <div className="direccion-mapa-container">
             <MapContainer
               center={coordenadas}
-              zoom={13}
-              style={{ height: '400px', width: '100%' }}
+              zoom={16}
+              style={{ height: '450px', width: '100%' }}
               ref={mapRef}
               onClick={handleMapClick}
             >
@@ -498,11 +704,14 @@ const ModificarDireccion = () => {
                     setMarkerPosition(newPosition);
                     setCoordenadas(newPosition);
                     reverseGeocode(position.lat, position.lng);
+                    setPrecision("manual");
                   }
                 }}
               >
                 <Popup>
                   {direccion || "Selecciona una ubicación"}
+                  <br />
+                  <small>Arrastra para ajustar la posición</small>
                 </Popup>
               </Marker>
             </MapContainer>
@@ -511,6 +720,9 @@ const ModificarDireccion = () => {
               {direccion 
                 ? `Ubicación: ${direccion}${ciudad ? `, ${ciudad}` : ''}` 
                 : "Busca una dirección o haz clic en el mapa para seleccionar tu ubicación"}
+            </div>
+            <div className="direccion-mapa-instrucciones">
+              <FaExclamationCircle /> Haz clic en el mapa o arrastra el marcador para ajustar la ubicación exacta
             </div>
           </div>
 
@@ -553,12 +765,14 @@ const ModificarDireccion = () => {
             <div className="direccion-instrucciones">
               <p>
                 <FaLightbulb className="direccion-instrucciones-icon" />
-                <strong>Consejo:</strong>
+                <strong>Para mejor precisión:</strong>
               </p>
               <ul>
-                <li>Si la dirección no se detecta automáticamente, puedes <strong>editarla manualmente</strong> en los campos de arriba</li>
-                <li>Asegúrate de que el <strong>marcador en el mapa</strong> esté en la ubicación correcta</li>
-                <li>Puedes <strong>arrastrar el marcador</strong> para ajustar la posición exacta</li>
+                <li><strong>En exteriores:</strong> El GPS funciona mejor al aire libre</li>
+                <li><strong>Espera unos segundos:</strong> Dale tiempo al GPS para obtener señal precisa</li>
+                <li><strong>WiFi activado:</strong> Ayuda a triangular la posición</li>
+                <li><strong>Si no es exacto:</strong> Arrastra el marcador a la posición correcta</li>
+                <li><strong>Si el GPS no funciona:</strong> Puedes escribir tu dirección manualmente en los campos de arriba</li>
               </ul>
             </div>
           </div>

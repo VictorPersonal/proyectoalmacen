@@ -274,6 +274,11 @@ const FormaEntrega = () => {
         </header>
 
         <div className="entrega-container">
+          {/* BOTÓN DE VOLVER EN LA VERSIÓN DE LOADING TAMBIÉN */}
+          <button className="entrega-btn-volver" onClick={handleVolverProducto}>
+            ← 
+          </button>
+
           <div className="entrega-left">
             <h2 className="entrega-titulo">Elige la forma de entrega</h2>
             <div className="entrega-opcion">
@@ -351,13 +356,14 @@ const FormaEntrega = () => {
         <div className="entrega-help-icon">?</div>
       </header>
 
-      <div className="entrega-back-wrapper">
+      {/* ELIMINADO: <div className="entrega-back-wrapper"> */}
+
+      <div className="entrega-container">
+        {/* BOTÓN DE VOLVER DENTRO DEL CONTENEDOR PRINCIPAL */}
         <button className="entrega-btn-volver" onClick={handleVolverProducto}>
           ← 
         </button>
-      </div>
 
-      <div className="entrega-container">
         <div className="entrega-left">
           <h2 className="entrega-titulo">Elige la forma de entrega</h2>
 

@@ -39,11 +39,11 @@ const Carrito = ({ abierto, onCerrar }) => {
 
       let productosData = Array.isArray(res.data) ? res.data : [];
 
-      // 🔥 SOLUCIÓN: Obtener imágenes individualmente desde /api/productos
+      // 🔥 SOLUCIÓN: Obtener información completa de productos
       if (productosData.length > 0) {
-        console.log("🔄 Obteniendo imágenes individualmente...");
+        console.log("🔄 Obteniendo información completa de productos...");
         
-        const productosConImagenes = await Promise.all(
+        const productosConInfo = await Promise.all(
           productosData.map(async (productoCarrito) => {
             try {
               // Obtener información completa del producto
@@ -53,20 +53,18 @@ const Carrito = ({ abierto, onCerrar }) => {
               
               console.log(`✅ Producto obtenido para ${productoCarrito.idproducto}:`, resProducto.data);
               
-              // ✅ CAMBIO AQUÍ: Usar producto_imagen en lugar de imagen_url
               const primeraImagen = resProducto.data.producto_imagen && resProducto.data.producto_imagen.length > 0 
                 ? resProducto.data.producto_imagen[0].url 
                 : null;
-              
-              console.log(`✅ Imagen obtenida para ${productoCarrito.idproducto}:`, primeraImagen);
               
               return {
                 id: productoCarrito.idproducto,
                 idproducto: productoCarrito.idproducto,
                 nombre: productoCarrito.nombre,
                 precio: productoCarrito.precio,
-                producto_imagen: resProducto.data.producto_imagen || [], // ← CORREGIDO
-                imagen_url: primeraImagen, // ← Mantenemos por compatibilidad
+                stock: resProducto.data.stock, 
+                producto_imagen: resProducto.data.producto_imagen || [],
+                imagen_url: primeraImagen,
                 cantidad: productoCarrito.cantidad,
                 subtotal: productoCarrito.subtotal
               };
@@ -75,6 +73,7 @@ const Carrito = ({ abierto, onCerrar }) => {
               return {
                 ...productoCarrito,
                 id: productoCarrito.idproducto,
+                stock: 0, 
                 producto_imagen: [],
                 imagen_url: null
               };
@@ -82,22 +81,10 @@ const Carrito = ({ abierto, onCerrar }) => {
           })
         );
         
-        productosData = productosConImagenes;
+        productosData = productosConInfo;
       }
 
-      console.log("🎯 Productos finales con imágenes:", productosData);
-
-      // 🔍 DEBUG
-      productosData.forEach((producto, index) => {
-        console.log(`Producto ${index + 1} en carrito:`, {
-          id: producto.id,
-          nombre: producto.nombre,
-          producto_imagen: producto.producto_imagen, // ← Nueva estructura
-          imagen_url: producto.imagen_url, // ← Para compatibilidad
-          cantidad: producto.cantidad,
-          subtotal: producto.subtotal
-        });
-      });
+      console.log("🎯 Productos finales con información:", productosData);
 
       setProductos(productosData);
 
@@ -132,15 +119,82 @@ const Carrito = ({ abierto, onCerrar }) => {
     }
   };
 
-  // ➕➖ Actualizar cantidad de producto
-  const handleActualizarCantidad = (idproducto, nuevaCantidad) => {
-    axios.put(
-      "http://localhost:4000/api/carrito/actualizar",
-      { idproducto, cantidad: nuevaCantidad },
-      { withCredentials: true }
-    )
-    .then(() => cargarCarrito())
-    .catch(manejarError);
+  // ➕➖ Actualizar cantidad de producto CON VALIDACIÓN DE STOCK
+  const handleActualizarCantidad = async (idproducto, nuevaCantidad) => {
+    try {
+      // Validar que la cantidad sea al menos 1
+      if (nuevaCantidad < 1) {
+        await handleEliminarProducto(idproducto, productos.find(p => p.idproducto === idproducto)?.nombre);
+        return;
+      }
+
+      // Obtener el producto actual para verificar stock disponible
+      const productoActual = productos.find(p => p.idproducto === idproducto);
+      if (!productoActual) return;
+
+      // Si estamos intentando aumentar la cantidad, validar stock
+      if (nuevaCantidad > productoActual.cantidad) {
+        const productoRes = await axios.get(`http://localhost:4000/api/productos/${idproducto}`);
+        const stockDisponible = productoRes.data.stock;
+        
+        // Validar que la nueva cantidad no exceda el stock
+        if (nuevaCantidad > stockDisponible) {
+          Swal.fire({
+            icon: "warning",
+            title: "Stock insuficiente",
+            html: `No hay suficiente stock disponible.<br>
+                   <strong>Stock disponible:</strong> ${stockDisponible} unidades<br>
+                   <strong>Intento de agregar:</strong> ${nuevaCantidad} unidades`,
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#1a73e8"
+          });
+          return;
+        }
+      }
+
+      // Actualizar la cantidad en el backend
+      const response = await axios.put(
+        "http://localhost:4000/api/carrito/actualizar",
+        { idproducto, cantidad: nuevaCantidad },
+        { withCredentials: true }
+      );
+      
+      // Recargar el carrito
+      cargarCarrito();
+
+      // Mostrar mensaje de éxito
+      if (response.data.stockRestante !== undefined) {
+        const stockRestante = response.data.stockRestante;
+        if (stockRestante < 5 && stockRestante > 0) {
+          Swal.fire({
+            icon: "info",
+            title: "Stock limitado",
+            html: `Quedan solo <strong>${stockRestante}</strong> unidades disponibles de este producto`,
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+          });
+        }
+      }
+
+    } catch (error) {
+      console.error("❌ Error al actualizar cantidad:", error);
+      
+      // Mostrar mensaje específico de error de stock
+      if (error.response?.status === 400 && error.response?.data?.message) {
+        Swal.fire({
+          icon: "warning",
+          title: "No se pudo actualizar",
+          html: error.response.data.message,
+          confirmButtonText: "Entendido",
+          confirmButtonColor: "#1a73e8"
+        });
+      } else {
+        manejarError(error);
+      }
+    }
   };
 
   // 🗑️ Eliminar un solo producto del carrito
@@ -285,7 +339,7 @@ const Carrito = ({ abierto, onCerrar }) => {
               <ul className="carrito-product-list">
                 {productos.map((producto) => (
                   <li key={producto.idproducto} className="carrito-product-item">
-                    {/* Imagen del producto - CORREGIDO */}
+                    {/* Imagen del producto */}
                     <div className="carrito-product-image">
                       {producto.imagen_url ? (
                         <img 
@@ -318,7 +372,7 @@ const Carrito = ({ abierto, onCerrar }) => {
                         ${(producto.subtotal / producto.cantidad).toFixed(2)} c/u
                       </p>
                       
-                      {/* Controles de cantidad */}
+                      {/* Controles de cantidad con validación de stock */}
                       <div className="carrito-quantity-controls">
                         <button
                           className="carrito-quantity-btn"
@@ -327,14 +381,33 @@ const Carrito = ({ abierto, onCerrar }) => {
                         >
                           <FaMinus />
                         </button>
-                        <span className="carrito-quantity">{producto.cantidad}</span>
+                        <span className="carrito-quantity">
+                          {producto.cantidad}
+                          {producto.stock && producto.cantidad >= producto.stock && (
+                            <span className="stock-warning"> (Máx)</span>
+                          )}
+                        </span>
                         <button
                           className="carrito-quantity-btn"
                           onClick={() => handleActualizarCantidad(producto.idproducto, producto.cantidad + 1)}
+                          disabled={producto.stock && producto.cantidad >= producto.stock}
+                          title={producto.stock && producto.cantidad >= producto.stock ? 
+                                 `Límite: ${producto.stock} unidades disponibles` : ""}
                         >
                           <FaPlus />
                         </button>
                       </div>
+
+                      {/* Mostrar información de stock */}
+                      {producto.stock !== undefined && (
+                        <div className="stock-info">
+                          <span className={`stock-text ${producto.stock <= 5 ? "stock-low" : "stock-ok"}`}>
+                            {producto.stock <= 5 ? 
+                              `¡Últimas ${producto.stock} unidades!` : 
+                              `${producto.stock} disponibles`}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Subtotal y eliminar */}
