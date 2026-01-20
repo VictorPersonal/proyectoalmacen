@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import logo from "../../assets/Logo dulce hogar.png";
 import { FaCheckCircle, FaQuestionCircle, FaFileInvoice, FaSpinner } from "react-icons/fa";
 import "./PagoExitoso.css";
@@ -142,14 +142,14 @@ const PagoExitoso = () => {
 
       <footer className="pago-exitoso-footer">
         <div className="pago-exitoso-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
         </div>
         <p className="pago-exitoso-footer-copyright">
-          © 2025 FHO, todos los derechos reservados
+          © 2025 FDO, todos los derechos reservados
         </p>
       </footer>
 

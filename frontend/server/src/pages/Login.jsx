@@ -19,7 +19,7 @@ const Login = () => {
       text: mensaje,
       confirmButtonColor: '#D84040',
       confirmButtonText: 'Aceptar',
-      timer: 2000,
+      timer: 1000,
       timerProgressBar: true
     });
   };
@@ -161,17 +161,17 @@ const Login = () => {
         </div>
       </main>
 
-      {/* Footer específico para login */}
+      {/* Footer con dimensiones consistentes */}
       <footer className="login-footer">
         <div className="login-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/Consejo-de-Seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
         </div>
         <div className="login-footer-copyright">
-          © 2025 FHO, todos los derechos reservados
+          © 2025 FDO, todos los derechos reservados
         </div>
       </footer>
     </div>

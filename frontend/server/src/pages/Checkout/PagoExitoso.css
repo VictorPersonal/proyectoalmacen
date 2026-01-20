@@ -14,24 +14,25 @@ body {
   flex-direction: column;
 }
 
-/* Header */
+/* Header - SOLO CAMBIOS AQUÍ */
 .pago-exitoso-top-bar {
-  background-color: #b8b4b1;
-  padding: 30px 30px;
+  background-color: #c8c4c1; /* Cambiado para consistencia */
+  padding: 10px 20px; /* Ajustado para consistencia */
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 120px; /* Añadido: altura mínima consistente */
 }
 
 .pago-exitoso-logo-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px; /* Aumentado para consistencia */
 }
 
 .pago-exitoso-logo-img {
-  width: 80px;
-  height: auto;
+  width: 90px; /* Aumentado para consistencia */
+  height: 70px; /* Añadido: altura específica */
 }
 
 .pago-exitoso-logo-text {
@@ -40,15 +41,16 @@ body {
 }
 
 .pago-exitoso-logo-title {
-  font-size: 18px;
+  font-size: 24px; /* Aumentado para consistencia */
   font-weight: bold;
   color: #000;
 }
 
 .pago-exitoso-logo-subtitle {
-  font-size: 7px;
+  font-size: 10px; /* Aumentado para consistencia */
   letter-spacing: 0.5px;
   color: #000;
+  margin-top: 4px; /* Añadido: margen superior */
 }
 
 .pago-exitoso-help-icon {
@@ -137,26 +139,28 @@ body {
   color: #fff;
 }
 
-/* Footer */
+/* Footer - SOLO CAMBIOS AQUÍ */
 .pago-exitoso-footer {
   background-color: #b8b4b1;
-  padding: 20px 30px;
+  padding: 15px 50px; /* Cambiado: padding horizontal aumentado */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 9px;
+  font-size: 13px; /* Cambiado: tamaño de fuente aumentado */
   color: #333;
+  height: 60px; /* Añadido: altura fija */
 }
 
 .pago-exitoso-footer-links {
   display: flex;
-  gap: 8px;
+  gap: 12px; /* Cambiado: espaciado aumentado */
   align-items: center;
 }
 
 .pago-exitoso-footer-links a {
   text-decoration: none;
   color: #333;
+  font-size: 13px; /* Cambiado: tamaño de fuente aumentado */
 }
 
 .pago-exitoso-footer-links a:hover {
@@ -169,6 +173,7 @@ body {
 
 .pago-exitoso-footer-copyright {
   color: #333;
+  font-size: 13px; /* Cambiado: tamaño de fuente aumentado */
 }
 
 /* Responsive */
@@ -187,10 +192,13 @@ body {
     flex-direction: column;
     gap: 8px;
     text-align: center;
+    padding: 15px 20px; /* Ajustado para móvil */
+    height: auto; /* Ajustado para móvil */
   }
 
   .pago-exitoso-top-bar {
-    padding: 10px 20px;
+    padding: 10px 20px; /* Ajustado para móvil */
+    min-height: 100px; /* Ajustado para móvil */
   }
 
   .pago-exitoso-title {
@@ -200,6 +208,19 @@ body {
   .pago-exitoso-icono {
     font-size: 50px;
     margin: 20px 0;
+  }
+  
+  .pago-exitoso-logo-img {
+    width: 80px; /* Ajustado para móvil */
+    height: 60px; /* Ajustado para móvil */
+  }
+  
+  .pago-exitoso-logo-title {
+    font-size: 20px; /* Ajustado para móvil */
+  }
+  
+  .pago-exitoso-logo-subtitle {
+    font-size: 9px; /* Ajustado para móvil */
   }
 }
 
@@ -221,16 +242,17 @@ body {
     font-size: 13px;
   }
 
-  .pago-exitoso-top-bar {
-    padding: 15px 20px;
-  }
-
-  .pago-exitoso-logo-img {
-    width: 60px;
-  }
-
   .pago-exitoso-logo-title {
-    font-size: 16px;
+    font-size: 18px; /* Ajustado para móvil pequeño */
+  }
+  
+  .pago-exitoso-logo-subtitle {
+    font-size: 8px; /* Ajustado para móvil pequeño */
+  }
+  
+  .pago-exitoso-footer {
+    gap: 10px;
+    padding: 15px 20px;
   }
 }
 

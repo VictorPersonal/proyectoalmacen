@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Registro.css";
 import logo from "../assets/Logo dulce hogar.png";
 import Swal from "sweetalert2";
@@ -53,6 +53,13 @@ function Registro() {
   };
 
   // Validaciones
+  const validarNombreCompleto = (nombre) => {
+  // Acepta letras, espacios y acentos
+    const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    return regex.test(nombre.trim());
+  };
+
+
   const validarEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -71,6 +78,7 @@ function Registro() {
   const validarFormulario = () => {
     const nuevosErrores = {};
 
+
     // Validar email
     if (!email) {
       nuevosErrores.email = "El email es requerido";
@@ -85,12 +93,17 @@ function Registro() {
       nuevosErrores.cedula = "La cédula debe tener máximo 10 dígitos numéricos";
     }
 
-    // Validar nombre
+
+    // Validar nombre completo
     if (!nombre.trim()) {
-      nuevosErrores.nombre = "El nombre es requerido";
+      nuevosErrores.nombre = "El nombre completo es requerido";
     } else if (nombre.trim().length < 2) {
       nuevosErrores.nombre = "El nombre debe tener al menos 2 caracteres";
+    } else if (!validarNombreCompleto(nombre)) {
+      nuevosErrores.nombre = "El nombre solo puede contener letras y espacios";
     }
+
+    
 
     // Validar contraseña
     if (!contrasena) {
@@ -219,7 +232,7 @@ function Registro() {
   };
 
   return (
-    <>
+    <div className="registro-page-wrapper">
       <header className="registro-top-bar">
         <div className="registro-logo-section">
           <img src={logo} alt="Dulce hogar logo" className="registro-logo-img" />
@@ -345,17 +358,20 @@ function Registro() {
         </div>
       </main>
 
+      {/* Footer */}
       <footer className="registro-footer">
         <div className="registro-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/Consejo-de-Seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
         </div>
-        <div className="registro-footer-copy">© 2025 FHO, todos los derechos reservados</div>
+        <div className="registro-footer-copyright">
+          © 2025 FDO, todos los derechos reservados
+        </div>
       </footer>
-    </>
+    </div>
   );
 }
 

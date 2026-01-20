@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./ActualizarDatos.css";
 import logo from "../assets/Logo dulce hogar.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
 function ActualizarPerfil() {
@@ -103,15 +103,51 @@ function ActualizarPerfil() {
     cargarPerfil();
   }, [navigate]);
 
+
   // 🔹 Enviar datos actualizados al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+///----VALIDACIONES ----///
+
     // Validar campos obligatorios
     if (!nombre.trim() || !apellido.trim() || !direccion.trim() || !ciudad.trim()) {
       mostrarError("Por favor, completa todos los campos obligatorios");
       return;
     }
+
+
+
+    // Regex para nombres y textos con espacios
+    const regexTexto = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+
+    if (!regexTexto.test(nombre.trim())) {
+      mostrarError("El nombre solo puede contener letras y espacios");
+      return;
+    }
+
+    if (!regexTexto.test(apellido.trim())) {
+      mostrarError("El apellido solo puede contener letras y espacios");
+      return;
+    }
+
+    if (!regexTexto.test(ciudad.trim())) {
+      mostrarError("La ciudad solo puede contener letras y espacios");
+      return;
+    }
+
+
+
+
+
+    // Validar dirección: letras, números, espacios, guiones, puntos, comas y #
+    const regexDireccion = /^[A-Za-z0-9\s\-\#\.,]+$/;
+
+    if (!regexDireccion.test(direccion.trim())) {
+      mostrarError("La dirección contiene caracteres no válidos. Usa solo letras, números, espacios, guiones, #, comas o puntos.");
+      return;
+    }
+
 
     // Validar teléfono (opcional pero con formato si se ingresa)
     if (telefono && !/^\d{7,15}$/.test(telefono.replace(/\s/g, ''))) {
@@ -361,13 +397,15 @@ function ActualizarPerfil() {
 
       <footer className="actualizar-footer">
         <div className="actualizar-footer-links">
-          <a href="#">Preguntas frecuentes</a>
+          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
           <span>/</span>
-          <a href="#">Consejos de seguridad</a>
+          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
           <span>/</span>
-          <a href="#">Términos</a>
+          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
         </div>
-        <div className="actualizar-footer-copy">© 2025 FHO, todos los derechos reservados</div>
+        <div className="actualizar-footer-copyright">
+          © 2025 FHO, todos los derechos reservados
+        </div>
       </footer>
     </>
   );

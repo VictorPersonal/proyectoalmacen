@@ -5,12 +5,21 @@
   box-sizing: border-box;
 }
 
+html, body, #root, .restablecer-page-wrapper {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #c8c4c1;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 /* ===== Estructura general ===== */
@@ -23,22 +32,26 @@ body {
 
 /* ===== Header ===== */
 .restablecer-top-bar {
-  background-color: #b8b4b1;
-  padding: 30px 30px;
+  background-color: #c8c4c1;
+  padding: 10px 20px;
+  width: 100%;
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 120px;
 }
 
 .restablecer-logo-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* LOGO con dimensiones consistentes (90x70px) */
 .restablecer-logo-img {
-  width: 80px;
-  height: auto;
+  width: 90px;
+  height: 70px;
 }
 
 .restablecer-logo-text {
@@ -46,16 +59,19 @@ body {
   flex-direction: column;
 }
 
+/* TÍTULO con dimensiones consistentes */
 .restablecer-logo-title {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
   color: #000;
 }
 
+/* SUBTÍTULO con dimensiones consistentes */
 .restablecer-logo-subtitle {
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.5px;
   color: #000;
+  margin-top: 4px;
 }
 
 .restablecer-help-icon {
@@ -69,18 +85,21 @@ body {
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  background-color: #c8c4c1;
+  background-color: #fff;
 }
 
-/* ===== Contenedor principal ===== */
+/* ===== Contenedor principal (MARGENES AJUSTADOS) ===== */
 .restablecer-container {
-  all: unset;
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  background-color: #edeae8;
+  width: 100%;
+  margin: 0;
+  padding: 40px 0; /* Añadido padding vertical */
+  min-height: calc(100vh - 120px - 60px); /* Ajustado al nuevo header y footer */
+  justify-content: center; /* Centra verticalmente */
   align-items: center;
-  padding: 40px 20px;
-  background-color: #c8c4c1;
 }
 
 /* ===== Caja principal ===== */
@@ -92,6 +111,7 @@ body {
   max-width: 420px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   text-align: center;
+  margin: 20px 0; /* Margen adicional para separación */
 }
 
 .restablecer-form-title {
@@ -111,7 +131,7 @@ body {
 .restablecer-form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   text-align: left;
 }
 
@@ -129,6 +149,7 @@ body {
   background-color: #fff;
   outline: none;
   transition: border-color 0.3s;
+  width: 100%;
 }
 
 .restablecer-form-input:focus {
@@ -140,10 +161,28 @@ body {
   font-size: 11px;
 }
 
-.restablecer-info-text {
+/* ===== REORDENADO: Primero campos, luego sugerencia ===== */
+
+/* Contenedor para campos de contraseña */
+.restablecer-password-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Sugerencia de contraseña (ahora va después de los campos) */
+.restablecer-password-hint {
+  color: #666;
   font-size: 11px;
-  color: #555;
-  line-height: 1.4;
+  margin-top: 8px;
+  margin-bottom: 10px; /* Separación antes del botón */
+  display: block;
+  line-height: 1.3;
+  font-style: italic;
+  padding: 8px 12px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  border-left: 3px solid #D84040;
   text-align: left;
 }
 
@@ -159,6 +198,7 @@ body {
   transition: all 0.3s;
   margin-top: 8px;
   text-transform: capitalize;
+  width: 100%;
 }
 
 .restablecer-btn-actualizar:hover {
@@ -204,26 +244,59 @@ body {
   text-decoration: underline;
 }
 
-/* ===== Footer ===== */
+/* ===== Estilos para errores ===== */
+.restablecer-error-input {
+  border: 2px solid #E53E3E !important;
+  background-color: #FFF3F3;
+  box-shadow: 0 0 4px rgba(229, 62, 62, 0.4);
+}
+
+.restablecer-error-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #E53E3E;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #FFE5E5;
+  border-left: 3px solid #E53E3E;
+  padding: 6px 10px;
+  margin-top: 4px;
+  border-radius: 4px;
+  animation: restablecer-fadeIn 0.25s ease;
+}
+
+@keyframes restablecer-fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== FOOTER CONSISTENTE ========== */
 .restablecer-footer {
   background-color: #b8b4b1;
-  padding: 20px 30px;
+  padding: 15px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 9px;
+  font-size: 13px;
   color: #333;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: auto;
+  height: 60px;
+  position: relative;
 }
 
 .restablecer-footer-links {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
 }
 
 .restablecer-footer-links a {
   text-decoration: none;
   color: #333;
+  font-size: 13px;
 }
 
 .restablecer-footer-links a:hover {
@@ -236,6 +309,7 @@ body {
 
 .restablecer-footer-copyright {
   color: #333;
+  font-size: 13px;
 }
 
 /* ===== Responsive ===== */
@@ -243,20 +317,61 @@ body {
   .restablecer-form-box {
     padding: 30px 35px;
     max-width: 380px;
+    margin: 15px 0; /* Margen responsive */
   }
 
   .restablecer-container {
-    margin: 15px;
-    padding: 30px 15px;
+    padding: 30px 15px; /* Padding ajustado para móviles */
   }
 
   .restablecer-footer {
     flex-direction: column;
     gap: 8px;
     text-align: center;
+    padding: 15px 20px;
+    height: auto;
   }
 
   .restablecer-top-bar {
     padding: 10px 20px;
+  }
+
+  .restablecer-password-hint {
+    font-size: 10px;
+    margin-top: 6px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .restablecer-form-box {
+    padding: 25px 30px;
+    max-width: 100%;
+    margin: 10px 0; /* Margen menor en móviles */
+  }
+
+  .restablecer-form-title {
+    font-size: 16px;
+  }
+
+  .restablecer-logo-title {
+    font-size: 20px;
+  }
+  
+  .restablecer-logo-subtitle {
+    font-size: 9px;
+  }
+
+  .restablecer-footer {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px 20px;
+    height: auto;
+  }
+
+  .restablecer-password-hint {
+    font-size: 10px;
+    margin-top: 6px;
+    padding: 6px 10px;
   }
 }

@@ -17,6 +17,10 @@ import ModificarDireccion from "./pages/Checkout/ModificarDireccion";
 import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
 import DescripcionProducto from "./components/DescripcionProducto";
 import Promociones from "./pages/Promociones";
+import ConsejodeSeguridad from "./pages/ConsejodeSeguridad";
+
+
+
 
 function AppWrapper() {
   const location = useLocation();
@@ -36,7 +40,7 @@ function AppWrapper() {
         <Route path="/reset-password/:token" element={<RestablecerContrasena />} />
         <Route path="/checkout/forma-entrega" element={<FormaEntrega />} />
         <Route path="/checkout/forma-entrega/pago" element={<Pago />} />
-        <Route path="/terminosycondiciones" element={<TerminosYCondiciones />} />
+        <Route path="/terminos-y-condiciones" element={<TerminosYCondiciones />} />
         <Route path="/checkout/forma-entrega/pago/exitoso" element={<PagoExitoso />} />
         <Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />
         <Route path="/categorias" element={<Categorias />} />
@@ -44,6 +48,7 @@ function AppWrapper() {
         <Route path="/promociones" element={<Promociones />} />
         <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
         <Route path="/registro/terminosycondiciones" element={<TerminosYCondiciones />} />
+        <Route path="/Consejo-de-Seguridad" element={<ConsejodeSeguridad />} />
         {/* ✅ AGREGAR ESTA RUTA TAMBIÉN EN LAS PRINCIPALES */}
         <Route path="/producto/:id" element={<DescripcionProducto />} />
       </Routes>
