@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import router from "../routes/router.js";
 import authRoutes from "../routes/auth-routes.js";
+import categoriaRoutes from "../routes/categoriaRoutes.js";
 import passwordRoutes from "../routes/passwordroutes.js";
 import { supabase } from "./db.js"; 
 import stripeRoutes from "../routes/stripeRoutes.js";
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
 app.use("/api/auth", express.json(), authRoutes);
 app.use("/api/password", express.json(), passwordRoutes);
 app.use("/api", router); // Esta ruta usa busboy para FormData
+app.use("/api/categorias", express.json(), categoriaRoutes);
 app.use("/api/favoritos", express.json(), router); // Ruta para favoritos
 app.use("/api/stripe", express.json(), stripeRoutes);
 

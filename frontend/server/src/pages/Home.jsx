@@ -316,7 +316,7 @@ const Home = () => {
     try {
       const [_, response] = await Promise.all([
         minLoadingTime,
-        fetch(`http://localhost:4000/api/categorias/${idCategoria}/productos`)
+        fetch(`http://localhost:4000/api/${idCategoria}/productos`)//Revisar si borrar /categorias
       ]);
 
       const data = await response.json();
