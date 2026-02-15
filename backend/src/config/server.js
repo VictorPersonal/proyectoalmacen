@@ -7,6 +7,9 @@ import router from "../routes/router.js";
 import authRoutes from "../routes/auth-routes.js";
 import categoriaRoutes from "../routes/categoriaRoutes.js";
 import passwordRoutes from "../routes/passwordroutes.js";
+import marcasRoutes from "../routes/marcasRoutes.js";
+import favoritoRoutes from "../routes/favoritoRoutes.js";
+import productoAdmin from "../routes/productoAdmin.js";
 import { supabase } from "./db.js"; 
 import stripeRoutes from "../routes/stripeRoutes.js";
 
@@ -37,7 +40,9 @@ app.use("/api/auth", express.json(), authRoutes);
 app.use("/api/password", express.json(), passwordRoutes);
 app.use("/api", router); // Esta ruta usa busboy para FormData
 app.use("/api/categorias", express.json(), categoriaRoutes);
-app.use("/api/favoritos", express.json(), router); // Ruta para favoritos
+app.use("/api/marcas", express.json(), marcasRoutes);
+app.use("/api/productosAdmin", express.json(), productoAdmin);
+app.use("/api/favoritos", express.json(), favoritoRoutes); // Ruta para favoritos
 app.use("/api/stripe", express.json(), stripeRoutes);
 
 const PORT = process.env.PORT || 4000;
