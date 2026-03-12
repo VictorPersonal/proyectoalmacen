@@ -9,7 +9,11 @@ import categoriaRoutes from "../routes/categoriaRoutes.js";
 import passwordRoutes from "../routes/passwordroutes.js";
 import marcasRoutes from "../routes/marcasRoutes.js";
 import favoritoRoutes from "../routes/favoritoRoutes.js";
+import carritoRoutes from "../routes/carritoRoutes.js";
 import productoAdmin from "../routes/productoAdmin.js";
+import estadisticasRoutes from "../routes/estadisticasRoutes.js";
+import adminPedidosRoutes from "../routes/adminpedidosRoutes.js";
+import productosRoutes from "../routes/productosRoutes.js";
 import { supabase } from "./db.js"; 
 import stripeRoutes from "../routes/stripeRoutes.js";
 
@@ -38,10 +42,13 @@ app.use((req, res, next) => {
 // ✅ Rutas - aplicar express.json() SOLO donde sea necesario
 app.use("/api/auth", express.json(), authRoutes);
 app.use("/api/password", express.json(), passwordRoutes);
-app.use("/api", router); // Esta ruta usa busboy para FormData
 app.use("/api/categorias", express.json(), categoriaRoutes);
+app.use("/api", express.json(), productosRoutes); // Ruta pública para productos
 app.use("/api/marcas", express.json(), marcasRoutes);
 app.use("/api/productosAdmin", express.json(), productoAdmin);
+app.use("/api", express.json(), adminPedidosRoutes);
+app.use("/api/estadisticas", express.json(), estadisticasRoutes);
+app.use("/api/carrito", express.json(), carritoRoutes); // Ruta para carrito
 app.use("/api/favoritos", express.json(), favoritoRoutes); // Ruta para favoritos
 app.use("/api/stripe", express.json(), stripeRoutes);
 
