@@ -8,7 +8,7 @@ const router = express.Router();
    CATEGORÍAS
 ========================================================= */
 
-router.get("/", async (req, res) => {
+router.get("/categorias", async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("categoria")
@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/categorias", async (req, res) => {
   try {
     const { descripcionCategoria } = req.body;
 
@@ -54,7 +54,7 @@ router.post("/", async (req, res) => {
 });
 
 // Productos por categoría
-router.get("/:idcategoria/productos", async (req, res) => {
+router.get("/categorias/:idcategoria/productos", async (req, res) => {
   const { idcategoria } = req.params;
 
   try {

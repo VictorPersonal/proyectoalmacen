@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -14,44 +13,50 @@ import productoAdmin from "../routes/productoAdmin.js";
 import estadisticasRoutes from "../routes/estadisticasRoutes.js";
 import adminPedidosRoutes from "../routes/adminpedidosRoutes.js";
 import productosRoutes from "../routes/productosRoutes.js";
-import { supabase } from "./db.js"; 
+import { supabase } from "./db.js";
 import stripeRoutes from "../routes/stripeRoutes.js";
-
+ 
 dotenv.config();
-
+ 
 const app = express();
 const isProduction = process.env.NODE_ENV === "production";
-app.use(express.json());
-
+ 
 app.use(cookieParser());
+ 
 const FRONTEND_URL = isProduction
-  ? process.env.FRONTEND_URL_PROD        // ejemplo: https://dulcehogar.netlify.app
+  ? process.env.FRONTEND_URL_PROD
   : "http://localhost:5173";
-
+ 
 app.use(cors({
   origin: FRONTEND_URL,
   credentials: true
 }));
-
+ 
+// express.json() global — aplica a todas las rutas
+app.use(express.json());
+ 
 // 🔹 Inyectar supabase en cada request
 app.use((req, res, next) => {
   req.supabase = supabase;
   next();
 });
-
-// ✅ Rutas - aplicar express.json() SOLO donde sea necesario
-app.use("/api/auth", express.json(), authRoutes);
-app.use("/api/password", express.json(), passwordRoutes);
-app.use("/api/categorias", express.json(), categoriaRoutes);
-app.use("/api", express.json(), productosRoutes); // Ruta pública para productos
-app.use("/api/marcas", express.json(), marcasRoutes);
-app.use("/api/productosAdmin", express.json(), productoAdmin);
-app.use("/api", express.json(), adminPedidosRoutes);
-app.use("/api/estadisticas", express.json(), estadisticasRoutes);
-app.use("/api/carrito", express.json(), carritoRoutes); // Ruta para carrito
-app.use("/api/favoritos", express.json(), favoritoRoutes); // Ruta para favoritos
-app.use("/api/stripe", express.json(), stripeRoutes);
-
+ 
+// ✅ Rutas específicas PRIMERO (más largas/concretas antes que las genéricas /api)
+app.use("/api/auth", authRoutes);
+app.use("/api/auth", passwordRoutes);
+app.use("/api/", categoriaRoutes);
+app.use("/api/marcas", marcasRoutes);
+app.use("/api/productosAdmin", productoAdmin);
+app.use("/api/estadisticas", estadisticasRoutes);
+app.use("/api/carrito", carritoRoutes);
+app.use("/api/", favoritoRoutes);
+app.use("/api/stripe", stripeRoutes);
+ 
+// ⚠️ Rutas genéricas /api AL FINAL para no interceptar las específicas
+app.use("/api", productosRoutes);
+app.use("/api", adminPedidosRoutes);
+app.use("/api", router);
+ 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);

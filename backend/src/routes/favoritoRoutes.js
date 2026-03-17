@@ -8,17 +8,14 @@ const router = express.Router();
    FAVORITOS (RUTAS PROTEGIDAS)
 ========================================================= */
 
-// 🔒 Aplicar middleware a todas las rutas
-router.use(verificarToken);
-
 /* =========================================================
    FAVORITOS (RUTAS PROTEGIDAS)
 ========================================================= */
 
-router.use(verificarToken);
+router.use("/favoritos",verificarToken);
 
 // Obtener favoritos
-router.get("/", async (req, res) => {
+router.get("/favoritos", async (req, res) => {
   try {
     const cedula = req.usuario.id;
 
@@ -86,7 +83,7 @@ router.get("/", async (req, res) => {
 });
 
 // Agregar favorito
-router.post("/", async (req, res) => {
+router.post("/favoritos", async (req, res) => {
   const { idproducto } = req.body;
   const cedula = req.usuario.id;
 
@@ -149,7 +146,7 @@ router.post("/", async (req, res) => {
 });
 
 // Eliminar favorito
-router.delete("/:idproducto", async (req, res) => {
+router.delete("/favoritos/:idproducto", async (req, res) => {
   const { idproducto } = req.params;
   const cedula = req.usuario.id;
 

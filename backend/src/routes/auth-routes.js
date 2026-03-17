@@ -7,14 +7,14 @@ import { verificarToken } from "../controller/authMiddleware.js";
 
 dotenv.config();
 
-const router = express.Router();
+const authRoutes = express.Router();
 
 /* =========================================================
    AUTENTICACIÓN Y USUARIOS
 ========================================================= */
 
 // Registro de usuario
-router.post("/usuario", async (req, res) => {
+authRoutes.post("/usuario", async (req, res) => {
   const {
     cedula,
     nombre,
@@ -82,7 +82,7 @@ router.post("/usuario", async (req, res) => {
 });
 
 // Login
-router.post("/login", async (req, res) => {
+authRoutes.post("/login", async (req, res) => {
   const { email, contrasena } = req.body;
 
   if (!email || !contrasena) {
@@ -138,7 +138,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Obtener perfil de usuario autenticado
-router.get("/usuario/perfil", verificarToken, async (req, res) => {
+authRoutes.get("/usuario/perfil", verificarToken, async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
@@ -161,7 +161,7 @@ router.get("/usuario/perfil", verificarToken, async (req, res) => {
 });
 
 // Actualizar perfil
-router.put("/usuario/perfil", verificarToken, async (req, res) => {
+authRoutes.put("/usuario/perfil", verificarToken, async (req, res) => {
   const cedula = req.usuario.id;
   const { nombre, apellido, direccion, ciudad, telefono } = req.body;
 
@@ -211,4 +211,4 @@ router.put("/usuario/perfil", verificarToken, async (req, res) => {
   }
 });
 
-export default router;
+export default authRoutes;

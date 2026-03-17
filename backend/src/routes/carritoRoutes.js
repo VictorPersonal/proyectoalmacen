@@ -44,10 +44,10 @@ async function obtenerCarritoCompleto(cedula) {
    CARRITO (RUTAS PROTEGIDAS)
 ========================================================= */
 
-router.use("/carrito", verificarToken);
+router.use("/", verificarToken);
 
-// Obtener carrito
-router.get("/carrito", async (req, res) => {
+// Obtener 
+router.get("/", async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
@@ -110,7 +110,7 @@ router.get("/carrito", async (req, res) => {
 });
 
 // Agregar / actualizar producto en carrito
-router.post("/carrito/agregar", async (req, res) => {
+router.post("/agregar", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
 
@@ -161,7 +161,7 @@ router.post("/carrito/agregar", async (req, res) => {
 // ====================================================================
 // ✏️ Actualizar cantidad en el carrito CON VALIDACIÓN DE STOCK
 // ====================================================================
-router.put("/carrito/actualizar", async (req, res) => {
+router.put("/actualizar", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
 
@@ -243,7 +243,7 @@ router.put("/carrito/actualizar", async (req, res) => {
 
 
 // Eliminar producto del carrito
-router.delete("/carrito/eliminar/:idproducto", async (req, res) => {
+router.delete("/eliminar/:idproducto", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto } = req.params;
 
@@ -275,7 +275,7 @@ router.delete("/carrito/eliminar/:idproducto", async (req, res) => {
 });
 
 // Vaciar carrito
-router.delete("/carrito/vaciar", async (req, res) => {
+router.delete("/vaciar", async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
