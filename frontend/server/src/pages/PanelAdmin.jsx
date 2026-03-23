@@ -219,7 +219,7 @@ const PanelAdmin = () => {
     try {
       setLoading(true);
 
-      const res = await axios.get("http://localhost:4000/api/admin/productos", {
+      const res = await axios.get("http://localhost:4000/api/productosAdmin/admin/productos", {
         withCredentials: true,
       });
 
@@ -475,11 +475,12 @@ const PanelAdmin = () => {
       let response;
       if (editingProduct) {
         response = await axios.put(
-          `http://localhost:4000/api/productos/${editingProduct.idproducto}/con-imagen`,
+          `http://localhost:4000/api/productosAdmin/productos/${editingProduct.idproducto}/con-imagen`,
           data,
           {
             headers: { "Content-Type": "multipart/form-data" },
             timeout: 30000,
+            withCredentials: true //Todas estas variables con withCredentials son para validar el token
           }
         );
 
@@ -496,11 +497,13 @@ const PanelAdmin = () => {
         });
       } else {
         response = await axios.post(
-          "http://localhost:4000/api/productos/con-imagen",
+          "http://localhost:4000/api/productosAdmin/productos/con-imagen",
           data,
+          
           {
             headers: { "Content-Type": "multipart/form-data" },
             timeout: 30000,
+            withCredentials: true
           }
         );
 
@@ -600,8 +603,9 @@ const PanelAdmin = () => {
         try {
           setLoading(true);
           await axios.patch(
-            `http://localhost:4000/api/productos/${product.idproducto}/estado`,
-            { activo: nuevoEstado }
+            `http://localhost:4000/api/productosAdmin/productos/${product.idproducto}/estado`,
+            { activo: nuevoEstado },
+            { withCredentials: true }
           );
 
           await fetchProducts();

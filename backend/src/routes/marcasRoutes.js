@@ -8,7 +8,7 @@ const router = express.Router();
 ========================================================= */
 
 // 🔹 Obtener todas las marcas
-router.get("/marcas", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("marca")
@@ -27,7 +27,7 @@ router.get("/marcas", async (req, res) => {
 });
 
 // 🔹 Crear nueva marca
-router.post("/marcas", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { descripcionMarca } = req.body;
 

@@ -9,7 +9,7 @@ const router = express.Router();
 ========================================================= */
 
 // Productos más vendidos
-router.get("estadisticas/productos-mas-vendidos", verificarToken, async (req, res) => {
+router.get("/productos-mas-vendidos", verificarToken, async (req, res) => {
   try {
     const tableNames = ["detallepedidomm", "detallepedidoMM", "detallepedido"];
 
@@ -50,7 +50,7 @@ router.get("estadisticas/productos-mas-vendidos", verificarToken, async (req, re
 });
 
 // Ventas mensuales
-router.get("/estadisticas/ventas-mensuales", verificarToken, async (req, res) => {
+router.get("/ventas-mensuales", verificarToken, async (req, res) => {
   try {
     const { data: detalles, error: errorDetalles } = await supabase
       .from("detallepedidomm")
@@ -94,7 +94,7 @@ router.get("/estadisticas/ventas-mensuales", verificarToken, async (req, res) =>
 });
 
 // Usuarios por tipo
-router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
+router.get("/usuarios", verificarToken, async (req, res) => {
   try {
     const { data: usuarios, error } = await supabase
       .from("usuario")
@@ -123,7 +123,7 @@ router.get("/estadisticas/usuarios", verificarToken, async (req, res) => {
 });
 
 // Estados de pedido
-router.get("/estadisticas/estados-pedidos", verificarToken, async (req, res) => {
+router.get("/estados-pedidos", verificarToken, async (req, res) => {
   try {
     const { data: pedidos, error: errorPedidos } = await supabase
       .from("pedido")
