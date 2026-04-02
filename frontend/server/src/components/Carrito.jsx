@@ -31,7 +31,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
     try {
       const res = await axios.get(
-        "http://localhost:4000/api/carrito",
+        "https://3e34-201-182-248-71.ngrok-free.app/api/carrito",
         { withCredentials: true }
       );
 
@@ -48,7 +48,7 @@ const Carrito = ({ abierto, onCerrar }) => {
             try {
               // Obtener información completa del producto
               const resProducto = await axios.get(
-                `http://localhost:4000/api/productos/${productoCarrito.idproducto}`
+                `https://3e34-201-182-248-71.ngrok-free.app/api/productos/${productoCarrito.idproducto}`
               );
               
               console.log(`✅ Producto obtenido para ${productoCarrito.idproducto}:`, resProducto.data);
@@ -134,7 +134,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
       // Si estamos intentando aumentar la cantidad, validar stock
       if (nuevaCantidad > productoActual.cantidad) {
-        const productoRes = await axios.get(`http://localhost:4000/api/productos/${idproducto}`);
+        const productoRes = await axios.get(`https://3e34-201-182-248-71.ngrok-free.app/api/productos/${idproducto}`);
         const stockDisponible = productoRes.data.stock;
         
         // Validar que la nueva cantidad no exceda el stock
@@ -154,7 +154,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
       // Actualizar la cantidad en el backend
       const response = await axios.put(
-        "http://localhost:4000/api/carrito/actualizar",
+        "https://3e34-201-182-248-71.ngrok-free.app/api/carrito/actualizar",
         { idproducto, cantidad: nuevaCantidad },
         { withCredentials: true }
       );
@@ -213,7 +213,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
     try {
       await axios.delete(
-        `http://localhost:4000/api/carrito/eliminar/${idproducto}`,
+        `https://3e34-201-182-248-71.ngrok-free.app/api/carrito/eliminar/${idproducto}`,
         { withCredentials: true }
       );
 
@@ -259,7 +259,7 @@ const Carrito = ({ abierto, onCerrar }) => {
     if (!confirmar.isConfirmed) return;
 
     try {
-      await axios.delete("http://localhost:4000/api/carrito/vaciar", {
+      await axios.delete("https://3e34-201-182-248-71.ngrok-free.app/api/carrito/vaciar", {
         withCredentials: true,
       });
 

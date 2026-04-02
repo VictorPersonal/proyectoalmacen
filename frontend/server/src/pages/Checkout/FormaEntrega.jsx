@@ -50,7 +50,7 @@ const FormaEntrega = () => {
           setTipoCompra("carrito");
 
           const respuestaCarrito = await fetch(
-            "http://localhost:4000/api/carrito",
+            "https://3e34-201-182-248-71.ngrok-free.app/api/carrito",
             {
               credentials: "include",
             }
@@ -65,7 +65,7 @@ const FormaEntrega = () => {
                 carrito.map(async (itemCarrito) => {
                   try {
                     const respuestaProducto = await fetch(
-                      `http://localhost:4000/api/productos/${itemCarrito.idproducto}`
+                      `https://3e34-201-182-248-71.ngrok-free.app/api/productos/${itemCarrito.idproducto}`
                     );
 
                     if (respuestaProducto.ok) {
@@ -138,7 +138,7 @@ const FormaEntrega = () => {
         }
 
         const respuestaUsuario = await fetch(
-          "http://localhost:4000/api/usuario/perfil",
+          "https://3e34-201-182-248-71.ngrok-free.app/api/usuario/perfil",
           {
             credentials: "include",
           }

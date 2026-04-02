@@ -244,7 +244,7 @@ const Home = () => {
       const [_, response] = await Promise.all([
         minLoadingTime,
         fetch(
-          `http://localhost:4000/api/productos?search=${encodeURIComponent(
+          `https://3e34-201-182-248-71.ngrok-free.app/api/productos?search=${encodeURIComponent(
             query
           )}&soloActivos=true`
         )
@@ -316,7 +316,7 @@ const Home = () => {
     try {
       const [_, response] = await Promise.all([
         minLoadingTime,
-        fetch(`http://localhost:4000/api/categorias/${idCategoria}/productos`)//Revisar si borrar /categorias
+        fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/categorias/${idCategoria}/productos`) //Revisar si borrar /categorias
       ]);
 
       const data = await response.json();

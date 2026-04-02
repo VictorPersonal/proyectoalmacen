@@ -59,7 +59,7 @@ function ActualizarPerfil() {
     const cargarPerfil = async () => {
       setCargando(true);
       try {
-        const res = await fetch("http://localhost:4000/api/auth/usuario/perfil", {
+        const res = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/auth/usuario/perfil", {
           method: "GET",
           credentials: "include",
         });
@@ -173,7 +173,7 @@ function ActualizarPerfil() {
     };
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/usuario/perfil", {
+      const res = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/auth/usuario/perfil", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

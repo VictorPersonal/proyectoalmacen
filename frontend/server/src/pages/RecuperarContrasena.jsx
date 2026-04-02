@@ -28,7 +28,7 @@ const RecuperarContrasena = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/api/auth/recuperar", {
+      const response = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/auth/recuperar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

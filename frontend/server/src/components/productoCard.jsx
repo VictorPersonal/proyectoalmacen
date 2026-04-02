@@ -66,7 +66,7 @@ const ProductoCard = ({ producto }) => {
         imagen: producto.producto_imagen?.[0]?.url || "",
       };
 
-      const response = await fetch("http://localhost:4000/api/favoritos", {
+      const response = await fetch(" https://3e34-201-182-248-71.ngrok-free.app/api/favoritos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -67,7 +67,7 @@ const Pago = () => {
 
       console.log("📤 Enviando a Stripe (solo una vez):", bodyData);
 
-      const res = await fetch("http://localhost:4000/api/pago/crear-preferencia", {
+      const res = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/pago/crear-preferencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),

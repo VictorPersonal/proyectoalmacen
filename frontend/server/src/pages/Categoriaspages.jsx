@@ -8,7 +8,7 @@ const CategoriaPage = () => {
   const [tituloCategoria, setTituloCategoria] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/${id}/productos`)
+    fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/${id}/productos`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
