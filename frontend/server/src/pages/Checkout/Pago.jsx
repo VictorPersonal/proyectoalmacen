@@ -38,7 +38,7 @@ const Pago = () => {
     ? productos[0].nombre
     : productos.map(p => p.nombre).join(", ");
 
-  const handlePagarStripe = async () => {
+  const handlePagarMercadoPago = async () => {
     try {
       const productName = productos.length === 1
         ? productos[0].nombre
@@ -67,7 +67,7 @@ const Pago = () => {
 
       console.log("📤 Enviando a Stripe (solo una vez):", bodyData);
 
-      const res = await fetch("http://localhost:4000/api/stripe/create-checkout-session", {
+      const res = await fetch("http://localhost:4000/api/pago/crear-preferencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
@@ -79,7 +79,7 @@ const Pago = () => {
       }
 
       const data = await res.json();
-      console.log("✅ Respuesta de Stripe (solo una vez):", data);
+      console.log("✅ Respuesta de Mercado Pago (solo una vez):", data);
       window.location.href = data.url;
 
     } catch (error) {
@@ -126,11 +126,11 @@ const Pago = () => {
             {/* 🔵 STRIPE - ÚNICO MÉTODO ACTIVO */}
             <div
               className="pago-metodo pago-activo"
-              onClick={handlePagarStripe}
+              onClick={handlePagarMercadoPago}
             >
               <div className="pago-metodo-info">
                 <FaCreditCard className="pago-metodo-icon" />
-                <span>Pagar con tarjeta (Stripe)</span>
+                <span>Pagar con Mercado Pago</span>
               </div>
               <FaArrowRight className="pago-metodo-flecha" />
             </div>

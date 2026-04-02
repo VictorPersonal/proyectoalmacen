@@ -11,19 +11,19 @@ const PagoExitoso = () => {
   const [generandoFactura, setGenerandoFactura] = useState(true); // 👈 Nuevo estado
   const ejecutadoRef = useRef(false);
 
-  // Leer session_id de la URL
+  // Leer payment_id de la URL
   const query = new URLSearchParams(window.location.search);
-  const sessionId = query.get("session_id");
+  const paymentId = query.get("payment_id");
 
   useEffect(() => {
-    if (!sessionId) {
-      setGenerandoFactura(false); // 👈 Si no hay sessionId, no generar factura
+    if (!paymentId) {
+      setGenerandoFactura(false); // 👈 Si no hay paymentId, no generar factura
       return;
     }
 
     const obtenerFactura = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/stripe/factura/${sessionId}`);
+        const res = await fetch(`http://localhost:4000/api/pago/factura/${paymentId}`);
         const data = await res.json();
 
         if (data.url) {
@@ -37,23 +37,23 @@ const PagoExitoso = () => {
     };
 
     obtenerFactura();
-  }, [sessionId]);
+  }, [paymentId]);
 
   useEffect(() => {
-    if (!sessionId || ejecutadoRef.current || pedidoConfirmado) {
-      console.log("⏭️ Confirmación ya ejecutada o sin sessionId");
+    if (!paymentId || ejecutadoRef.current || pedidoConfirmado) {
+      console.log("⏭️ Confirmación ya ejecutada o sin paymentId");
       return;
     }
 
     const confirmarPedido = async () => {
       try {
         ejecutadoRef.current = true;
-        console.log("🔔 Confirmando pedido por primera vez para session:", sessionId);
+        console.log("🔔 Confirmando pedido por primera vez para session:", paymentId);
 
-        const res = await fetch("http://localhost:4000/api/stripe/pedido/confirmar", {
+        const res = await fetch("http://localhost:4000/api/pago/pedido/confirmar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId }),
+          body: JSON.stringify({ payment_id: paymentId }),
         });
         
         const data = await res.json();
@@ -77,7 +77,7 @@ const PagoExitoso = () => {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [sessionId, pedidoConfirmado]);
+  }, [paymentId, pedidoConfirmado]);
 
   return (
     <div className="pago-exitoso-page-wrapper">

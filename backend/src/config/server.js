@@ -14,7 +14,8 @@ import estadisticasRoutes from "../routes/estadisticasRoutes.js";
 import adminPedidosRoutes from "../routes/adminpedidosRoutes.js";
 import productosRoutes from "../routes/productosRoutes.js";
 import { supabase } from "./db.js";
-import stripeRoutes from "../routes/stripeRoutes.js";
+import mercadopagoRoutes from "../routes/mercadopagoRoutes.js";
+
  
 dotenv.config();
  
@@ -50,7 +51,7 @@ app.use("/api/productosAdmin", productoAdmin);
 app.use("/api/estadisticas", estadisticasRoutes);
 app.use("/api/carrito", carritoRoutes);
 app.use("/api/", favoritoRoutes);
-app.use("/api/stripe", stripeRoutes);
+app.use("/api/pago", mercadopagoRoutes);
  
 // ⚠️ Rutas genéricas /api AL FINAL para no interceptar las específicas
 app.use("/api", productosRoutes);
