@@ -1,0 +1,62 @@
+/* ========== SIMPLE FOOTER ========== */
+/* Usado en: Login, Registro, RecuperarContrasena, RestablecerContrasena,
+   ActualizarDatos, FormaEntrega, Pago, PagoExitoso, ModificarDireccion, Home */
+
+.simple-footer {
+  background-color: #b8b4b1;
+  padding: 15px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #333;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: auto;
+  height: 60px;
+  position: relative;
+}
+
+.simple-footer-links {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.simple-footer-links a {
+  text-decoration: none;
+  color: #333;
+  font-size: 13px;
+}
+
+.simple-footer-links a:hover {
+  text-decoration: underline;
+}
+
+.simple-footer-links span {
+  color: #333;
+}
+
+.simple-footer-copyright {
+  color: #333;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .simple-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 15px 20px;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .simple-footer {
+    padding: 15px 20px;
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+  }
+}

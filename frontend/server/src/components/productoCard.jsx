@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import Swal from "sweetalert2";
-import "./productoCard.css";
+import "../styles/components/productoCard.css";
 
 const ProductoCard = ({ producto }) => {
   const [cargando, setCargando] = useState(false);

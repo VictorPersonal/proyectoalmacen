@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./PanelAdmin.css";
+import "../styles/pages/PanelAdmin.css";
 import Dashboard from "../components/dashboard";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";

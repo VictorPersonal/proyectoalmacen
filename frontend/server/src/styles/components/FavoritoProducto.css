@@ -10,11 +10,6 @@ html, body {
   background: #d8d7d7 !important; 
 }
 
-body {
-  background: #d8d7d7 !important;
-  min-height: 100%;
-}
-
 /* CONTENEDOR PRINCIPAL */
 .favoritos-container {
   max-width: 1200px;

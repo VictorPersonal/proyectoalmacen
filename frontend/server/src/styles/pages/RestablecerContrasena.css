@@ -1,23 +1,8 @@
 /* ===== Reset ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
 html, body, #root, .restablecer-page-wrapper {
   height: 100%;
   width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #c8c4c1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
   margin: 0;
   padding: 0;
 }
@@ -28,64 +13,6 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-/* ===== Header ===== */
-.restablecer-top-bar {
-  background-color: #c8c4c1;
-  padding: 10px 20px;
-  width: 100%;
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 120px;
-}
-
-.restablecer-logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* LOGO con dimensiones consistentes (90x70px) */
-.restablecer-logo-img {
-  width: 90px;
-  height: 70px;
-}
-
-.restablecer-logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-/* TÍTULO con dimensiones consistentes */
-.restablecer-logo-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #000;
-}
-
-/* SUBTÍTULO con dimensiones consistentes */
-.restablecer-logo-subtitle {
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  color: #000;
-  margin-top: 4px;
-}
-
-.restablecer-help-icon {
-  width: 26px;
-  height: 26px;
-  border: 2px solid #000;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: #fff;
 }
 
 /* ===== Contenedor principal (MARGENES AJUSTADOS) ===== */
@@ -272,45 +199,6 @@ body {
 }
 
 /* ========== FOOTER CONSISTENTE ========== */
-.restablecer-footer {
-  background-color: #b8b4b1;
-  padding: 15px 50px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: #333;
-  width: 100%;
-  flex-shrink: 0;
-  margin-top: auto;
-  height: 60px;
-  position: relative;
-}
-
-.restablecer-footer-links {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.restablecer-footer-links a {
-  text-decoration: none;
-  color: #333;
-  font-size: 13px;
-}
-
-.restablecer-footer-links a:hover {
-  text-decoration: underline;
-}
-
-.restablecer-footer-links span {
-  color: #333;
-}
-
-.restablecer-footer-copyright {
-  color: #333;
-  font-size: 13px;
-}
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
@@ -322,18 +210,6 @@ body {
 
   .restablecer-container {
     padding: 30px 15px; /* Padding ajustado para móviles */
-  }
-
-  .restablecer-footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    padding: 15px 20px;
-    height: auto;
-  }
-
-  .restablecer-top-bar {
-    padding: 10px 20px;
   }
 
   .restablecer-password-hint {
@@ -354,20 +230,7 @@ body {
     font-size: 16px;
   }
 
-  .restablecer-logo-title {
-    font-size: 20px;
-  }
   
-  .restablecer-logo-subtitle {
-    font-size: 9px;
-  }
-
-  .restablecer-footer {
-    flex-direction: column;
-    gap: 10px;
-    padding: 15px 20px;
-    height: auto;
-  }
 
   .restablecer-password-hint {
     font-size: 10px;

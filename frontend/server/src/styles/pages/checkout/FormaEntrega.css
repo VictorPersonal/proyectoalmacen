@@ -286,93 +286,6 @@
   flex-direction: column;
 }
 
-.entrega-top-bar {
-  background-color: #c8c4c1; 
-  padding: 10px 20px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  min-height: 120px; 
-}
-
-.entrega-logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px; 
-}
-
-.entrega-logo-img {
-  width: 90px; 
-  height: 70px; 
-}
-
-.entrega-logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.entrega-logo-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #000;
-}
-
-.entrega-logo-subtitle {
-  font-size: 10px; 
-  letter-spacing: 0.5px;
-  color: #000;
-  margin-top: 4px; 
-}
-
-.entrega-help-icon {
-  width: 26px;
-  height: 26px;
-  border: 2px solid #000;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: #fff;
-}
-
-.entrega-footer {
-  background-color: #b8b4b1;
-  padding: 15px 50px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px; 
-  color: #333;
-  width: 100%;
-  margin-top: auto;
-  height: 60px; 
-}
-
-.entrega-footer-links {
-  display: flex;
-  gap: 12px; 
-  align-items: center;
-}
-
-.entrega-footer-links a {
-  text-decoration: none;
-  color: #333;
-  font-size: 13px; 
-}
-
-.entrega-footer-links a:hover {
-  text-decoration: underline;
-}
-
-.entrega-footer-copyright {
-  color: #333;
-  font-size: 13px; 
-}
-
 /* ===== RADIO BUTTONS ===== */
 .entrega-opcion-header input[type="radio"] {
   margin-right: 10px;
@@ -389,46 +302,23 @@
 
 /* ===== RESPONSIVE HEADER/FOOTER ===== */
 @media (max-width: 768px) {
-  .entrega-top-bar {
-    padding: 10px 20px; 
-    min-height: 100px; 
-  }
+
   
-  .entrega-footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    padding: 15px 20px; 
-    height: auto; 
-  }
+
   
-  .entrega-logo-img {
-    width: 80px; 
-    height: 60px; 
-  }
+
   
-  .entrega-logo-title {
-    font-size: 20px; 
-  }
+
   
-  .entrega-logo-subtitle {
-    font-size: 9px; 
-  }
+
 }
 
 @media (max-width: 480px) {
-  .entrega-logo-title {
-    font-size: 18px; 
-  }
+
   
-  .entrega-logo-subtitle {
-    font-size: 8px; 
-  }
+
   
-  .entrega-footer {
-    gap: 10px;
-    padding: 15px 20px;
-  }
+
 }
 
 @media (max-width: 900px) {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaTrashAlt, FaShoppingCart, FaHeart } from "react-icons/fa";
 import { RiErrorWarningLine } from "react-icons/ri";
 import Swal from "sweetalert2";
-import "./FavoritoProducto.css";
+import "../styles/components/FavoritoProducto.css";
 
 const FavoritoProducto = () => {
   const [favoritos, setFavoritos] = useState([]);

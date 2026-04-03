@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Home.css";
+import "../styles/pages/Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight } from "react-icons/fa";
@@ -7,6 +7,7 @@ import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
 import Carrito from "../components/Carrito";
+import SimpleFooter from "../components/SimpleFooter";
 
 const Home = () => {
   const [menuMasInfo, setMenuMasInfo] = useState(false);
@@ -671,19 +672,7 @@ const Home = () => {
       )}
 
       {/* FOOTER */}
-      <footer id="footer">
-        <div className="footer-links">
-          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-          <span>/</span>
-          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
-        </div>
-
-        <div className="footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };

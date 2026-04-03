@@ -1,27 +1,3 @@
-/* ========== RESETEO GENERAL ========== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body, #root {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #c8c4c1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-}
-
 /* ========== HEADER ========== */
 header {
   background-color: #c8c4c1;
@@ -584,7 +560,6 @@ main {
   color: #333;
 }
 
-
 /* --- RESULTADOS DE BÚSQUEDA --- */
 .resultados {
   display: flex;
@@ -637,39 +612,7 @@ main {
 }
 
 /* ========== FOOTER ========== */
-footer {
-  background-color: #b8b4b1;
-  padding: 15px 50px; /* Padding normal y consistente */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: #333;
-  width: 100%;
-  flex-shrink: 0;
-  margin-top: auto; /* Esto empuja el footer hacia abajo */
-  height: 60px; /* Altura adecuada */
-  position: relative;
-}
 
-.footer-links {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.footer-links a {
-  text-decoration: none;
-  color: #333;
-}
-
-.footer-links a:hover {
-  text-decoration: underline;
-}
-
-.footer-copyright {
-  color: #333;
-}
 .content-wrapper {
   flex: 1;
   display: flex;
@@ -890,12 +833,7 @@ footer {
     padding: 8px 15px;
   }
   
-  footer {
-    padding: 15px 20px;
-    flex-direction: column;
-    gap: 10px;
-    height: auto;
-  }
+
 }
 
 /* Versión sin overlay - dentro del flujo normal pero bien centrado */

@@ -1,6 +1,6 @@
 import React from "react";
 import { FaTools, FaWrench, FaCog, FaHardHat } from "react-icons/fa";
-import "./Promociones.css";
+import "../styles/pages/Promociones.css";
 
 const PromocionesSection = () => {
   return (

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import logo from "../../assets/Logo dulce hogar.png";
-import "./FormaEntrega.css";
+import "../../styles/pages/checkout/FormaEntrega.css";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import SimpleHeader from "../../components/SimpleHeader";
+import SimpleFooter from "../../components/SimpleFooter";
 
 const FormaEntrega = () => {
   const [opcion, setOpcion] = useState("domicilio");
@@ -256,22 +257,7 @@ const FormaEntrega = () => {
   if (loading) {
     return (
       <div className="entrega-page-wrapper">
-        <header className="entrega-top-bar">
-          <div className="entrega-logo-section">
-            <img
-              src={logo}
-              alt="Dulce hogar logo"
-              className="entrega-logo-img"
-            />
-            <div className="entrega-logo-text">
-              <span className="entrega-logo-title">Dulce hogar</span>
-              <span className="entrega-logo-subtitle">
-                ALMACÉN DE ELECTRODOMÉSTICOS
-              </span>
-            </div>
-          </div>
-          <div className="entrega-help-icon">?</div>
-        </header>
+        <SimpleHeader />
 
         <div className="entrega-container">
           {/* BOTÓN DE VOLVER EN LA VERSIÓN DE LOADING TAMBIÉN */}
@@ -325,36 +311,14 @@ const FormaEntrega = () => {
         </div>
 
         {/* FOOTER ACTUALIZADO */}
-        <footer className="entrega-footer">
-          <div className="entrega-footer-links">
-            <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
-            <span>/</span>
-            <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-            <span>/</span>
-            <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-          </div>
-          <div className="entrega-footer-copyright">
-            © 2025 FHO, todos los derechos reservados
-          </div>
-        </footer>
+        <SimpleFooter />
       </div>
     );
   }
 
   return (
     <div className="entrega-page-wrapper">
-      <header className="entrega-top-bar">
-        <div className="entrega-logo-section">
-          <img src={logo} alt="Dulce hogar logo" className="entrega-logo-img" />
-          <div className="entrega-logo-text">
-            <span className="entrega-logo-title">Dulce hogar</span>
-            <span className="entrega-logo-subtitle">
-              ALMACÉN DE ELECTRODOMÉSTICOS
-            </span>
-          </div>
-        </div>
-        <div className="entrega-help-icon">?</div>
-      </header>
+      <SimpleHeader />
 
       {/* ELIMINADO: <div className="entrega-back-wrapper"> */}
 
@@ -444,18 +408,7 @@ const FormaEntrega = () => {
       </div>
 
       {/* FOOTER ACTUALIZADO */}
-      <footer className="entrega-footer">
-        <div className="entrega-footer-links">
-          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
-          <span>/</span>
-          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-        </div>
-        <div className="entrega-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };

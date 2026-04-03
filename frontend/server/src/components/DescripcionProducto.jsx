@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./DescripcionProducto.css";
+import "../styles/components/DescripcionProducto.css";
 import Swal from "sweetalert2";
 import { FaStar, FaHeart, FaShoppingCart, FaArrowLeft, FaExclamationTriangle } from "react-icons/fa";
 import { SiVisa, SiMastercard, SiAmericanexpress, SiJcb } from "react-icons/si";

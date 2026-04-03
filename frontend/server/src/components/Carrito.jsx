@@ -12,7 +12,7 @@ import {
 import { MdRemoveShoppingCart } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import "./Carrito.css";
+import "../styles/components/Carrito.css";
 
 const Carrito = ({ abierto, onCerrar }) => {
   const [productos, setProductos] = useState([]);

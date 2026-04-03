@@ -1,5 +1,5 @@
 import React from "react";
-import "./Historia.css";
+import "../styles/pages/Historia.css";
 
 import historiaImg from "../assets/almacen.png";
 

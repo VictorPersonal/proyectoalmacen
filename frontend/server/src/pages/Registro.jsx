@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "./Registro.css";
-import logo from "../assets/Logo dulce hogar.png";
+import "../styles/pages/Registro.css";
 import Swal from "sweetalert2";
+import SimpleHeader from "../components/SimpleHeader";
+import SimpleFooter from "../components/SimpleFooter";
 
 function Registro() {
   const [email, setEmail] = useState("");
@@ -233,16 +234,7 @@ function Registro() {
 
   return (
     <div className="registro-page-wrapper">
-      <header className="registro-top-bar">
-        <div className="registro-logo-section">
-          <img src={logo} alt="Dulce hogar logo" className="registro-logo-img" />
-          <div className="registro-logo-text">
-            <span className="registro-logo-title">Dulce hogar</span>
-            <span className="registro-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="registro-help-icon">?</div>
-      </header>
+      <SimpleHeader />
 
       <main className="registro-container">
         <div className="registro-form-wrapper">
@@ -359,18 +351,7 @@ function Registro() {
       </main>
 
       {/* Footer */}
-      <footer className="registro-footer">
-        <div className="registro-footer-links">
-          <Link to="/Consejo-de-Seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-          <span>/</span>
-          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
-        </div>
-        <div className="registro-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import "./ActualizarDatos.css";
-import logo from "../assets/Logo dulce hogar.png";
+import "../styles/pages/ActualizarDatos.css";
 import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import SimpleHeader from "../components/SimpleHeader";
+import SimpleFooter from "../components/SimpleFooter";
 
 function ActualizarPerfil() {
   const [nombre, setNombre] = useState("");
@@ -230,16 +231,7 @@ function ActualizarPerfil() {
 
   return (
     <>
-      <header className="actualizar-top-bar">
-        <div className="actualizar-logo-section">
-          <img src={logo} alt="Dulce hogar logo" className="actualizar-logo-img" />
-          <div className="actualizar-logo-text">
-            <span className="actualizar-logo-title">Dulce hogar</span>
-            <span className="actualizar-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="actualizar-help-icon">?</div>
-      </header>
+      <SimpleHeader />
 
       <main className="actualizar-container">
         <div className="actualizar-form-wrapper">
@@ -395,18 +387,7 @@ function ActualizarPerfil() {
         </div>
       </main>
 
-      <footer className="actualizar-footer">
-        <div className="actualizar-footer-links">
-          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
-          <span>/</span>
-          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-        </div>
-        <div className="actualizar-footer-copyright">
-          © 2025 FHO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </>
   );
 }

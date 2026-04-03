@@ -33,60 +33,6 @@
 }
 
 /* ===== HEADER ===== */
-.direccion-top-bar {
-  background-color: #c8c4c1; 
-  padding: 10px 20px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  min-height: 120px; 
-}
-
-.direccion-logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px; 
-}
-
-.direccion-logo-img {
-  width: 90px; 
-  height: 70px; 
-}
-
-.direccion-logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.direccion-logo-title {
-  font-size: 24px; 
-  font-weight: bold;
-  color: #000;
-}
-
-.direccion-logo-subtitle {
-  font-size: 10px; 
-  letter-spacing: 0.5px;
-  color: #000;
-  margin-top: 4px; 
-}
-
-.direccion-help-icon {
-  width: 26px;
-  height: 26px;
-  border: 2px solid #666;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: #f0f0f0;
-  color: #666;
-  transition: all 0.3s ease;
-}
 
 .direccion-help-icon:hover {
   background-color: #666;
@@ -516,45 +462,6 @@
 }
 
 /* ===== FOOTER ACTUALIZADO ===== */
-.direccion-footer {
-  background-color: #b8b4b1;
-  padding: 15px 50px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: #333;
-  width: 100%;
-  margin-top: auto;
-  height: 60px; 
-}
-
-.direccion-footer-links {
-  display: flex;
-  gap: 12px; 
-  align-items: center;
-}
-
-.direccion-footer-links a {
-  text-decoration: none;
-  color: #333;
-  font-size: 13px; 
-  transition: color 0.3s ease;
-}
-
-.direccion-footer-links a:hover {
-  color: #d32f2f;
-  text-decoration: underline;
-}
-
-.direccion-footer-links span {
-  color: #666;
-}
-
-.direccion-footer-copyright {
-  color: #333;
-  font-size: 13px; 
-}
 
 /* ===== MENSAJE DE AYUDA PARA BUSCADOR ===== */
 .direccion-ayuda-buscador {
@@ -620,31 +527,15 @@
     justify-content: center;
   }
   
-  .direccion-top-bar {
-    padding: 10px 20px; 
-    min-height: 100px; 
-  }
+
   
-  .direccion-footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    padding: 15px 20px; 
-    height: auto; 
-  }
+
   
-  .direccion-logo-img {
-    width: 80px; 
-    height: 60px; 
-  }
+
   
-  .direccion-logo-title {
-    font-size: 20px; 
-  }
+
   
-  .direccion-logo-subtitle {
-    font-size: 9px;
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -673,18 +564,11 @@
     font-size: 14px;
   }
   
-  .direccion-logo-title {
-    font-size: 18px;
-  }
+
   
-  .direccion-logo-subtitle {
-    font-size: 8px; 
-  }
+
   
-  .direccion-footer {
-    gap: 10px;
-    padding: 15px 20px;
-  }
+
 }
 
 /* ===== ESTILOS PARA LEAFLET (MAPAS) ===== */

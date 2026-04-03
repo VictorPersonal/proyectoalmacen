@@ -14,7 +14,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import "./dashboard.css";
+import "../styles/components/dashboard.css";
 
 const Dashboard = () => {
   const [ventasMensuales, setVentasMensuales] = useState([]);

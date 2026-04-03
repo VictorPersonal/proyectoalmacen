@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Login.css";
-import logo from "../assets/Logo dulce hogar.png";
+import "../styles/pages/Login.css";
 import Swal from "sweetalert2";
+import SimpleHeader from "../components/SimpleHeader";
+import SimpleFooter from "../components/SimpleFooter";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -84,16 +85,7 @@ const Login = () => {
   return (
     <div className="login-page-wrapper">
       {/* Header específico para login */}
-      <header className="login-top-bar">
-        <div className="login-logo-section">
-          <img src={logo} alt="Dulce hogar logo" className="login-logo-img" />
-          <div className="login-logo-text">
-            <span className="login-logo-title">Dulce hogar</span>
-            <span className="login-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="login-help-icon">?</div>
-      </header>
+      <SimpleHeader />
 
       {/* Contenido principal */}
       <main className="login-container">
@@ -161,19 +153,7 @@ const Login = () => {
         </div>
       </main>
 
-      {/* Footer con dimensiones consistentes */}
-      <footer className="login-footer">
-        <div className="login-footer-links">
-          <Link to="/Consejo-de-Seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-          <span>/</span>
-          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
-        </div>
-        <div className="login-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };
