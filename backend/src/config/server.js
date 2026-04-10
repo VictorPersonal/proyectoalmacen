@@ -15,6 +15,7 @@ import adminPedidosRoutes from "../routes/adminpedidosRoutes.js";
 import productosRoutes from "../routes/productosRoutes.js";
 import { supabase } from "./db.js";
 import mercadopagoRoutes from "../routes/mercadopagoRoutes.js";
+import removeBgRoutes from "../routes/removeBgRoutes.js";
 
  
 dotenv.config();
@@ -52,6 +53,7 @@ app.use("/api/estadisticas", estadisticasRoutes);
 app.use("/api/carrito", carritoRoutes);
 app.use("/api/", favoritoRoutes);
 app.use("/api/pago", mercadopagoRoutes);
+app.use("/api/images", removeBgRoutes);
  
 // ⚠️ Rutas genéricas /api AL FINAL para no interceptar las específicas
 app.use("/api", productosRoutes);

@@ -26,7 +26,13 @@ import {
   FaBell,
 } from "react-icons/fa";
 
-const ESTADOS_PEDIDO = ["Pendiente", "Pagado", "En camino", "Entregado", "Cancelado"];
+const ESTADOS_PEDIDO = [
+  "Pendiente",
+  "Pagado",
+  "En camino",
+  "Entregado",
+  "Cancelado",
+];
 
 const PanelAdmin = () => {
   const [currentSection, setCurrentSection] = useState("productos");
@@ -43,29 +49,37 @@ const PanelAdmin = () => {
   const [marcas, setMarcas] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 ESTADO PARA PEDIDOS (ADMIN)
+  // Procesamiento de imágenes
+  const [processingImages, setProcessingImages] = useState([
+    false,
+    false,
+    false,
+    false,
+  ]);
+  const [autoRemoveBg, setAutoRemoveBg] = useState(true);
+
+  // Pedidos
   const [pedidos, setPedidos] = useState([]);
   const [pedidosLoading, setPedidosLoading] = useState(false);
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [estadoEditando, setEstadoEditando] = useState("");
   const [showPedidoModal, setShowPedidoModal] = useState(false);
 
-  const navigate = useNavigate();
-  const profileRef = useRef(null);
-
-   // 🔔 NOTIFICACIONES
+  // Notificaciones
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
 
-  // 🔹 El formulario ahora usa nombre de categoría y marca, no IDs directos
+  const navigate = useNavigate();
+  const profileRef = useRef(null);
+
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
     stock: "",
     descripcion: "",
-    categoriaNombre: "", // texto visible para el usuario
-    marcaNombre: "", // texto visible para el usuario
+    categoriaNombre: "",
+    marcaNombre: "",
     imagenes: [],
   });
 
@@ -170,29 +184,63 @@ const PanelAdmin = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  /* =========================================================
+     HELPERS IMÁGENES
+  ========================================================= */
+  const resetProcessingImages = () => {
+    setProcessingImages([false, false, false, false]);
+  };
 
-    // =========================================================
-  // 🔔 NOTIFICACIONES (pedidos en estado Pendiente)
-  // =========================================================
+  const fileFromBlob = (blob, originalName = "imagen") => {
+    const safeName = originalName.replace(/\.[^/.]+$/, "");
+    return new File([blob], `${safeName}-sin-fondo.png`, {
+      type: "image/png",
+    });
+  };
+
+  const removeBackgroundFromImage = async (file) => {
+    const data = new FormData();
+    data.append("image", file);
+
+    const response = await axios.post(
+      "http://localhost:4000/api/images/remove-background",
+      data,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        responseType: "blob",
+        timeout: 60000,
+        withCredentials: true,
+      }
+    );
+
+    return fileFromBlob(response.data, file.name);
+  };
+
+  const previewImage = (file) => {
+    if (!file) return null;
+    return URL.createObjectURL(file);
+  };
+
+  /* =========================================================
+     NOTIFICACIONES
+  ========================================================= */
   const fetchNotifications = async () => {
     try {
       setNotificationsLoading(true);
 
-      const res = await axios.get(
-        "http://localhost:4000/api/admin/pedidos",
-        { withCredentials: true }
-      );
+      const res = await axios.get("http://localhost:4000/api/admin/pedidos", {
+        withCredentials: true,
+      });
 
       const pedidosData = res.data || [];
-
-      // Notificamos solo pedidos en estado "Pendiente"
-      const pendientes = pedidosData.filter(
-        (p) => p.estado === "Pendiente"
-      );
+      const pendientes = pedidosData.filter((p) => p.estado === "Pendiente");
 
       setNotifications(pendientes);
     } catch (err) {
-      console.error("Error al obtener notificaciones:", err.response?.data || err.message);
+      console.error(
+        "Error al obtener notificaciones:",
+        err.response?.data || err.message
+      );
       Swal.fire({
         title: "Error",
         text: "No se pudieron cargar las notificaciones",
@@ -205,7 +253,6 @@ const PanelAdmin = () => {
   };
 
   const toggleNotifications = () => {
-    // Cuando se abre el panel, recargamos las notificaciones
     if (!showNotifications) {
       fetchNotifications();
     }
@@ -219,9 +266,12 @@ const PanelAdmin = () => {
     try {
       setLoading(true);
 
-      const res = await axios.get("http://localhost:4000/api/productosAdmin/admin/productos", {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        "http://localhost:4000/api/productosAdmin/admin/productos",
+        {
+          withCredentials: true,
+        }
+      );
 
       setProducts(res.data);
     } catch (err) {
@@ -248,7 +298,6 @@ const PanelAdmin = () => {
         });
       } else {
         try {
-          console.log("⚠️ Intentando con endpoint público...");
           const resPublic = await axios.get(
             "http://localhost:4000/api/productos",
             {
@@ -256,7 +305,7 @@ const PanelAdmin = () => {
             }
           );
           setProducts(resPublic.data);
-        } catch (fallbackErr) {
+        } catch {
           Swal.fire({
             title: "Error",
             text: "No se pudieron cargar los productos",
@@ -275,7 +324,7 @@ const PanelAdmin = () => {
   }, []);
 
   /* =========================================================
-     TRAER CATEGORÍAS Y MARCAS (id + descripción)
+     TRAER CATEGORÍAS Y MARCAS
   ========================================================= */
   useEffect(() => {
     const fetchCatalogos = async () => {
@@ -296,12 +345,10 @@ const PanelAdmin = () => {
     fetchCatalogos();
   }, []);
 
-  // cuando cambie el término de búsqueda, volver a página 1
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  // limpiar el buscador cuando cambias de sección
   useEffect(() => {
     setSearchTerm("");
   }, [currentSection]);
@@ -315,21 +362,71 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     IMÁGENES MÚLTIPLES
+     IMÁGENES MÚLTIPLES + REMOVE BACKGROUND
   ========================================================= */
-  const handleImageChange = (e, index) => {
+  const handleImageChange = async (e, index) => {
     const files = e.target.files;
-    if (files && files[0]) {
+    if (!files || !files[0]) return;
+
+    const selectedFile = files[0];
+
+    try {
+      const updatedProcessing = [...processingImages];
+      updatedProcessing[index] = true;
+      setProcessingImages(updatedProcessing);
+
+      let finalFile = selectedFile;
+
+      if (autoRemoveBg) {
+        finalFile = await removeBackgroundFromImage(selectedFile);
+
+        Swal.fire({
+          title: "Imagen procesada",
+          text: `Se quitó el fondo de la imagen ${index + 1}`,
+          icon: "success",
+          timer: 1400,
+          showConfirmButton: false,
+        });
+      }
+
       const newImages = [...(formData.imagenes || [])];
-      newImages[index] = files[0];
-      setFormData({ ...formData, imagenes: newImages });
+      newImages[index] = finalFile;
+
+      setFormData((prev) => ({
+        ...prev,
+        imagenes: newImages,
+      }));
+    } catch (err) {
+      console.error(
+        "Error al procesar imagen:",
+        err.response?.data || err.message
+      );
+
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo quitar el fondo. Se usará la imagen original.",
+        icon: "warning",
+        confirmButtonText: "Entendido",
+      });
+
+      const newImages = [...(formData.imagenes || [])];
+      newImages[index] = selectedFile;
+
+      setFormData((prev) => ({
+        ...prev,
+        imagenes: newImages,
+      }));
+    } finally {
+      const updatedProcessing = [...processingImages];
+      updatedProcessing[index] = false;
+      setProcessingImages(updatedProcessing);
     }
   };
 
   const removeImage = (index) => {
     const newImages = [...(formData.imagenes || [])];
     newImages[index] = null;
-    setFormData({ ...formData, imagenes: newImages });
+    setFormData((prev) => ({ ...prev, imagenes: newImages }));
   };
 
   /* =========================================================
@@ -340,40 +437,26 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     HELPERS CATEGORÍA / MARCA (id <-> descripción)
+     HELPERS CATEGORÍA / MARCA
   ========================================================= */
-
-  // Obtener texto legible de categoría para mostrar en tabla o al editar
   const getNombreCategoria = (productOrId) => {
-    // Si viene el objeto producto
     if (productOrId && typeof productOrId === "object") {
       const p = productOrId;
-
-      // si el producto ya viene con la descripción directa
       if (p.descripcionCategoria) return p.descripcionCategoria;
 
-      // si solo trae el idcategoria, buscamos en el arreglo categorias
       const id = p.idcategoria;
-      const cat = categorias.find(
-        (c) => String(c.idcategoria) === String(id)
-      );
+      const cat = categorias.find((c) => String(c.idcategoria) === String(id));
       return cat ? cat.descripcionCategoria : id;
     }
 
-    // Si viene solo el ID
     const id = productOrId;
-    const cat = categorias.find(
-      (c) => String(c.idcategoria) === String(id)
-    );
+    const cat = categorias.find((c) => String(c.idcategoria) === String(id));
     return cat ? cat.descripcionCategoria : id;
   };
 
   const getNombreMarca = (productOrId) => {
-    // Si viene el objeto producto completo
     if (productOrId && typeof productOrId === "object") {
       const p = productOrId;
-
-      // Si el producto ya trae la descripción de la marca
       if (p.descripcionMarca) return p.descripcionMarca;
 
       const id = p.idmarca;
@@ -383,7 +466,6 @@ const PanelAdmin = () => {
       return m ? m.descripcionMarca : String(id);
     }
 
-    // Si viene solo el ID
     const id = productOrId;
     if (!id) return "";
 
@@ -391,12 +473,11 @@ const PanelAdmin = () => {
     return m ? m.descripcionMarca : String(id);
   };
 
-  // Buscar o crear categoría según su descripción
   const obtenerOCrearCategoria = async (nombreCategoria) => {
     const nombre = (nombreCategoria || "").trim();
     if (!nombre) return null;
 
-    let existente = categorias.find((c) => {
+    const existente = categorias.find((c) => {
       const desc =
         c.descripcionCategoria ||
         c.descripionCategoria ||
@@ -407,7 +488,6 @@ const PanelAdmin = () => {
 
     if (existente) return existente.idcategoria;
 
-    // Crear nueva categoría usando la columna de descripción que manejes
     const res = await axios.post("http://localhost:4000/api/categorias", {
       descripcionCategoria: nombre,
     });
@@ -417,12 +497,11 @@ const PanelAdmin = () => {
     return nueva.idcategoria;
   };
 
-  // Buscar o crear marca según su descripción
   const obtenerOCrearMarca = async (nombreMarca) => {
     const nombre = (nombreMarca || "").trim();
     if (!nombre) return null;
 
-    let existente = marcas.find((m) => {
+    const existente = marcas.find((m) => {
       const desc = m.descripcionMarca || m.descripcion || "";
       return desc.toLowerCase() === nombre.toLowerCase();
     });
@@ -446,16 +525,15 @@ const PanelAdmin = () => {
     setLoading(true);
 
     try {
-      // Resolver nombres de categoría / marca a IDs reales
       const idCategoria = await obtenerOCrearCategoria(
         formData.categoriaNombre
       );
+
       const idMarca = formData.marcaNombre
         ? await obtenerOCrearMarca(formData.marcaNombre)
         : null;
 
       const data = new FormData();
-
       data.append("nombre", formData.nombre);
       data.append("precio", formData.precio);
       data.append("stock", formData.stock);
@@ -473,6 +551,7 @@ const PanelAdmin = () => {
       }
 
       let response;
+
       if (editingProduct) {
         response = await axios.put(
           `http://localhost:4000/api/productosAdmin/productos/${editingProduct.idproducto}/con-imagen`,
@@ -480,7 +559,7 @@ const PanelAdmin = () => {
           {
             headers: { "Content-Type": "multipart/form-data" },
             timeout: 30000,
-            withCredentials: true //Todas estas variables con withCredentials son para validar el token
+            withCredentials: true,
           }
         );
 
@@ -499,11 +578,10 @@ const PanelAdmin = () => {
         response = await axios.post(
           "http://localhost:4000/api/productosAdmin/productos/con-imagen",
           data,
-          
           {
             headers: { "Content-Type": "multipart/form-data" },
             timeout: 30000,
-            withCredentials: true
+            withCredentials: true,
           }
         );
 
@@ -524,6 +602,7 @@ const PanelAdmin = () => {
 
       setModalVisible(false);
       setEditingProduct(null);
+      resetProcessingImages();
       setFormData({
         nombre: "",
         precio: "",
@@ -557,6 +636,7 @@ const PanelAdmin = () => {
   ========================================================= */
   const handleEdit = (product) => {
     setEditingProduct(product);
+    resetProcessingImages();
     setFormData({
       nombre: product.nombre,
       precio: product.precio,
@@ -686,7 +766,7 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     PAGINACIÓN CON TECLADO (PRODUCTOS)
+     PAGINACIÓN CON TECLADO
   ========================================================= */
   useEffect(() => {
     if (currentSection !== "productos") return;
@@ -710,32 +790,14 @@ const PanelAdmin = () => {
   }, [currentPage, totalPages, currentSection]);
 
   /* =========================================================
-     LIMPIAR URLs DE OBJETOS AL CERRAR MODAL
-  ========================================================= */
-  useEffect(() => {
-    return () => {
-      if (formData.imagenes) {
-        formData.imagenes.forEach((img) => {
-          if (img && typeof img === "object") {
-            URL.revokeObjectURL(URL.createObjectURL(img));
-          }
-        });
-      }
-    };
-  }, [modalVisible]);
-
-  /* =========================================================
-     PEDIDOS - FETCH & HELPERS
+     PEDIDOS
   ========================================================= */
   const fetchPedidos = async () => {
     try {
       setPedidosLoading(true);
-      const res = await axios.get(
-        "http://localhost:4000/api/admin/pedidos",
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await axios.get("http://localhost:4000/api/admin/pedidos", {
+        withCredentials: true,
+      });
       setPedidos(res.data || []);
     } catch (err) {
       console.error(
@@ -753,14 +815,12 @@ const PanelAdmin = () => {
     }
   };
 
-  // cargar pedidos al entrar a la sección
   useEffect(() => {
     if (currentSection === "pedidos" && pedidos.length === 0) {
       fetchPedidos();
     }
   }, [currentSection, pedidos.length]);
 
-  // filtro de pedidos (por número o cliente)
   const filteredPedidos = pedidos.filter((p) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -803,6 +863,7 @@ const PanelAdmin = () => {
 
   const handleGuardarEstadoPedido = async () => {
     if (!selectedPedido) return;
+
     if (!estadoEditando) {
       Swal.fire({
         title: "Estado requerido",
@@ -814,13 +875,13 @@ const PanelAdmin = () => {
 
     try {
       setPedidosLoading(true);
+
       await axios.patch(
         `http://localhost:4000/api/admin/pedidos/${selectedPedido.idpedido}/estado`,
         { estado: estadoEditando },
         { withCredentials: true }
       );
 
-      // actualizar en la tabla
       setPedidos((prev) =>
         prev.map((p) =>
           p.idpedido === selectedPedido.idpedido
@@ -855,13 +916,9 @@ const PanelAdmin = () => {
     }
   };
 
-  /* =========================================================
-     RENDER
-  ========================================================= */
   return (
     <div className="admin-panel">
       <aside className="sidebar">
-        {/* Perfil con menú de opciones */}
         <div
           className="admin-profile profile-clickable"
           onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -889,7 +946,6 @@ const PanelAdmin = () => {
         </div>
 
         <nav className="sidebar-nav">
-          {/* 👇 NAVBAR ACTUALIZADO CON 3 ELEMENTOS */}
           <button
             type="button"
             className={`nav-item ${
@@ -925,7 +981,6 @@ const PanelAdmin = () => {
         </nav>
       </aside>
 
-      {/* MODAL AYUDA */}
       {showHelp && (
         <div className="modal">
           <div className="modal-content help-modal">
@@ -948,27 +1003,22 @@ const PanelAdmin = () => {
 
       <main className="main-content">
         <div className="top-buttons">
-          {/* 🔔 Botón de notificaciones */}
           <button
-              className="notif-btn"
-              onClick={toggleNotifications}
-              title="Notificaciones"
-            >
-              <FaBell size={18} />
-              {notifications.length > 0 && (
-                <span className="notif-badge">
-                  {notifications.length}
-                </span>
-              )}
-            </button>
+            className="notif-btn"
+            onClick={toggleNotifications}
+            title="Notificaciones"
+          >
+            <FaBell size={18} />
+            {notifications.length > 0 && (
+              <span className="notif-badge">{notifications.length}</span>
+            )}
+          </button>
 
-            {/* Botón de ayuda existente */}
-            <button className="help-btn" onClick={() => setShowHelp(true)}>
-              <FaQuestionCircle size={18} />
-            </button>
-          </div>
+          <button className="help-btn" onClick={() => setShowHelp(true)}>
+            <FaQuestionCircle size={18} />
+          </button>
+        </div>
 
-        {/* Panel de notificaciones */}
         {showNotifications && (
           <div className="notifications-panel">
             <div className="notifications-header">
@@ -987,9 +1037,7 @@ const PanelAdmin = () => {
                 <span>Cargando notificaciones...</span>
               </div>
             ) : notifications.length === 0 ? (
-              <p className="notifications-empty">
-                No hay pedidos pendientes.
-              </p>
+              <p className="notifications-empty">No hay pedidos pendientes.</p>
             ) : (
               <ul className="notifications-list">
                 {notifications.map((pedido) => (
@@ -1006,9 +1054,7 @@ const PanelAdmin = () => {
                       <span className="notification-total">
                         ${pedido.total.toLocaleString()}
                       </span>
-                      <span className="notification-date">
-                        {pedido.fecha}
-                      </span>
+                      <span className="notification-date">{pedido.fecha}</span>
                     </div>
                     <button
                       className="notification-btn"
@@ -1026,14 +1072,8 @@ const PanelAdmin = () => {
           </div>
         )}
 
-
-
-        {/* =====================================================
-            SECCIÓN PRODUCTOS
-        ===================================================== */}
         {currentSection === "productos" && (
           <>
-            {/* Buscador + agregar */}
             <div className="search-wrapper">
               <div className="search-container">
                 <FaSearch className="search-icon" />
@@ -1049,6 +1089,7 @@ const PanelAdmin = () => {
                 className="btn btn--add-secondary"
                 onClick={() => {
                   setEditingProduct(null);
+                  resetProcessingImages();
                   setFormData({
                     nombre: "",
                     precio: "",
@@ -1067,7 +1108,6 @@ const PanelAdmin = () => {
               </button>
             </div>
 
-            {/* Loading indicator */}
             {loading && (
               <div className="loading-indicator">
                 <FaSpinner className="loading-spinner" />
@@ -1075,7 +1115,6 @@ const PanelAdmin = () => {
               </div>
             )}
 
-            {/* Tabla de productos */}
             <div className="table-wrapper">
               <table className="products-table">
                 <thead>
@@ -1117,7 +1156,6 @@ const PanelAdmin = () => {
                               }}
                               onError={(e) => {
                                 e.target.style.display = "none";
-                                e.target.nextSibling.style.display = "flex";
                               }}
                             />
                           ) : (
@@ -1129,7 +1167,6 @@ const PanelAdmin = () => {
                         <td>{prod.nombre}</td>
                         <td>${Number(prod.precio).toFixed(2)}</td>
                         <td>{prod.stock}</td>
-                        {/* 🔹 Aquí ya mostramos la descripción, no el ID */}
                         <td>{getNombreCategoria(prod)}</td>
                         <td>
                           <span
@@ -1205,7 +1242,6 @@ const PanelAdmin = () => {
               </table>
             </div>
 
-            {/* Paginación */}
             <div className="pagination">
               <button
                 className="page-btn"
@@ -1237,9 +1273,6 @@ const PanelAdmin = () => {
           </>
         )}
 
-        {/* =====================================================
-            SECCIÓN DE PEDIDOS (REAL)
-        ===================================================== */}
         {currentSection === "pedidos" && (
           <div className="pedidos-section">
             <div className="section-header">
@@ -1250,7 +1283,6 @@ const PanelAdmin = () => {
               <p>Visualiza y administra todos los pedidos del sistema.</p>
             </div>
 
-            {/* Buscador de pedidos */}
             <div className="search-wrapper">
               <div className="search-container">
                 <FaSearch className="search-icon" />
@@ -1263,7 +1295,6 @@ const PanelAdmin = () => {
               </div>
             </div>
 
-            {/* Loading */}
             {pedidosLoading && (
               <div className="loading-indicator">
                 <FaSpinner className="loading-spinner" />
@@ -1271,7 +1302,6 @@ const PanelAdmin = () => {
               </div>
             )}
 
-            {/* Tabla de pedidos */}
             <div className="table-wrapper">
               <table className="pedidos-table">
                 <thead>
@@ -1308,9 +1338,7 @@ const PanelAdmin = () => {
                           </span>
                         </td>
                         <td>
-                          <span
-                            className={getEstadoBadgeClass(pedido.estado)}
-                          >
+                          <span className={getEstadoBadgeClass(pedido.estado)}>
                             {pedido.estado}
                           </span>
                         </td>
@@ -1343,7 +1371,6 @@ const PanelAdmin = () => {
         {currentSection === "dashboard" && <Dashboard />}
       </main>
 
-      {/* MODAL CREAR / EDITAR PRODUCTO CON 4 IMÁGENES */}
       {modalVisible && (
         <div className="modal">
           <div className="modal-content">
@@ -1358,6 +1385,7 @@ const PanelAdmin = () => {
                 </>
               )}
             </h3>
+
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -1368,6 +1396,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <input
                 type="number"
                 name="precio"
@@ -1379,6 +1408,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <input
                 type="number"
                 name="stock"
@@ -1389,6 +1419,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <textarea
                 name="descripcion"
                 placeholder="Descripción del producto"
@@ -1398,7 +1429,6 @@ const PanelAdmin = () => {
                 disabled={loading}
               />
 
-              {/* 🔹 Categoría por nombre, con autocompletado */}
               <input
                 type="text"
                 name="categoriaNombre"
@@ -1409,6 +1439,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <datalist id="categoria-options">
                 {categorias.map((cat) => (
                   <option
@@ -1422,7 +1453,6 @@ const PanelAdmin = () => {
                 ))}
               </datalist>
 
-              {/* 🔹 Marca por nombre, con autocompletado */}
               <input
                 type="text"
                 name="marcaNombre"
@@ -1432,6 +1462,7 @@ const PanelAdmin = () => {
                 onChange={handleChange}
                 disabled={loading}
               />
+
               <datalist id="marca-options">
                 {marcas.map((mar) => (
                   <option
@@ -1441,16 +1472,35 @@ const PanelAdmin = () => {
                 ))}
               </datalist>
 
-              {/* SECCIÓN DE 4 IMÁGENES */}
               <div className="image-upload-section">
                 <h4>
                   <FaImage className="section-icon" />
                   Imágenes del Producto (máximo 4)
                 </h4>
+
                 <p className="image-upload-info">
                   Puedes subir hasta 4 imágenes. La primera imagen será la
                   principal.
                 </p>
+
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "12px",
+                    fontSize: "14px",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={autoRemoveBg}
+                    onChange={(e) => setAutoRemoveBg(e.target.checked)}
+                    disabled={loading}
+                  />
+                  Quitar fondo automáticamente al subir imagen
+                </label>
+
                 <div className="image-grid">
                   {[0, 1, 2, 3].map((index) => (
                     <div
@@ -1461,12 +1511,17 @@ const PanelAdmin = () => {
                           : ""
                       }`}
                     >
+                      {processingImages[index] && (
+                        <div className="image-processing-overlay">
+                          <FaSpinner className="loading-spinner spinning" />
+                          <span>Procesando...</span>
+                        </div>
+                      )}
+
                       {formData.imagenes && formData.imagenes[index] ? (
                         <>
                           <img
-                            src={URL.createObjectURL(
-                              formData.imagenes[index]
-                            )}
+                            src={previewImage(formData.imagenes[index])}
                             alt={`Vista ${index + 1}`}
                             className="image-preview"
                           />
@@ -1474,7 +1529,7 @@ const PanelAdmin = () => {
                             type="button"
                             className="remove-image-btn"
                             onClick={() => removeImage(index)}
-                            disabled={loading}
+                            disabled={loading || processingImages[index]}
                           >
                             <FaTimes />
                           </button>
@@ -1485,12 +1540,13 @@ const PanelAdmin = () => {
                           <span>Imagen {index + 1}</span>
                         </div>
                       )}
+
                       <input
                         type="file"
                         className="image-upload-input"
-                        accept="image/*"
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
                         onChange={(e) => handleImageChange(e, index)}
-                        disabled={loading}
+                        disabled={loading || processingImages[index]}
                       />
                     </div>
                   ))}
@@ -1501,7 +1557,7 @@ const PanelAdmin = () => {
                 <button
                   type="submit"
                   className="btn btn--add"
-                  disabled={loading}
+                  disabled={loading || processingImages.some(Boolean)}
                 >
                   {loading ? (
                     <>
@@ -1515,12 +1571,14 @@ const PanelAdmin = () => {
                     </>
                   )}
                 </button>
+
                 <button
                   type="button"
                   className="btn btn--delete"
                   onClick={() => {
                     setModalVisible(false);
                     setEditingProduct(null);
+                    resetProcessingImages();
                   }}
                   disabled={loading}
                 >
@@ -1533,7 +1591,6 @@ const PanelAdmin = () => {
         </div>
       )}
 
-      {/* MODAL DETALLE PEDIDO */}
       {showPedidoModal && selectedPedido && (
         <div className="modal">
           <div className="modal-content pedido-modal">
@@ -1545,16 +1602,31 @@ const PanelAdmin = () => {
             <div className="pedido-detalle-grid">
               <div className="pedido-detalle-col">
                 <h4>Cliente</h4>
-                <p><strong>Nombre:</strong> {selectedPedido.cliente}</p>
-                <p><strong>Correo:</strong> {selectedPedido.correo || "N/D"}</p>
-                <p><strong>Teléfono:</strong> {selectedPedido.telefono || "N/D"}</p>
+                <p>
+                  <strong>Nombre:</strong> {selectedPedido.cliente}
+                </p>
+                <p>
+                  <strong>Correo:</strong> {selectedPedido.correo || "N/D"}
+                </p>
+                <p>
+                  <strong>Teléfono:</strong> {selectedPedido.telefono || "N/D"}
+                </p>
               </div>
+
               <div className="pedido-detalle-col">
                 <h4>Envío</h4>
-                <p><strong>Dirección:</strong> {selectedPedido.direccion || "Sin dirección"}</p>
-                <p><strong>Ciudad:</strong> {selectedPedido.ciudad || "N/D"}</p>
-                <p><strong>Fecha:</strong> {selectedPedido.fecha}</p>
+                <p>
+                  <strong>Dirección:</strong>{" "}
+                  {selectedPedido.direccion || "Sin dirección"}
+                </p>
+                <p>
+                  <strong>Ciudad:</strong> {selectedPedido.ciudad || "N/D"}
+                </p>
+                <p>
+                  <strong>Fecha:</strong> {selectedPedido.fecha}
+                </p>
               </div>
+
               <div className="pedido-detalle-col">
                 <h4>Resumen</h4>
                 <p>
@@ -1567,10 +1639,9 @@ const PanelAdmin = () => {
                     {selectedPedido.estado}
                   </span>
                 </p>
+
                 <div className="estado-selector">
-                  <label htmlFor="estadoPedido">
-                    Cambiar estado:
-                  </label>
+                  <label htmlFor="estadoPedido">Cambiar estado:</label>
                   <select
                     id="estadoPedido"
                     value={estadoEditando}
@@ -1607,6 +1678,7 @@ const PanelAdmin = () => {
                   </>
                 )}
               </button>
+
               <button
                 type="button"
                 className="btn btn--delete"
