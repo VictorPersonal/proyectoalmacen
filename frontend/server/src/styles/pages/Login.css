@@ -1,6 +1,6 @@
 /* Estructura de página */
 .login-page-wrapper {
-  background-color: #c8c4c1;
+  background-color: #F8FAFC;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -11,7 +11,7 @@
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  background-color: #edeae8;
+  background-color: #F8FAFC;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -21,19 +21,19 @@
 }
 
 .login-form-box {
-  background-color: #fff;
-  border-radius: 12px;
+  background-color: #FFFFFF;
+  border-radius: 20px;
   padding: 35px 45px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .login-form-title {
   text-align: center;
   font-size: 18px;
   font-weight: normal;
-  color: #D84040;
+  color: #22C55E;
   margin-bottom: 30px;
 }
 
@@ -52,61 +52,63 @@
 
 .login-form-label {
   font-size: 12px;
-  color: #000;
+  color: #1E293B;
   font-weight: 500;
 }
 
 .login-form-input {
-  padding: 10px 14px;
-  border: 1px solid #999;
-  border-radius: 4px;
-  font-size: 12px;
-  background-color: #fff;
-  color: #000;
+  padding: 12px 16px;
+  border: 1px solid #E2E8F0;
+  border-radius: 15px;
+  font-size: 14px;
+  background-color: #FFFFFF;
+  color: #1E293B;
   outline: none;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
 }
 
 .login-form-input:focus {
-  border-color: #D84040;
+  border-color: #22C55E;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .login-form-input::placeholder {
-  color: #999;
-  font-size: 11px;
+  color: #94A3B8;
+  font-size: 13px;
 }
 
 /* Botón */
 .login-btn-ingresar {
-  background-color: #fff;
-  color: #D84040;
-  border: 1px solid #D84040;
-  padding: 10px 20px;
-  font-size: 12px;
-  font-weight: normal;
-  border-radius: 4px;
+  background-color: #22C55E;
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 8px;
-  text-transform: capitalize;
 }
 
 .login-btn-ingresar:hover {
-  background-color: #D84040;
-  color: #fff;
+  background-color: #16A34A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .login-btn-ingresar:disabled {
-  background-color: #cccccc;
-  border-color: #cccccc;
+  background-color: #94A3B8;
+  border-color: #94A3B8;
   cursor: not-allowed;
-  color: #666;
+  color: #FFFFFF;
+  transform: none;
+  box-shadow: none;
 }
 
 .login-btn-ingresar:disabled:hover {
-  background-color: #cccccc;
-  border-color: #cccccc;
-  color: #666;
+  background-color: #94A3B8;
+  color: #FFFFFF;
 }
 
 /* Enlaces */
@@ -120,14 +122,14 @@
 
 .login-forgot-password,
 .login-register-link {
-  font-size: 11px;
-  color: #000;
+  font-size: 12px;
+  color: #475569;
   text-align: center;
 }
 
 .login-forgot-password a,
 .login-register-link a {
-  color: #D84040;
+  color: #22C55E;
   text-decoration: none;
   font-weight: 500;
 }
@@ -135,30 +137,29 @@
 .login-forgot-password a:hover,
 .login-register-link a:hover {
   text-decoration: underline;
+  color: #16A34A;
 }
-
-/* ========== FOOTER ========== */
 
 /* Mensajes */
 .login-mensaje {
   text-align: center;
   margin-bottom: 15px;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
 }
 
 .login-mensaje-exito {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background-color: #F0FDF4;
+  color: #22C55E;
+  border: 1px solid #22C55E;
 }
 
 .login-mensaje-error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: #FEF2F2;
+  color: #EF4444;
+  border: 1px solid #EF4444;
 }
 
 /* ---- Ícono de mostrar/ocultar contraseña ---- */
@@ -170,25 +171,25 @@
 
 .login-password-wrapper input {
   width: 100%;
-  padding-right: 36px;
+  padding-right: 46px;
 }
 
 .login-toggle-password {
   position: absolute;
-  right: 10px;
+  right: 16px;
   cursor: pointer;
-  color: #555;
-  font-size: 16px;
+  color: #94A3B8;
+  font-size: 18px;
 }
 
 .login-toggle-password:hover {
-  color: #D84040;
+  color: #22C55E;
 }
 
 /* Spinner para login */
 .login-spinner {
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #ffffff;
+  border: 2px solid #FFFFFF;
+  border-top: 2px solid #FFFFFF;
   border-radius: 50%;
   width: 16px;
   height: 16px;
@@ -213,13 +214,15 @@
     margin: 15px;
     padding: 30px 15px;
   }
-
 }
 
 @media (max-width: 480px) {
-
+  .login-form-box {
+    padding: 25px 30px;
+    max-width: 100%;
+  }
   
-
-  
-
+  .login-form-input {
+    padding: 10px 14px;
+  }
 }

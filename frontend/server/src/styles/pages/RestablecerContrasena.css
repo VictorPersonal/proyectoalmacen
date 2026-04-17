@@ -9,7 +9,7 @@ html, body, #root, .restablecer-page-wrapper {
 
 /* ===== Estructura general ===== */
 .restablecer-page-wrapper {
-  background-color: #c8c4c1;
+  background-color: #F8FAFC;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@ html, body, #root, .restablecer-page-wrapper {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  background-color: #edeae8;
+  background-color: #F1F5F9;
   width: 100%;
   margin: 0;
   padding: 40px 0; /* Añadido padding vertical */
@@ -44,7 +44,7 @@ html, body, #root, .restablecer-page-wrapper {
 .restablecer-form-title {
   font-size: 18px;
   font-weight: normal;
-  color: #D84040;
+  color: #22C55E;
   margin-bottom: 25px;
 }
 
@@ -80,7 +80,7 @@ html, body, #root, .restablecer-page-wrapper {
 }
 
 .restablecer-form-input:focus {
-  border-color: #D84040;
+  border-color: #22C55E;
 }
 
 .restablecer-form-input::placeholder {
@@ -107,17 +107,17 @@ html, body, #root, .restablecer-page-wrapper {
   line-height: 1.3;
   font-style: italic;
   padding: 8px 12px;
-  background-color: #f8f8f8;
+  background-color: #F1F5F9;
   border-radius: 4px;
-  border-left: 3px solid #D84040;
+  border-left: 3px solid #22C55E;
   text-align: left;
 }
 
 /* ===== Botón ===== */
 .restablecer-btn-actualizar {
   background-color: #fff;
-  color: #D84040;
-  border: 1px solid #D84040;
+  color: #22C55E;
+  border: 1px solid #22C55E;
   padding: 10px 20px;
   font-size: 12px;
   border-radius: 4px;
@@ -129,7 +129,7 @@ html, body, #root, .restablecer-page-wrapper {
 }
 
 .restablecer-btn-actualizar:hover {
-  background-color: #D84040;
+  background-color: #22C55E;
   color: #fff;
 }
 
@@ -162,7 +162,7 @@ html, body, #root, .restablecer-page-wrapper {
 }
 
 .restablecer-form-links a {
-  color: #D84040;
+  color: #22C55E;
   text-decoration: none;
   font-weight: 500;
 }

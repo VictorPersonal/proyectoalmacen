@@ -1,6 +1,6 @@
 /* ===== ESTRUCTURA PRINCIPAL ===== */
 .direccion-page-wrapper {
-  background-color: #ceccca;
+  background-color: #F8FAFC;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   display: flex;
   justify-content: center;
   padding: 40px 20px;
-  background-color: #ceccca;
+  background-color: #F8FAFC;
   min-height: calc(100vh - 120px - 60px); 
   flex: 1;
 }
@@ -64,7 +64,7 @@
 
 .direccion-buscador-input:focus {
   outline: none;
-  border-color: #d32f2f;
+  border-color: #EF4444;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
 }
 
@@ -123,7 +123,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #EF4444, #b71c1c);
   color: white;
   border: none;
   padding: 12px 20px;
@@ -212,7 +212,7 @@
 }
 
 .direccion-mapa-leyenda {
-  background-color: #f8f9fa;
+  background-color: #F1F5F9;
   padding: 10px 15px;
   border: 1px solid #dee2e6;
   border-top: none;
@@ -227,7 +227,7 @@
 }
 
 .direccion-leyenda-icon {
-  color: #d32f2f;
+  color: #EF4444;
   font-size: 14px;
 }
 
@@ -236,7 +236,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background-color: #f8f9fa;
+  background-color: #F1F5F9;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   font-size: 12px;
@@ -269,7 +269,7 @@
 
 .direccion-campo-icon {
   font-size: 16px;
-  color: #d32f2f;
+  color: #EF4444;
 }
 
 .direccion-input {
@@ -286,7 +286,7 @@
 
 .direccion-input:focus {
   outline: none;
-  border-color: #d32f2f;
+  border-color: #EF4444;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
 }
 
@@ -307,18 +307,18 @@
 
 .direccion-ayuda-icon {
   font-size: 12px;
-  color: #d32f2f;
+  color: #EF4444;
   margin-top: 1px;
   flex-shrink: 0;
 }
 
 /* ===== INSTRUCCIONES ===== */
 .direccion-instrucciones {
-  background-color: #f8f9fa;
+  background-color: #F1F5F9;
   padding: 15px;
   border-radius: 6px;
   margin-top: 25px;
-  border-left: 4px solid #d32f2f;
+  border-left: 4px solid #EF4444;
 }
 
 .direccion-instrucciones p {
@@ -330,7 +330,7 @@
 }
 
 .direccion-instrucciones-icon {
-  color: #d32f2f;
+  color: #EF4444;
   font-size: 16px;
 }
 
@@ -384,7 +384,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #EF4444, #b71c1c);
   color: white;
   border: none;
   padding: 12px 25px;
@@ -469,8 +469,8 @@
   align-items: flex-start;
   gap: 8px;
   padding: 10px 15px;
-  background-color: #f8f9fa;
-  border-left: 4px solid #d32f2f;
+  background-color: #F1F5F9;
+  border-left: 4px solid #EF4444;
   border-radius: 6px;
   margin-top: 10px;
   margin-bottom: 15px;
@@ -483,7 +483,7 @@
 }
 
 .direccion-ayuda-icon-small {
-  color: #d32f2f;
+  color: #EF4444;
   font-size: 14px;
   margin-top: 2px;
   flex-shrink: 0;
@@ -592,8 +592,8 @@
 
 .leaflet-control-zoom a:hover {
   background-color: #f4f4f4;
-  color: #d32f2f;
-  border-color: #d32f2f;
+  color: #EF4444;
+  border-color: #EF4444;
 }
 
 /* Asegurar que todos los elementos tengan colores consistentes */
@@ -612,13 +612,13 @@
 
 /* Paleta de colores rojo y gris */
 :root {
-  --rojo-principal: #d32f2f;
+  --rojo-principal: #EF4444;
   --rojo-oscuro: #b71c1c;
   --rojo-mas-oscuro: #9a0007;
   --gris-oscuro: #424242;
   --gris-medio: #616161;
   --gris-claro: #e0e0e0;
-  --gris-muy-claro: #f5f5f5;
+  --gris-muy-claro: #F1F5F9;
   --texto-oscuro: #333;
   --texto-medio: #666;
   --texto-claro: #888;

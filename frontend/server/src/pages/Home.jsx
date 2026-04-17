@@ -369,7 +369,7 @@ const Home = () => {
             </div>
             <div className="logo-text" id="logo-text">
               <h1>Dulce hogar</h1>
-              <p>ALMACÉN DE ELECTRODOMÉSTICOS</p>
+              <p>Tradición y calidad</p>
             </div>
           </div>
 

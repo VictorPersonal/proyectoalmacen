@@ -7,7 +7,7 @@
 
 /* Container Principal */
 .pago-page-wrapper {
-  background-color: #d0cbc8;
+  background-color: #F8FAFC;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  background-color: #d0cbc8;
+  background-color: #F8FAFC;
 }
 
 .pago-form-box {
@@ -36,7 +36,7 @@
   text-align: center;
   font-size: 18px;
   font-weight: normal;
-  color: #D84040;
+  color: #22C55E;
   margin-bottom: 30px;
 }
 
@@ -50,7 +50,7 @@
 
 /* Resumen de compra */
 .pago-resumen {
-  background-color: #f5f5f5;
+  background-color: #F1F5F9;
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 20px;
@@ -89,8 +89,8 @@
 }
 
 .pago-metodo.pago-activo:hover {
-  background-color: #f8f9fa;
-  border-color: #D84040;
+  background-color: #F1F5F9;
+  border-color: #22C55E;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -115,12 +115,12 @@
 }
 
 .pago-metodo.pago-activo .pago-metodo-icon {
-  color: #D84040;
+  color: #22C55E;
 }
 
 .pago-metodo-flecha {
   font-size: 14px;
-  color: #D84040;
+  color: #22C55E;
 }
 
 .pago-metodo-bloqueado {
@@ -137,8 +137,8 @@
 
 .pago-btn-volver {
   background-color: #fff;
-  color: #D84040;
-  border: 1px solid #D84040;
+  color: #22C55E;
+  border: 1px solid #22C55E;
   padding: 10px 20px;
   font-size: 12px;
   font-weight: normal;
@@ -151,7 +151,7 @@
 }
 
 .pago-btn-volver:hover {
-  background-color: #D84040;
+  background-color: #22C55E;
   color: #fff;
 }
 
@@ -227,11 +227,11 @@
 
 /* Mejoras de accesibilidad */
 .pago-metodo.pago-activo:focus {
-  outline: 2px solid #D84040;
+  outline: 2px solid #22C55E;
   outline-offset: 2px;
 }
 
 .pago-btn-volver:focus {
-  outline: 2px solid #D84040;
+  outline: 2px solid #22C55E;
   outline-offset: 2px;
 }

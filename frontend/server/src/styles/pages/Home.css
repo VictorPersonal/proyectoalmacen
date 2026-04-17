@@ -1,9 +1,10 @@
 /* ========== HEADER ========== */
 header {
-  background-color: #c8c4c1;
+  background-color: #16A34A;
   padding: 10px 20px;
   width: 100%;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .navbar {
@@ -23,19 +24,31 @@ header {
 .logo-icon img {
   width: 90px;
   height: 70px;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+  transition: filter 0.3s ease;
+}
+
+.logo-icon img:hover {
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+}
+
+.logo-text {
+  text-align: center;
 }
 
 .logo-text h1 {
   font-size: 24px;
   font-weight: bold;
-  color: #000;
+  color: #244397;
+  margin: 0;
 }
 
 .logo-text p {
   font-size: 10px;
   letter-spacing: 0.5px;
-  color: #000;
+  color: #F0FDF4;
   margin-top: 4px;
+  margin-bottom: 0;
 }
 
 /* --- BUSCADOR --- */
@@ -43,8 +56,8 @@ header {
   display: flex;
   align-items: center;
   background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
   padding: 6px 12px;
   width: 600px;    
   max-width: 55%;  
@@ -59,13 +72,14 @@ header {
   outline: none;
   flex: 1;
   font-size: 14px;
-  color: #444;
-  padding-right: 30px; /* Espacio para el botón */
+  color: #1E293B;
+  padding-right: 30px;
+  background: transparent;
 }
 
 /* Placeholder */
 .search-container-home input::placeholder {
-  color: #999;
+  color: #94A3B8;
 }
 
 /* Botón buscar - SOLO LUPA */
@@ -75,7 +89,7 @@ header {
   cursor: pointer;
   font-size: 18px;
   padding: 0;
-  color: #666;
+  color: #475569;
   transition: 0.2s ease;
   position: absolute;
   right: 12px;
@@ -89,7 +103,7 @@ header {
 }
 
 .search-container-home .search-btn:hover {
-  color: #D84040;
+  color: #22C55E;
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -100,7 +114,7 @@ header {
   cursor: pointer;
   font-size: 18px;
   padding: 0;
-  color: #666;
+  color: #475569;
   transition: 0.2s ease;
   position: absolute;
   right: 12px;
@@ -114,9 +128,9 @@ header {
 }
 
 .search-container-home .clear-btn:hover {
-  color: #D84040;
+  color: #22C55E;
   transform: translateY(-50%) scale(1.1);
-  background: none; /* Sin fondo */
+  background: none;
 }
 
 /* --- ENLACES DE NAVEGACIÓN --- */
@@ -128,7 +142,7 @@ header {
 
 .nav-link {
   text-decoration: none;
-  color: #000;
+  color: #FFFFFF;
   font-size: 14px;
   font-weight: 500;
   display: flex;
@@ -137,7 +151,7 @@ header {
 }
 
 .nav-link:hover {
-  color: #D84040;
+  color: #F0FDF4;
 }
 
 /* --- LOGIN / REGISTRO --- */
@@ -152,18 +166,19 @@ header {
 
 .auth-links a {
   text-decoration: none;
-  color: #000;
+  color: #FFFFFF;
   font-size: 13px;
 }
 
 .auth-links a:hover {
   text-decoration: underline;
+  color: #F0FDF4;
 }
 
 /* --- ICONO DEL CARRITO --- */
 .cart-icon {
   font-size: 22px;
-  color: #000000;
+  color: #FFFFFF;
   cursor: pointer;
   transition: transform 0.2s ease;
   display: flex;
@@ -174,7 +189,7 @@ header {
 
 .cart-icon:hover {
   transform: scale(1.1);
-  color: #D84040;
+  color: #F0FDF4;
 }
 
 /* MENÚ DESPLEGABLE DE CATEGORÍAS */
@@ -194,13 +209,13 @@ header {
   background: none;
   border: none;
   font-family: inherit;
-  color: inherit;
+  color: #FFFFFF;
   padding: 0 8px;
   transition: color 0.3s ease;
 }
 
 .categorias-btn:hover {
-  color: #D84040;
+  color: #F0FDF4;
 }
 
 .menu-desplegable {
@@ -208,9 +223,9 @@ header {
   top: 100%;
   left: 0;
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   min-width: 240px;
   z-index: 1000;
   margin-top: 8px;
@@ -239,7 +254,7 @@ header {
 
 .categoria-item {
   text-decoration: none;
-  color: #333;
+  color: #1E293B;
   font-size: 14px;
   transition: all 0.3s ease;
   display: block;
@@ -253,8 +268,8 @@ header {
 }
 
 .categoria-item:hover {
-  color: #D84040;
-  background-color: #f8f8f8;
+  color: #22C55E;
+  background-color: #F0FDF4;
 }
 
 /* SUBMENÚS */
@@ -268,13 +283,13 @@ header {
 
 .submenu-icon {
   font-size: 10px;
-  color: #999;
+  color: #94A3B8;
   transition: transform 0.3s ease;
 }
 
 .categoria-item.con-submenu:hover .submenu-icon {
   transform: translateX(2px);
-  color: #D84040;
+  color: #22C55E;
 }
 
 .submenu {
@@ -282,9 +297,9 @@ header {
   left: 100%;
   top: -12px;
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   min-width: 200px;
   padding: 12px 0;
   z-index: 1001;
@@ -304,7 +319,7 @@ header {
   display: block;
   padding: 8px 20px;
   text-decoration: none;
-  color: #666;
+  color: #475569;
   font-size: 14px;
   transition: all 0.3s ease;
   background: transparent;
@@ -312,8 +327,8 @@ header {
 }
 
 .submenu-item:hover {
-  background-color: #f8f8f8;
-  color: #D84040;
+  background-color: #F0FDF4;
+  color: #22C55E;
 }
 
 /* MENÚ DE PERFIL */
@@ -336,17 +351,17 @@ header {
 }
 
 .perfil-btn:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .perfil-icon {
   font-size: 24px;
-  color: #000;
+  color: #FFFFFF;
 }
 
 .nombre-usuario {
   font-size: 14px;
-  color: #000;
+  color: #FFFFFF;
   font-weight: 500;
   max-width: 120px;
   overflow: hidden;
@@ -359,9 +374,9 @@ header {
   top: 100%;
   right: 0;
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   min-width: 200px;
   z-index: 1000;
   margin-top: 10px;
@@ -370,14 +385,14 @@ header {
 
 .info-usuario {
   padding: 12px 15px;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #f9f9f9;
+  border-bottom: 1px solid #E2E8F0;
+  background-color: #F8FAFC;
 }
 
 .usuario-nombre {
   display: block;
   font-weight: bold;
-  color: #000;
+  color: #1E293B;
   font-size: 14px;
   margin-bottom: 4px;
 }
@@ -386,7 +401,7 @@ header {
 .usuario-rol {
   display: block;
   font-size: 12px;
-  color: #666;
+  color: #475569;
   margin-bottom: 2px;
 }
 
@@ -394,7 +409,7 @@ header {
   display: block;
   padding: 12px 15px;
   text-decoration: none;
-  color: #666;
+  color: #1E293B !important;
   font-size: 14px;
   transition: all 0.3s ease;
   font-weight: 500;
@@ -407,14 +422,14 @@ header {
 }
 
 .perfil-item:hover {
-  background-color: #f5f5f5;
-  color: #D84040;
+  background-color: #F0FDF4;
+  color: #22C55E;
 }
 
 .cerrar-sesion {
   margin-top: 0;
   padding-top: 12px;
-  color: #D84040;
+  color: #EF4444, ;
 }
 
 /* ========== MAIN ========== */
@@ -422,14 +437,14 @@ main {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  background-color: #edeae8;
+  background-color: #F8FAFC;
   width: 100%;
   margin: 0;
   padding: 0;
   min-height: calc(100vh - 60px - 140px);
 }
 
-/* ========== CARRUSEL MEJORADO CON TRANSICIÓN SUAVE ========== */
+/* ========== CARRUSEL ========== */
 .hero-section {
   position: relative;
   width: 100%;
@@ -438,7 +453,7 @@ main {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-color: #f2f2f2;
+  background-color: #F1F5F9;
   margin-top: 0;
   margin-bottom: 0;
   flex-shrink: 0;
@@ -454,7 +469,6 @@ main {
   justify-content: center;
 }
 
-/* CONTENEDOR DE IMÁGENES CON TRANSICIÓN */
 .carousel-images-container {
   position: relative;
   width: 100%;
@@ -485,7 +499,6 @@ main {
   z-index: 1;
 }
 
-/* EFECTO DE ZOOM SUTIL DURANTE LA TRANSICIÓN */
 .carousel-image.entering {
   animation: zoomIn 0.8s ease-in-out;
 }
@@ -521,7 +534,7 @@ main {
   }
 }
 
-/* BOTONES DEL CARRUSEL MEJORADOS */
+/* BOTONES DEL CARRUSEL */
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -557,7 +570,7 @@ main {
 .carousel-btn svg {
   width: 20px;
   height: 20px;
-  color: #333;
+  color: #1E293B;
 }
 
 /* --- RESULTADOS DE BÚSQUEDA --- */
@@ -570,7 +583,6 @@ main {
   width: 100%;
 }
 
-/* ETIQUETA DE RESULTADOS - ESQUINA SUPERIOR IZQUIERDA */
 .resultados-header {
   width: 100%;
   max-width: 1200px;
@@ -582,11 +594,11 @@ main {
 
 .resultados-count {
   font-size: 14px;
-  color: #666;
-  background-color: #f5f5f5;
+  color: #475569;
+  background-color: #F1F5F9;
   padding: 6px 12px;
   border-radius: 20px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #E2E8F0;
   display: inline-block;
   font-weight: 500;
   margin-left: 0;
@@ -605,21 +617,19 @@ main {
 
 .loading, .no-result {
   text-align: center;
-  color: #333;
+  color: #1E293B;
   font-size: 16px;
   width: 100%;
   margin-top: 30px;
 }
 
 /* ========== FOOTER ========== */
-
 .content-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* ==== SECCIÓN DE MÁS INFORMACIÓN ==== */
 .info-section {
   position: relative;
   margin-top: 0;
@@ -634,16 +644,14 @@ main {
   justify-content: center;
   position: relative;
   margin: 0;
-  padding-top:-50px;
   background: transparent;
 }
 
-/* BOTÓN NORMAL (CERRADO) - CON BORDES */
 .info-toggle-btn {
   padding: 12px 30px;
-  border-radius: 8px 8px 0 0;
-  background-color: rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(213, 211, 211, 0.4);
+  border-radius: 12px 12px 0 0;
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
   font-weight: 600;
   position: absolute;
   cursor: pointer;
@@ -651,40 +659,39 @@ main {
   top: -49px;
   left: 50%;
   transform: translateX(-50%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  color: #000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #1E293B;
   z-index: 10;
 }
 
 .info-toggle-btn:hover {
-  background-color: #ffffff;
-  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.2);
+  background-color: #F8FAFC;
+  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.12);
+  color: #22C55E;
 }
 
-/* BOTÓN CUANDO ESTÁ ABIERTO - SIN BORDES, SOLO TEXTO */
 .info-toggle-btn.abierto {
   background-color: transparent;
   border: none;
   box-shadow: none;
-  color: #000;
+  color: #1E293B;
   font-weight: 600;
 }
 
 .info-toggle-btn.abierto:hover {
   background-color: transparent;
   box-shadow: none;
-  color: #D84040; /* Cambia el color del texto al hacer hover */
+  color: #22C55E;
 }
 
-/* PANEL DESPLEGADO */
 .info-panel {
   width: 100%;
   display: flex;
   justify-content: space-evenly;
   padding: 40px 0 30px 0;
-  background-color: rgba(247, 247, 247, 0.98);
+  background-color: #FFFFFF;
   border-top: none;
-  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.04);
   z-index: 6;
   margin-top: -25px;
 }
@@ -711,41 +718,40 @@ main {
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 10px;
-  color: #222;
+  color: #1E293B;
 }
 
 .info-column a {
   text-decoration: none;
-  color: #666;
+  color: #475569;
   font-size: 14px;
   transition: color 0.2s ease;
 }
 
 .info-column a:hover {
-  color: #000;
+  color: #22C55E;
 }
 
-/* Clase para ocultar el panel */
 .info-panel.hidden {
   display: none;
 }
 
-/* Clase para mostrar el panel */
 .info-panel.visible {
   display: flex;
 }
+
 .admin-panel-btn {
-  background-color: #444;
+  background-color: #22C55E;
   color: white;
   padding: 6px 14px;
-  border-radius: 6px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: background .2s;
 }
 
 .admin-panel-btn:hover {
-  background-color: #333;
+  background-color: #16A34A;
 }
 
 .favoritos-link {
@@ -759,11 +765,11 @@ main {
 
 .favoritos-icon {
   font-size: 18px;
-  color: #c12532;
+  color: #EF4444;
 }
 
 .favoritos-link:hover .favoritos-icon {
-  color: #cc2435;
+  color: #DC2626;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -783,15 +789,6 @@ main {
   
   .carousel-btn.next {
     right: 10px;
-  }
-  
-  .carousel-indicators {
-    bottom: 10px;
-  }
-  
-  .indicator {
-    width: 8px;
-    height: 8px;
   }
   
   .navbar {
@@ -832,17 +829,15 @@ main {
     gap: 10px;
     padding: 8px 15px;
   }
-  
-
 }
 
-/* Versión sin overlay - dentro del flujo normal pero bien centrado */
+/* SPINNER */
 .spinner-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 70vh; /* Ocupa el 70% de la altura de la ventana */
+  min-height: 70vh;
   width: 100%;
   padding: 40px;
   text-align: center;
@@ -851,8 +846,8 @@ main {
 .spinner {
   width: 60px;
   height: 60px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #3498db;
+  border: 3px solid #F0FDF4;
+  border-top: 3px solid #22C55E;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
@@ -860,14 +855,14 @@ main {
 
 .loading-text {
   font-size: 20px;
-  color: #333;
+  color: #1E293B;
   margin-bottom: 10px;
   font-weight: 600;
 }
 
 .loading-subtext {
   font-size: 15px;
-  color: #666;
+  color: #475569;
   line-height: 1.4;
   max-width: 300px;
 }

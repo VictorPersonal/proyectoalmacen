@@ -7,7 +7,7 @@ html, body {
   padding: 0;
   width: 100%;
   overflow-x: hidden;
-  background: #d8d7d7 !important; 
+  background: #F8FAFC !important; 
 }
 
 /* CONTENEDOR PRINCIPAL */
@@ -16,8 +16,8 @@ html, body {
   margin: 0 auto;
   padding: 2rem;
   min-height: 70vh;
-  border-radius: 10px;
-  background: #f5f5f5 !important; 
+  border-radius: 15px;
+  background: #F8FAFC !important; 
 }
 
 /* HEADER */
@@ -25,17 +25,17 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #2c3e50;
+  color: #1E293B;
   font-size: 2rem;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 3px solid #000000;
+  border-bottom: 3px solid #22C55E;
   font-weight: 700;
-  background: #f5f5f5 !important; 
+  background: #F8FAFC !important; 
 }
 
 .favoritos-titulo-icono {
-  color: #000000;
+  color: #22C55E;
   animation: favoritos-pulse 2s infinite;
 }
 
@@ -51,13 +51,13 @@ html, body {
   align-items: center;
   justify-content: center;
   height: 50vh;
-  border-radius: 12px;
-  background: #f5f5f5 !important; 
+  border-radius: 15px;
+  background: #F8FAFC !important; 
 }
 
 .favoritos-loading-icon {
   font-size: 3rem;
-  color: #000000;
+  color: #22C55E;
   animation: favoritos-heartbeat 1.5s infinite;
   margin-bottom: 1rem;
 }
@@ -65,11 +65,11 @@ html, body {
 @keyframes favoritos-heartbeat {
   0%, 100% { 
     transform: scale(1);
-    color: #000000;
+    color: #22C55E;
   }
   50% { 
     transform: scale(1.2);
-    color: #333333;
+    color: #16A34A;
   }
 }
 
@@ -77,16 +77,16 @@ html, body {
 .favoritos-empty-favoritos {
   text-align: center;
   padding: 4rem 2rem;
-  border-radius: 12px;
-  color: #333333;
+  border-radius: 15px;
+  color: #1E293B;
   margin: 2rem 0;
-  border: 1px solid #e0e0e0;
-  background: #f5f5f5 !important; 
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF !important; 
 }
 
 .favoritos-empty-icon {
   font-size: 4rem;
-  color: #666666;
+  color: #94A3B8;
   margin-bottom: 1rem;
 }
 
@@ -94,15 +94,15 @@ html, body {
   font-size: 1.2rem;
   font-weight: 500;
   margin-bottom: 1rem;
-  color: #555555;
+  color: #475569;
 }
 
 .favoritos-btn-explorar {
-  background: #333333;
+  background: #22C55E;
   color: white;
   border: none;
   padding: 0.8rem 2rem;
-  border-radius: 25px;
+  border-radius: 40px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -112,8 +112,8 @@ html, body {
 
 .favoritos-btn-explorar:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  background: #000000;
+  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.3);
+  background: #16A34A;
 }
 
 /* GRID DE PRODUCTOS */
@@ -122,26 +122,26 @@ html, body {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
   margin-top: 1rem;
-  background: #f5f5f5 !important; 
+  background: #F8FAFC !important; 
 }
 
 /* TARJETA DE PRODUCTO */
 .favorito-card {
-  background: white;
-  border-radius: 12px;
+  background: #FFFFFF;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #E2E8F0;
 }
 
 .favorito-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-color: #e0e0e0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #22C55E;
 }
 
 /* CONTENEDOR DE IMAGEN */
@@ -149,13 +149,13 @@ html, body {
   position: relative;
   width: 100%;
   height: 200px;
-  background: #f5f5f5 !important; 
+  background: #F8FAFC !important; 
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .favorito-imagen {
@@ -163,7 +163,7 @@ html, body {
   max-height: 100%;
   object-fit: contain;
   transition: transform 0.4s ease;
-  background: #f5f5f5;
+  background: #F8FAFC;
   padding: 8px; 
 }
 
@@ -193,11 +193,11 @@ html, body {
 
 .favoritos-btn-comprar-ahora {
   flex: 1;
-  background: #333333; 
+  background: #22C55E; 
   color: white;
   border: none;
   padding: 0.8rem 1rem;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -210,19 +210,19 @@ html, body {
 }
 
 .favoritos-btn-comprar-ahora:hover {
-  background: #000000;
+  background: #16A34A;
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.3);
 }
 
 /* BOTÓN ELIMINAR CORREGIDO */
 .favoritos-btn-eliminar {
-  background: #333333;
+  background: #EF4444;
   color: white;
   border: none;
   width: 60px; 
   height: 60px; 
-  border-radius: 8px; 
+  border-radius: 12px; 
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -234,9 +234,9 @@ html, body {
 }
 
 .favoritos-btn-eliminar:hover {
-  background: #000000;
-  transform: scale(1.1);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  background: #DC2626;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* Tamaño específico para el icono dentro del botón */
@@ -257,7 +257,7 @@ html, body {
 .favoritos-nombre-producto {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333333;
+  color: #1E293B;
   margin-bottom: 0.5rem;
   line-height: 1.4;
   display: -webkit-box;
@@ -270,7 +270,7 @@ html, body {
 .favoritos-precio {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #333333;
+  color: #22C55E;
   margin-top: auto;
   margin-bottom: 0.5rem;
   display: flex;
@@ -284,7 +284,7 @@ html, body {
 }
 
 .favoritos-descripcion {
-  color: #666666;
+  color: #475569;
   font-size: 0.85rem;
   line-height: 1.5;
   margin-bottom: 1rem;
@@ -297,13 +297,13 @@ html, body {
 .favoritos-producto-detalles {
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #E2E8F0;
 }
 
 /* MENSAJES DE FEEDBACK */
 .favoritos-mensaje {
   padding: 1rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
@@ -311,23 +311,23 @@ html, body {
   animation: favoritos-slideIn 0.4s ease-out;
   font-weight: 500;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border-left: 4px solid #333333;
-  background: #f5f5f5 !important; 
+  border-left: 4px solid #22C55E;
+  background: #FFFFFF !important; 
 }
 
 .favoritos-success {
-  background: #f5f5f5 !important;
-  color: #333333;
+  background: #FFFFFF !important;
+  color: #1E293B;
 }
 
 .favoritos-error {
-  background: #f5f5f5 !important;
-  color: #333333;
+  background: #FEF2F2 !important;
+  color: #EF4444;
 }
 
 .favoritos-info {
-  background: #f5f5f5 !important;
-  color: #333333;
+  background: #FFFFFF !important;
+  color: #1E293B;
 }
 
 @keyframes favoritos-slideIn {
@@ -371,7 +371,7 @@ html, body {
   .favorito-acciones {
     opacity: 1;
     transform: translateY(0);
-    background: rgba(0, 0, 0, 0.85);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 100%);
   }
   
   .favorito-info {
@@ -386,7 +386,6 @@ html, body {
     font-size: 1.3rem;
   }
   
-  /* Botón eliminar responsive */
   .favoritos-btn-eliminar {
     width: 55px; 
     height: 55px;
@@ -424,7 +423,6 @@ html, body {
     font-size: 1.2rem;
   }
   
-  /* Botón eliminar en móviles pequeños */
   .favoritos-btn-eliminar {
     width: 50px;
     height: 50px;
@@ -464,7 +462,6 @@ html, body {
     font-size: 1.1rem;
   }
   
-  /* Botón eliminar en móviles muy pequeños */
   .favoritos-btn-eliminar {
     width: 45px;
     height: 45px;

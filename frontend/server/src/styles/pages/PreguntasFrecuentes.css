@@ -1,7 +1,7 @@
 :root {
-  --primary-red: #dc2626;
-  --dark-red: #b91c1c;
-  --light-red: #fef2f2;
+  --primary-red: #22C55E;
+  --dark-red: #16A34A;
+  --light-red: #F0FDF4;
   --black: #1a1a1a;
   --dark-gray: #374151;
   --medium-gray: #6b7280;
@@ -9,7 +9,7 @@
   --lighter-gray: #f3f4f6;
   --border-gray: #e5e7eb;
   --white: #ffffff;
-  --background: #fafafa;
+  --background: #F8FAFC;
 }
 
 /* Reset limpio */

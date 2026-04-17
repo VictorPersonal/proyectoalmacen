@@ -4,7 +4,7 @@ CONTENEDOR GENERAL
 .historia-wrapper {
   font-family: "Segoe UI", Arial, sans-serif;
   color: #333;
-  background: #f6f6f6;
+  background: #F8FAFC;
   line-height: 1.6;
 }
 
@@ -44,7 +44,7 @@ HERO (PRIMERA SECCIÓN)
 }
 
 .hero-text p {
-  background: #b22e39;
+  background: #16A34A;
   color: #000;
   display: inline-block;
   padding: 8px 20px;
@@ -81,7 +81,7 @@ HISTORIA CON FOTO
 
 .bloque-texto h2 {
   font-size: 2.2rem;
-  color: #b22e39;
+  color: #16A34A;
   margin-bottom: 25px;
   font-weight: 700;
 }
@@ -100,7 +100,7 @@ MISIÓN Y VISIÓN DOS COLUMNAS
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
-  background: #f8f9fa;
+  background: #F1F5F9;
 }
 
 .mv-card {
@@ -128,7 +128,7 @@ MISIÓN Y VISIÓN DOS COLUMNAS
 .mv-card h3 {
   font-size: 1.7rem;
   margin-bottom: 15px;
-  color: #b22e39;
+  color: #16A34A;
   font-weight: 600;
 }
 
@@ -149,7 +149,7 @@ VALORES
 .valores-seccion h2 {
   font-size: 2.2rem;
   margin-bottom: 30px;
-  color: #b22e39;
+  color: #16A34A;
   text-align: center;
   font-weight: 700;
 }
@@ -164,7 +164,7 @@ VALORES
   font-size: 1.1rem;
   margin-bottom: 20px;
   padding: 15px 20px;
-  background: #f8f9fa;
+  background: #F1F5F9;
   border-radius: 10px;
   border-left: 4px solid #ffdd00;
   transition: background-color 0.3s ease;
@@ -175,7 +175,7 @@ VALORES
 }
 
 .valores-seccion b {
-  color: #b22e39;
+  color: #16A34A;
   font-weight: 600;
 }
 
@@ -184,7 +184,7 @@ CIERRE DETALLADO
 ========================================================= */
 .historia-cierre {
   padding: 80px 6%;
-  background: linear-gradient(135deg, #b22e39 0%, #8a2230 100%);
+  background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
   color: #fff;
   text-align: center;
 }

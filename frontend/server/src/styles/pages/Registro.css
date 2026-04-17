@@ -9,7 +9,7 @@ html, body, #root, .registro-page-wrapper {
 
 /* Estructura de página */
 .registro-page-wrapper {
-  background-color: #c8c4c1;
+  background-color: #F8FAFC;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@ html, body, #root, .registro-page-wrapper {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  background-color: #edeae8;
+  background-color: #F8FAFC;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -33,12 +33,12 @@ html, body, #root, .registro-page-wrapper {
 
 /* Formulario - REDUCIDO */
 .registro-form-wrapper {
-  background-color: #ffffff;
-  border-radius: 10px;
+  background-color: #FFFFFF;
+  border-radius: 15px;
   padding: 20px 30px; 
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin-top: 0;
 }
 
@@ -46,7 +46,7 @@ html, body, #root, .registro-page-wrapper {
   text-align: center;
   font-size: 22px;
   font-weight: normal;
-  color: #D84040;
+  color: #22C55E;
   margin-bottom: 20px; 
 }
 
@@ -64,7 +64,7 @@ html, body, #root, .registro-page-wrapper {
 
 .registro-form-group label {
   font-size: 13px;
-  color: #000;
+  color: #1E293B;
   font-weight: 500;
   display: block;
   margin-bottom: 4px;
@@ -73,43 +73,45 @@ html, body, #root, .registro-page-wrapper {
 /* INPUTS - ESTILOS CORREGIDOS */
 .registro-form-group input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #999;
-  border-radius: 5px;
+  padding: 12px 16px;
+  border: 1px solid #E2E8F0;
+  border-radius: 15px;
   font-size: 14px;
-  background-color: #fff;
+  background-color: #FFFFFF;
+  color: #1E293B;
   outline: none;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
 }
 
 .registro-form-group input:focus {
-  border-color: #D84040;
+  border-color: #22C55E;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .registro-form-group input::placeholder {
-  color: #999;
-  font-size: 12px;
+  color: #94A3B8;
+  font-size: 13px;
 }
 
 /* Estilos para errores */
 .registro-error-input {
-  border: 2px solid #E53E3E !important;
-  background-color: #FFF3F3;
-  box-shadow: 0 0 4px rgba(229, 62, 62, 0.4);
+  border: 2px solid #EF4444 !important;
+  background-color: #FEF2F2;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
 }
 
 .registro-error-message {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #E53E3E;
+  color: #EF4444;
   font-size: 12px;
   font-weight: 500;
-  background-color: #FFE5E5;
-  border-left: 3px solid #E53E3E;
+  background-color: #FEF2F2;
+  border-left: 3px solid #EF4444;
   padding: 6px 10px;
   margin-top: 4px;
-  border-radius: 4px;
+  border-radius: 8px;
   animation: registro-fadeIn 0.25s ease;
 }
 
@@ -119,7 +121,7 @@ html, body, #root, .registro-page-wrapper {
 }
 
 .registro-hint {
-  color: #666;
+  color: #475569;
   font-size: 11px;
   margin-top: 3px;
   display: block;
@@ -128,12 +130,13 @@ html, body, #root, .registro-page-wrapper {
 
 /* Botón */
 .registro-btn-registrar {
-  background-color: #fff;
-  color: #D84040;
-  border: 1px solid #D84040;
+  background-color: #22C55E;
+  color: #FFFFFF;
+  border: none;
   padding: 12px 24px;
   font-size: 14px;
-  border-radius: 5px;
+  font-weight: 600;
+  border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 10px;
@@ -145,21 +148,24 @@ html, body, #root, .registro-page-wrapper {
 }
 
 .registro-btn-registrar:hover:not(:disabled) {
-  background-color: #D84040;
-  color: #fff;
+  background-color: #16A34A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .registro-btn-registrar:disabled {
-  background-color: #cccccc;
-  border-color: #cccccc;
-  color: #666;
+  background-color: #94A3B8;
+  border-color: #94A3B8;
+  color: #FFFFFF;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Spinner para registro */
 .registro-spinner {
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #ffffff;
+  border: 2px solid #FFFFFF;
+  border-top: 2px solid #FFFFFF;
   border-radius: 50%;
   width: 16px;
   height: 16px;
@@ -176,9 +182,9 @@ html, body, #root, .registro-page-wrapper {
 .registro-terminos-group {
   margin: 3px 0 8px 0; 
   padding: 12px 15px; 
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  border: 1px solid #e0e0e0;
+  background-color: #F8FAFC;
+  border-radius: 15px;
+  border: 1px solid #E2E8F0;
 }
 
 .registro-terminos-label {
@@ -188,7 +194,7 @@ html, body, #root, .registro-page-wrapper {
   cursor: pointer;
   font-size: 14px;
   line-height: 1.4;
-  color: #333;
+  color: #1E293B;
   margin: 0;
   width: 100%;
 }
@@ -198,7 +204,7 @@ html, body, #root, .registro-page-wrapper {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #D84040;
+  accent-color: #22C55E;
   margin: 0;
   margin-top: 2px;
 }
@@ -210,7 +216,7 @@ html, body, #root, .registro-page-wrapper {
 }
 
 .registro-terminos-link {
-  color: #D84040;
+  color: #22C55E;
   text-decoration: underline;
   cursor: pointer;
   font-size: 14px;
@@ -218,7 +224,7 @@ html, body, #root, .registro-page-wrapper {
 }
 
 .registro-terminos-link:hover {
-  color: #b33535;
+  color: #16A34A;
 }
 
 /* Estilo específico para errores de términos */
@@ -229,16 +235,16 @@ html, body, #root, .registro-page-wrapper {
 
 /* === ESTILO PARA EL MENSAJE DE SUGERENCIA DE CONTRASEÑA === */
 .registro-password-hint {
-  color: #666;
+  color: #475569;
   font-size: 11px;
   margin-top: 8px;
   display: block;
   line-height: 1.3;
   font-style: italic;
   padding: 8px 12px;
-  background-color: #f8f8f8;
-  border-radius: 4px;
-  border-left: 3px solid #D84040;
+  background-color: #F8FAFC;
+  border-radius: 12px;
+  border-left: 3px solid #22C55E;
 }
 
 /* ========== FOOTER ========== */
@@ -311,8 +317,8 @@ html, body, #root, .registro-page-wrapper {
   }
 
   .registro-form-group input {
-    padding: 10px 12px;
-    font-size: 16px;
+    padding: 10px 14px;
+    font-size: 14px;
   }
 
   .registro-btn-registrar {

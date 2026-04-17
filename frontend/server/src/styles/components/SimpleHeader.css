@@ -3,7 +3,7 @@
    ActualizarDatos, FormaEntrega, Pago, PagoExitoso, ModificarDireccion */
 
 .simple-header {
-  background-color: #c8c4c1;
+  background-color: #16A34A;
   padding: 10px 20px;
   width: 100%;
   flex-shrink: 0;
@@ -11,6 +11,7 @@
   justify-content: space-between;
   align-items: center;
   min-height: 120px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .simple-header-logo-section {
@@ -22,30 +23,38 @@
 .simple-header-logo-img {
   width: 90px;
   height: 70px;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+  transition: filter 0.3s ease;
+}
+
+.simple-header-logo-img:hover {
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
 }
 
 .simple-header-logo-text {
   display: flex;
   flex-direction: column;
+  text-align: center;
 }
 
 .simple-header-logo-title {
   font-size: 24px;
   font-weight: bold;
-  color: #000;
+  color: #415faf;
+  margin: 0;
 }
 
 .simple-header-logo-subtitle {
   font-size: 10px;
   letter-spacing: 0.5px;
-  color: #000;
+  color: #F0FDF4;
   margin-top: 4px;
 }
 
 .simple-header-help-icon {
-  width: 26px;
-  height: 26px;
-  border: 2px solid #000;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #FFFFFF;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -53,12 +62,59 @@
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  background-color: #fff;
+  background-color: transparent;
+  color: #FFFFFF;
+  transition: all 0.3s ease;
+}
+
+.simple-header-help-icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .simple-header {
     padding: 10px 20px;
+    min-height: 100px;
+  }
+  
+  .simple-header-logo-img {
+    width: 70px;
+    height: 55px;
+  }
+  
+  .simple-header-logo-title {
+    font-size: 18px;
+  }
+  
+  .simple-header-logo-subtitle {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .simple-header {
+    padding: 8px 15px;
+    min-height: 80px;
+  }
+  
+  .simple-header-logo-img {
+    width: 55px;
+    height: 45px;
+  }
+  
+  .simple-header-logo-title {
+    font-size: 14px;
+  }
+  
+  .simple-header-logo-subtitle {
+    font-size: 7px;
+  }
+  
+  .simple-header-help-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
   }
 }

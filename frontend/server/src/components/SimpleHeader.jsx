@@ -9,7 +9,7 @@ const SimpleHeader = () => {
         <img src={logo} alt="Dulce hogar logo" className="simple-header-logo-img" />
         <div className="simple-header-logo-text">
           <span className="simple-header-logo-title">Dulce hogar</span>
-          <span className="simple-header-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
+          <span className="simple-header-logo-subtitle">Tradición y Calidad</span>
         </div>
       </div>
       <div className="simple-header-help-icon">?</div>

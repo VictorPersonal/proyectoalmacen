@@ -1,6 +1,6 @@
 .terminos-container {
   min-height: 100vh;
-  background-color: #d0cbc8;
+  background-color: #F8FAFC;
   padding: 40px 20px;
   font-family: Arial, sans-serif;
   line-height: 1.6;
@@ -8,7 +8,7 @@
 
 .terminos-container h1 {
   text-align: center;
-  color: #D84040;
+  color: #22C55E;
   margin-bottom: 10px;
   font-size: 24px;
   font-weight: bold;
@@ -32,7 +32,7 @@
   padding: 20px;
   background-color: #ffffff;
   border-radius: 8px;
-  border-left: 4px solid #D84040;
+  border-left: 4px solid #22C55E;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -62,7 +62,7 @@
 }
 
 .terminos-section strong {
-  color: #D84040;
+  color: #22C55E;
   font-weight: bold;
 }
 
