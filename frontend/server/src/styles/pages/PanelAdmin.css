@@ -1192,3 +1192,37 @@ html, body, #root {
 .notification-btn:hover {
   background: #2566a9;
 }
+.promos-section {
+  width: 100%;
+}
+
+.promos-section .section-header {
+  margin-bottom: 20px;
+}
+
+.promos-section .section-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.promos-section .section-header p {
+  margin-top: 6px;
+  color: #666;
+}
+
+.status-active {
+  color: #155724;
+  background: #d4edda;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.status-inactive {
+  color: #721c24;
+  background: #f8d7da;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+}

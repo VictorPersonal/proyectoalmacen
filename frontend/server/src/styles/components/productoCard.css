@@ -335,3 +335,41 @@
     height: 16px;
   }
 }
+
+.card {
+  position: relative;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #d84040;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-precios {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-precio-original {
+  font-size: 14px;
+  color: #888;
+  text-decoration: line-through;
+  margin: 0;
+}
+
+.card-precio-final {
+  font-size: 20px;
+  font-weight: 700;
+  color: #d84040;
+  margin: 0;
+}

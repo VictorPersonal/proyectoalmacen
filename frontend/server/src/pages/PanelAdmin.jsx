@@ -24,6 +24,8 @@ import {
   FaShoppingCart,
   FaClipboardList,
   FaBell,
+  FaTags,
+  FaTrash,
 } from "react-icons/fa";
 
 const ESTADOS_PEDIDO = [
@@ -69,6 +71,24 @@ const PanelAdmin = () => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
+
+  // Promociones
+  const [promociones, setPromociones] = useState([]);
+  const [promoModalVisible, setPromoModalVisible] = useState(false);
+  const [editingPromo, setEditingPromo] = useState(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  const [promoForm, setPromoForm] = useState({
+    nombre: "",
+    descripcion: "",
+    valor_descuento: "",
+    scope: "global",
+    idproducto: "",
+    idcategoria: "",
+    fecha_inicio: "",
+    fecha_fin: "",
+    activo_manual: true,
+  });
 
   const navigate = useNavigate();
   const profileRef = useRef(null);
@@ -222,6 +242,39 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
+     HELPERS PROMOCIONES
+  ========================================================= */
+  const formatDateTimeLocal = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - offset * 60000);
+    return localDate.toISOString().slice(0, 16);
+  };
+
+  const resetPromoForm = () => {
+    setPromoForm({
+      nombre: "",
+      descripcion: "",
+      valor_descuento: "",
+      scope: "global",
+      idproducto: "",
+      idcategoria: "",
+      fecha_inicio: "",
+      fecha_fin: "",
+      activo_manual: true,
+    });
+  };
+
+  const handlePromoChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setPromoForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  /* =========================================================
      NOTIFICACIONES
   ========================================================= */
   const fetchNotifications = async () => {
@@ -344,6 +397,34 @@ const PanelAdmin = () => {
     };
     fetchCatalogos();
   }, []);
+
+  /* =========================================================
+     TRAER PROMOCIONES
+  ========================================================= */
+  const fetchPromociones = async () => {
+    try {
+      setPromoLoading(true);
+      const res = await axios.get("http://localhost:4000/api/promociones", {
+        withCredentials: true,
+      });
+      setPromociones(res.data || []);
+    } catch (err) {
+      console.error("Error promociones:", err.response?.data || err.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudieron cargar las promociones",
+      });
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentSection === "promociones") {
+      fetchPromociones();
+    }
+  }, [currentSection]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -632,7 +713,7 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     PREPARAR EDICIÓN
+     PREPARAR EDICIÓN PRODUCTO
   ========================================================= */
   const handleEdit = (product) => {
     setEditingProduct(product);
@@ -719,7 +800,7 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     IMÁGENES DEL PRODUCTO
+     HELPERS PRODUCTO
   ========================================================= */
   const getPrimeraImagen = (product) => {
     if (product.producto_imagen && product.producto_imagen.length > 0) {
@@ -737,6 +818,178 @@ const PanelAdmin = () => {
 
   const tieneImagenes = (product) => {
     return product.producto_imagen && product.producto_imagen.length > 0;
+  };
+
+  /* =========================================================
+     CRUD PROMOCIONES
+  ========================================================= */
+  const handleSavePromo = async () => {
+    const descuento = Number(promoForm.valor_descuento);
+
+    if (!promoForm.nombre.trim()) {
+      Swal.fire("Error", "El nombre es obligatorio", "error");
+      return;
+    }
+
+    if (!promoForm.valor_descuento) {
+      Swal.fire("Error", "Debes ingresar el descuento", "error");
+      return;
+    }
+
+    if (!promoForm.fecha_inicio || !promoForm.fecha_fin) {
+      Swal.fire("Error", "Debes ingresar fecha de inicio y fin", "error");
+      return;
+    }
+
+    if (promoForm.scope === "producto" && !promoForm.idproducto) {
+      Swal.fire("Error", "Debes seleccionar un producto", "error");
+      return;
+    }
+
+    if (promoForm.scope === "categoria" && !promoForm.idcategoria) {
+      Swal.fire("Error", "Debes seleccionar una categoría", "error");
+      return;
+    }
+
+    if (descuento > 50) {
+      const confirm = await Swal.fire({
+        title: "Descuento alto",
+        text: `Estás aplicando ${descuento}% de descuento. ¿Seguro que deseas continuar?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí aplicar",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (!confirm.isConfirmed) return;
+    }
+
+    try {
+      setPromoLoading(true);
+
+      const payload = {
+        nombre: promoForm.nombre,
+        descripcion: promoForm.descripcion,
+        valor_descuento: Number(promoForm.valor_descuento),
+        scope: promoForm.scope,
+        idproducto:
+          promoForm.scope === "producto" && promoForm.idproducto
+            ? Number(promoForm.idproducto)
+            : null,
+        idcategoria:
+          promoForm.scope === "categoria" && promoForm.idcategoria
+            ? Number(promoForm.idcategoria)
+            : null,
+        fecha_inicio: promoForm.fecha_inicio,
+        fecha_fin: promoForm.fecha_fin,
+        activo_manual: promoForm.activo_manual,
+      };
+
+      if (editingPromo) {
+        await axios.put(
+          `http://localhost:4000/api/promociones/${editingPromo.idpromocion}`,
+          payload,
+          { withCredentials: true }
+        );
+      } else {
+        await axios.post("http://localhost:4000/api/promociones", payload, {
+          withCredentials: true,
+        });
+      }
+
+      Swal.fire("Éxito", "Promoción guardada correctamente", "success");
+
+      setPromoModalVisible(false);
+      setEditingPromo(null);
+      resetPromoForm();
+      fetchPromociones();
+    } catch (err) {
+      console.error("Error guardando promoción:", err.response?.data || err);
+
+      const mensaje =
+        err.response?.data?.errores?.join(" | ") ||
+        err.response?.data?.message ||
+        "No se pudo guardar la promoción";
+
+      Swal.fire("Error", mensaje, "error");
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const handleEditPromo = (promo) => {
+    setEditingPromo(promo);
+    setPromoForm({
+      nombre: promo.nombre || "",
+      descripcion: promo.descripcion || "",
+      valor_descuento: promo.valor_descuento || "",
+      scope: promo.scope || "global",
+      idproducto: promo.idproducto || "",
+      idcategoria: promo.idcategoria || "",
+      fecha_inicio: formatDateTimeLocal(promo.fecha_inicio),
+      fecha_fin: formatDateTimeLocal(promo.fecha_fin),
+      activo_manual:
+        promo.activo_manual === undefined ? true : promo.activo_manual,
+    });
+    setPromoModalVisible(true);
+  };
+
+  const togglePromoEstado = async (promo) => {
+    try {
+      await axios.patch(
+        `http://localhost:4000/api/promociones/${promo.idpromocion}/estado`,
+        { activo_manual: !promo.activo_manual },
+        { withCredentials: true }
+      );
+
+      Swal.fire({
+        title: "Actualizado",
+        text: `Promoción ${
+          promo.activo_manual ? "desactivada" : "activada"
+        } correctamente`,
+        icon: "success",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+
+      fetchPromociones();
+    } catch (err) {
+      console.error("Error al actualizar promoción:", err);
+      Swal.fire("Error", "No se pudo actualizar la promoción", "error");
+    }
+  };
+
+  const deletePromo = async (promo) => {
+    const confirm = await Swal.fire({
+      title: "Eliminar promoción",
+      text: `¿Deseas eliminar "${promo.nombre}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.delete(
+        `http://localhost:4000/api/promociones/${promo.idpromocion}`,
+        { withCredentials: true }
+      );
+
+      Swal.fire({
+        title: "Eliminada",
+        text: "La promoción fue eliminada correctamente",
+        icon: "success",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+
+      fetchPromociones();
+    } catch (err) {
+      console.error("Error eliminando promoción:", err);
+      Swal.fire("Error", "No se pudo eliminar la promoción", "error");
+    }
   };
 
   /* =========================================================
@@ -764,6 +1017,13 @@ const PanelAdmin = () => {
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
+
+  /* =========================================================
+     FILTRO PROMOCIONES
+  ========================================================= */
+  const filteredPromociones = promociones.filter((promo) =>
+    promo.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   /* =========================================================
      PAGINACIÓN CON TECLADO
@@ -971,6 +1231,17 @@ const PanelAdmin = () => {
           <button
             type="button"
             className={`nav-item ${
+              currentSection === "promociones" ? "active" : ""
+            }`}
+            onClick={() => setCurrentSection("promociones")}
+          >
+            <FaTags className="nav-icon" />
+            Promociones
+          </button>
+
+          <button
+            type="button"
+            className={`nav-item ${
               currentSection === "dashboard" ? "active" : ""
             }`}
             onClick={() => setCurrentSection("dashboard")}
@@ -989,9 +1260,9 @@ const PanelAdmin = () => {
               Ayuda del Administrador
             </h3>
             <p>
-              Desde aquí puedes gestionar todos los productos del sistema.
-              Puedes agregar hasta 4 imágenes por producto, editar información y
-              activar/desactivar productos según la disponibilidad de stock.
+              Desde aquí puedes gestionar productos, pedidos y promociones.
+              También puedes programar descuentos por porcentaje con fecha de
+              inicio y fin.
             </p>
             <button className="btn btn--add" onClick={() => setShowHelp(false)}>
               <FaTimes className="btn-icon" />
@@ -1368,6 +1639,134 @@ const PanelAdmin = () => {
           </div>
         )}
 
+        {currentSection === "promociones" && (
+          <div className="promos-section">
+            <div className="section-header">
+              <h2>
+                <FaTags className="section-icon" />
+                Gestión de Promociones
+              </h2>
+              <p>Programa descuentos por producto, categoría o globales.</p>
+            </div>
+
+            <div className="search-wrapper">
+              <div className="search-container">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Buscar promoción"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+
+              <button
+                className="btn btn--add-secondary"
+                onClick={() => {
+                  setEditingPromo(null);
+                  resetPromoForm();
+                  setPromoModalVisible(true);
+                }}
+                disabled={promoLoading}
+              >
+                <FaPlus className="btn-icon" />
+                Nueva promoción
+              </button>
+            </div>
+
+            {promoLoading && (
+              <div className="loading-indicator">
+                <FaSpinner className="loading-spinner" />
+                <span>Cargando promociones...</span>
+              </div>
+            )}
+
+            <div className="table-wrapper">
+              <table className="products-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descuento</th>
+                    <th>Scope</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPromociones.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="no-products">
+                        {searchTerm
+                          ? "No se encontraron promociones"
+                          : "No hay promociones registradas"}
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredPromociones.map((promo) => (
+                      <tr key={promo.idpromocion}>
+                        <td>{promo.idpromocion}</td>
+                        <td>{promo.nombre}</td>
+                        <td>{promo.valor_descuento}%</td>
+                        <td>{promo.scope}</td>
+                        <td>
+                          {new Date(promo.fecha_inicio).toLocaleString("es-CO")}
+                        </td>
+                        <td>
+                          {new Date(promo.fecha_fin).toLocaleString("es-CO")}
+                        </td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              promo.activo_manual
+                                ? "status-active"
+                                : "status-inactive"
+                            }`}
+                          >
+                            {promo.activo_manual ? "Activa" : "Desactivada"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn btn--edit"
+                              onClick={() => handleEditPromo(promo)}
+                            >
+                              <FaEdit className="btn-icon" />
+                              Editar
+                            </button>
+
+                            <button
+                              className={`btn btn--status ${
+                                promo.activo_manual
+                                  ? "btn--inactive"
+                                  : "btn--add"
+                              }`}
+                              onClick={() => togglePromoEstado(promo)}
+                            >
+                              {promo.activo_manual ? "Desactivar" : "Activar"}
+                            </button>
+
+                            <button
+                              className="btn btn--delete"
+                              onClick={() => deletePromo(promo)}
+                            >
+                              <FaTrash className="btn-icon" />
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {currentSection === "dashboard" && <Dashboard />}
       </main>
 
@@ -1587,6 +1986,171 @@ const PanelAdmin = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {promoModalVisible && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>
+              {editingPromo ? (
+                <>
+                  <FaEdit className="modal-icon" /> Editar Promoción
+                </>
+              ) : (
+                <>
+                  <FaPlus className="modal-icon" /> Nueva Promoción
+                </>
+              )}
+            </h3>
+
+            <input
+              type="text"
+              name="nombre"
+              placeholder="Nombre de la promoción"
+              value={promoForm.nombre}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <textarea
+              name="descripcion"
+              placeholder="Descripción"
+              value={promoForm.descripcion}
+              onChange={handlePromoChange}
+              rows="3"
+              disabled={promoLoading}
+            />
+
+            <input
+              type="number"
+              name="valor_descuento"
+              placeholder="Descuento (%)"
+              min="1"
+              max="90"
+              value={promoForm.valor_descuento}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <select
+              name="scope"
+              value={promoForm.scope}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            >
+              <option value="global">Global</option>
+              <option value="producto">Producto</option>
+              <option value="categoria">Categoría</option>
+            </select>
+
+            {promoForm.scope === "producto" && (
+              <select
+                name="idproducto"
+                value={promoForm.idproducto}
+                onChange={handlePromoChange}
+                disabled={promoLoading}
+              >
+                <option value="">Selecciona un producto</option>
+                {products.map((prod) => (
+                  <option key={prod.idproducto} value={prod.idproducto}>
+                    {prod.nombre}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {promoForm.scope === "categoria" && (
+              <select
+                name="idcategoria"
+                value={promoForm.idcategoria}
+                onChange={handlePromoChange}
+                disabled={promoLoading}
+              >
+                <option value="">Selecciona una categoría</option>
+                {categorias.map((cat) => (
+                  <option key={cat.idcategoria} value={cat.idcategoria}>
+                    {cat.descripcionCategoria || cat.descripcion}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <label style={{ marginTop: "8px", fontWeight: "600" }}>
+              Fecha y hora de inicio
+            </label>
+            <input
+              type="datetime-local"
+              name="fecha_inicio"
+              value={promoForm.fecha_inicio}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <label style={{ marginTop: "8px", fontWeight: "600" }}>
+              Fecha y hora de fin
+            </label>
+            <input
+              type="datetime-local"
+              name="fecha_fin"
+              value={promoForm.fecha_fin}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginTop: "10px",
+              }}
+            >
+              <input
+                type="checkbox"
+                name="activo_manual"
+                checked={promoForm.activo_manual}
+                onChange={handlePromoChange}
+                disabled={promoLoading}
+              />
+              Activar promoción manualmente
+            </label>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn btn--add"
+                onClick={handleSavePromo}
+                disabled={promoLoading}
+              >
+                {promoLoading ? (
+                  <>
+                    <FaSpinner className="btn-icon spinning" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="btn-icon" />
+                    Guardar
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className="btn btn--delete"
+                onClick={() => {
+                  setPromoModalVisible(false);
+                  setEditingPromo(null);
+                  resetPromoForm();
+                }}
+                disabled={promoLoading}
+              >
+                <FaTimes className="btn-icon" />
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
       )}
