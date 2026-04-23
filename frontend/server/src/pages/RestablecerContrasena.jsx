@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import "./RestablecerContrasena.css";
-import logo from "../assets/Logo dulce hogar.png";
+import "../styles/pages/RestablecerContrasena.css";
+import SimpleHeader from "../components/SimpleHeader";
+import SimpleFooter from "../components/SimpleFooter";
 
 const RestablecerContrasena = () => {
   const [nuevaContrasena, setNuevaContrasena] = useState("");
@@ -87,7 +88,7 @@ const RestablecerContrasena = () => {
     }
 
     try {
-      const response = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/auth/restablecer", {
+      const response = await fetch("http://localhost:4000/api/auth/restablecer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, nuevaContrasena }),
@@ -113,16 +114,7 @@ const RestablecerContrasena = () => {
   return (
     <div className="restablecer-page-wrapper">
       {/* ===== HEADER ===== */}
-      <header className="restablecer-top-bar">
-        <div className="restablecer-logo-section">
-          <img src={logo} alt="Logo" className="restablecer-logo-img" />
-          <div className="restablecer-logo-text">
-            <span className="restablecer-logo-title">Dulce hogar</span>
-            <span className="restablecer-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="restablecer-help-icon">?</div>
-      </header>
+      <SimpleHeader />
 
       {/* ===== BODY ===== */}
       <main className="restablecer-container">
@@ -195,18 +187,7 @@ const RestablecerContrasena = () => {
       </main>
 
       {/* ===== FOOTER ===== */}
-      <footer className="restablecer-footer">
-        <div className="restablecer-footer-links">
-          <Link to="/Consejo-de-Seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-          <span>/</span>
-          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
-        </div>
-        <div className="restablecer-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };

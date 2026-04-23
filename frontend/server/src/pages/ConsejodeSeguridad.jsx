@@ -1,5 +1,5 @@
 import React from "react";
-import "./ConsejodeSeguridad.css";
+import "../styles/pages/ConsejodeSeguridad.css";
 
 export default function ConsejodeSeguridad() {
   const consejos = [
@@ -26,3 +26,4 @@ export default function ConsejodeSeguridad() {
     </section>
   );
 }
+

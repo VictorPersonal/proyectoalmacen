@@ -1,8 +1,9 @@
-import "./RecuperarContrasena.css";
-import logo from "../assets/Logo dulce hogar.png"; 
+import "../styles/pages/RecuperarContrasena.css";
 import { useNavigate, Link } from "react-router-dom";
 import React, { useState } from "react";
 import Swal from "sweetalert2";
+import SimpleHeader from "../components/SimpleHeader";
+import SimpleFooter from "../components/SimpleFooter";
 
 const RecuperarContrasena = () => {
   const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ const RecuperarContrasena = () => {
     }
 
     try {
-      const response = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/auth/recuperar", {
+      const response = await fetch("http://localhost:4000/api/auth/recuperar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -99,16 +100,7 @@ const RecuperarContrasena = () => {
 
   return (
     <div className="recuperar-page-wrapper">
-      <header className="recuperar-top-bar">
-        <div className="recuperar-logo-section">
-          <img src={logo} alt="Logo Dulce Hogar" className="recuperar-logo-img" />
-          <div className="recuperar-logo-text">
-            <h1 className="recuperar-logo-title">Dulce hogar</h1>
-            <span className="recuperar-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="recuperar-help-icon">?</div>
-      </header>
+      <SimpleHeader />
 
       <div className="recuperar-container">
         <div className="recuperar-form-box">
@@ -156,18 +148,7 @@ const RecuperarContrasena = () => {
       </div>
 
       {/* FOOTER */}
-      <footer className="recuperar-footer">
-        <div className="recuperar-footer-links">
-          <Link to="/Consejo-de-Seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-          <span>/</span>
-          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
-        </div>
-        <div className="recuperar-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };

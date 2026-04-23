@@ -1,6 +1,6 @@
 /* ===== ESTRUCTURA PRINCIPAL ===== */
 .direccion-page-wrapper {
-  background-color: #ceccca;
+  background-color: #F8FAFC;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   display: flex;
   justify-content: center;
   padding: 40px 20px;
-  background-color: #ceccca;
+  background-color: #F8FAFC;
   min-height: calc(100vh - 120px - 60px); 
   flex: 1;
 }
@@ -33,60 +33,6 @@
 }
 
 /* ===== HEADER ===== */
-.direccion-top-bar {
-  background-color: #c8c4c1; 
-  padding: 10px 20px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  min-height: 120px; 
-}
-
-.direccion-logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px; 
-}
-
-.direccion-logo-img {
-  width: 90px; 
-  height: 70px; 
-}
-
-.direccion-logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.direccion-logo-title {
-  font-size: 24px; 
-  font-weight: bold;
-  color: #000;
-}
-
-.direccion-logo-subtitle {
-  font-size: 10px; 
-  letter-spacing: 0.5px;
-  color: #000;
-  margin-top: 4px; 
-}
-
-.direccion-help-icon {
-  width: 26px;
-  height: 26px;
-  border: 2px solid #666;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: #f0f0f0;
-  color: #666;
-  transition: all 0.3s ease;
-}
 
 .direccion-help-icon:hover {
   background-color: #666;
@@ -118,7 +64,7 @@
 
 .direccion-buscador-input:focus {
   outline: none;
-  border-color: #d32f2f;
+  border-color: #EF4444;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
 }
 
@@ -177,7 +123,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #EF4444, #b71c1c);
   color: white;
   border: none;
   padding: 12px 20px;
@@ -266,7 +212,7 @@
 }
 
 .direccion-mapa-leyenda {
-  background-color: #f8f9fa;
+  background-color: #F1F5F9;
   padding: 10px 15px;
   border: 1px solid #dee2e6;
   border-top: none;
@@ -281,7 +227,7 @@
 }
 
 .direccion-leyenda-icon {
-  color: #d32f2f;
+  color: #EF4444;
   font-size: 14px;
 }
 
@@ -290,7 +236,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background-color: #f8f9fa;
+  background-color: #F1F5F9;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   font-size: 12px;
@@ -323,7 +269,7 @@
 
 .direccion-campo-icon {
   font-size: 16px;
-  color: #d32f2f;
+  color: #EF4444;
 }
 
 .direccion-input {
@@ -340,7 +286,7 @@
 
 .direccion-input:focus {
   outline: none;
-  border-color: #d32f2f;
+  border-color: #EF4444;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
 }
 
@@ -361,18 +307,18 @@
 
 .direccion-ayuda-icon {
   font-size: 12px;
-  color: #d32f2f;
+  color: #EF4444;
   margin-top: 1px;
   flex-shrink: 0;
 }
 
 /* ===== INSTRUCCIONES ===== */
 .direccion-instrucciones {
-  background-color: #f8f9fa;
+  background-color: #F1F5F9;
   padding: 15px;
   border-radius: 6px;
   margin-top: 25px;
-  border-left: 4px solid #d32f2f;
+  border-left: 4px solid #EF4444;
 }
 
 .direccion-instrucciones p {
@@ -384,7 +330,7 @@
 }
 
 .direccion-instrucciones-icon {
-  color: #d32f2f;
+  color: #EF4444;
   font-size: 16px;
 }
 
@@ -438,7 +384,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #EF4444, #b71c1c);
   color: white;
   border: none;
   padding: 12px 25px;
@@ -516,45 +462,6 @@
 }
 
 /* ===== FOOTER ACTUALIZADO ===== */
-.direccion-footer {
-  background-color: #b8b4b1;
-  padding: 15px 50px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: #333;
-  width: 100%;
-  margin-top: auto;
-  height: 60px; 
-}
-
-.direccion-footer-links {
-  display: flex;
-  gap: 12px; 
-  align-items: center;
-}
-
-.direccion-footer-links a {
-  text-decoration: none;
-  color: #333;
-  font-size: 13px; 
-  transition: color 0.3s ease;
-}
-
-.direccion-footer-links a:hover {
-  color: #d32f2f;
-  text-decoration: underline;
-}
-
-.direccion-footer-links span {
-  color: #666;
-}
-
-.direccion-footer-copyright {
-  color: #333;
-  font-size: 13px; 
-}
 
 /* ===== MENSAJE DE AYUDA PARA BUSCADOR ===== */
 .direccion-ayuda-buscador {
@@ -562,8 +469,8 @@
   align-items: flex-start;
   gap: 8px;
   padding: 10px 15px;
-  background-color: #f8f9fa;
-  border-left: 4px solid #d32f2f;
+  background-color: #F1F5F9;
+  border-left: 4px solid #EF4444;
   border-radius: 6px;
   margin-top: 10px;
   margin-bottom: 15px;
@@ -576,7 +483,7 @@
 }
 
 .direccion-ayuda-icon-small {
-  color: #d32f2f;
+  color: #EF4444;
   font-size: 14px;
   margin-top: 2px;
   flex-shrink: 0;
@@ -620,31 +527,15 @@
     justify-content: center;
   }
   
-  .direccion-top-bar {
-    padding: 10px 20px; 
-    min-height: 100px; 
-  }
+
   
-  .direccion-footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    padding: 15px 20px; 
-    height: auto; 
-  }
+
   
-  .direccion-logo-img {
-    width: 80px; 
-    height: 60px; 
-  }
+
   
-  .direccion-logo-title {
-    font-size: 20px; 
-  }
+
   
-  .direccion-logo-subtitle {
-    font-size: 9px;
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -673,18 +564,11 @@
     font-size: 14px;
   }
   
-  .direccion-logo-title {
-    font-size: 18px;
-  }
+
   
-  .direccion-logo-subtitle {
-    font-size: 8px; 
-  }
+
   
-  .direccion-footer {
-    gap: 10px;
-    padding: 15px 20px;
-  }
+
 }
 
 /* ===== ESTILOS PARA LEAFLET (MAPAS) ===== */
@@ -708,8 +592,8 @@
 
 .leaflet-control-zoom a:hover {
   background-color: #f4f4f4;
-  color: #d32f2f;
-  border-color: #d32f2f;
+  color: #EF4444;
+  border-color: #EF4444;
 }
 
 /* Asegurar que todos los elementos tengan colores consistentes */
@@ -728,13 +612,13 @@
 
 /* Paleta de colores rojo y gris */
 :root {
-  --rojo-principal: #d32f2f;
+  --rojo-principal: #EF4444;
   --rojo-oscuro: #b71c1c;
   --rojo-mas-oscuro: #9a0007;
   --gris-oscuro: #424242;
   --gris-medio: #616161;
   --gris-claro: #e0e0e0;
-  --gris-muy-claro: #f5f5f5;
+  --gris-muy-claro: #F1F5F9;
   --texto-oscuro: #333;
   --texto-medio: #666;
   --texto-claro: #888;

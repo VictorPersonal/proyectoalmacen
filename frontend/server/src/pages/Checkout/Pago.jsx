@@ -1,16 +1,15 @@
 import React, { useRef, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { 
   FaCreditCard, 
   FaMobileAlt, 
   FaUniversity, 
   FaArrowRight, 
-  FaBan,
-  FaQuestionCircle
+  FaBan
 } from "react-icons/fa";
-import logo from "../../assets/Logo dulce hogar.png";
-import "./Pago.css";
-import { Link } from "react-router-dom";
+import "../../styles/pages/checkout/Pago.css";
+import SimpleHeader from "../../components/SimpleHeader";
+import SimpleFooter from "../../components/SimpleFooter";
 
 const Pago = () => {
   const navigate = useNavigate();
@@ -67,7 +66,7 @@ const Pago = () => {
 
       console.log("📤 Enviando a Stripe (solo una vez):", bodyData);
 
-      const res = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/pago/crear-preferencia", {
+      const res = await fetch("http://localhost:4000/api/pago/crear-preferencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
@@ -91,18 +90,7 @@ const Pago = () => {
   return (
     <div className="pago-page-wrapper">
       {/* HEADER */}
-      <header className="pago-top-bar">
-        <div className="pago-logo-section">
-          <img src={logo} alt="Logo" className="pago-logo-img" />
-          <div className="pago-logo-text">
-            <span className="pago-logo-title">Dulce hogar</span>
-            <span className="pago-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="pago-help-icon">
-          <FaQuestionCircle />
-        </div>
-      </header>
+      <SimpleHeader />
 
       {/* CONTENIDO PRINCIPAL */}
       <main className="pago-container">
@@ -171,20 +159,8 @@ const Pago = () => {
       </main>
 
       {/* FOOTER */}
-      <footer className="pago-footer">
-        <div className="pago-footer-links">
-          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
-          <span>/</span>
-          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-        </div>
-        <p className="pago-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </p>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };
-
 export default Pago;

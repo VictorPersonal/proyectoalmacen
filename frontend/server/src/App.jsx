@@ -49,7 +49,6 @@ function AppWrapper() {
         <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
         <Route path="/registro/terminosycondiciones" element={<TerminosYCondiciones />} />
         <Route path="/Consejo-de-Seguridad" element={<ConsejodeSeguridad />} />
-        {/* ✅ AGREGAR ESTA RUTA TAMBIÉN EN LAS PRINCIPALES */}
         <Route path="/producto/:id" element={<DescripcionProducto />} />
       </Routes>
 

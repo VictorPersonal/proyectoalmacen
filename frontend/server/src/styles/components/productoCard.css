@@ -8,9 +8,9 @@
 .card {
   width: 180px;
   height: 260px;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
   padding: 12px;
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -20,22 +20,21 @@
   justify-content: space-between;
   overflow: hidden;
   position: relative; 
-  /* Mejora del marco de la tarjeta */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
   transform: scale(1.03);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+  border-color: #22C55E;
 }
 
-/* Contenedor principal de la imagen - MEJORADO */
+/* Contenedor principal de la imagen */
 .card-imagen-container {
   width: 100%;
   height: 140px; 
-  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
-  border-radius: 10px;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,54 +42,47 @@
   overflow: hidden;
   position: relative;
   flex-shrink: 0; 
-  /* Borde sutil con sombra interna - igual que imagen-cuadro */
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.05),
-    0 3px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02), 0 3px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* Imagen del producto - FORZAR MISMAS DIMENSIONES MEJORADO */
+/* Imagen del producto */
 .card-imagen {
   width: 100%;
   height: 100%;
   object-fit: contain;
   object-position: center;
-  /* Padding para que la imagen respire - igual que imagen-cuadro */
   padding: 10px;
-  background: #fafafa;
+  background: #F8FAFC;
 }
 
-/* Placeholder cuando no hay imagen - MEJORADO */
+/* Placeholder cuando no hay imagen */
 .card-imagen-placeholder {
   width: 100%;
   height: 140px; 
-  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
-  border-radius: 10px;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #777;
+  color: #94A3B8;
   font-size: 11px;
   font-style: italic;
   flex-shrink: 0;
-  /* Borde y sombra igual que imagen-container */
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.05),
-    0 3px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02), 0 3px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-placeholder-icon {
   font-size: 24px;
   margin-bottom: 6px;
-  color: #888;
+  color: #94A3B8;
 }
 
 .card-placeholder-text {
   font-size: 10px;
-  color: #666;
+  color: #94A3B8;
 }
 
 .card-info {
@@ -105,7 +97,7 @@
 .card-nombre {
   font-size: 14px;
   font-weight: 600;
-  color: #2c2c2c;
+  color: #1E293B;
   margin: 0;
   line-height: 1.4;
   display: -webkit-box;
@@ -119,63 +111,63 @@
 .card-precio {
   font-size: 15px;
   font-weight: 700;
-  color: #2c5aa0;
+  color: #22C55E;
   margin: 0;
   margin-top: auto;
 }
 
 .card-btn-agregar {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-  color: #fff;
+  background: #22C55E;
+  color: #FFFFFF;
   border: none;
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: 40px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
   margin-top: 8px;
-  box-shadow: 0 2px 6px rgba(78, 205, 196, 0.3);
+  transition: all 0.2s ease;
 }
 
 .card-btn-agregar:hover {
-  background: linear-gradient(135deg, #44a08d 0%, #3a8c7a 100%);
-  box-shadow: 0 4px 10px rgba(78, 205, 196, 0.4);
+  background: #16A34A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3);
 }
 
 /* Información adicional opcional */
 .card-stock-info {
   font-size: 10px;
-  color: #666;
+  color: #475569;
   margin: 0;
   margin-top: 2px;
 }
 
-/* ❤️ Estilos para el corazón de favoritos en las tarjetas - CORREGIDO */
+/* ❤️ Estilos para el corazón de favoritos en las tarjetas */
 .card-corazon-favorito {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.9);
   border: none;
+  border-radius: 50%;
   cursor: pointer;
   z-index: 10;
-  padding: 4px;
+  padding: 6px;
   margin: 0;
-  /* Prevenir desplazamientos */
   transform: translateZ(0);
   backface-visibility: hidden;
   will-change: color;
-  /* Asegurar dimensiones constantes */
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
 
-/* Eliminar transformaciones en clic que causan movimiento */
 .card-corazon-favorito:active {
-  transform: translateZ(0) scale(0.95); /* Efecto controlado sin movimiento */
+  transform: scale(0.95);
 }
 
 .card-corazon-favorito:focus {
@@ -183,25 +175,28 @@
 }
 
 .card-corazon-favorito svg {
-  font-size: 24px;
-  color: #ccc;
+  font-size: 20px;
+  color: #94A3B8;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-  /* Dimensiones fijas */
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  /* Solo transición para propiedades que no afectan layout */
   transition: color 0.2s ease, filter 0.2s ease;
 }
 
 .card-corazon-favorito.activo svg {
-  color: #ff4757;
-  filter: drop-shadow(0 1px 3px rgba(255, 71, 87, 0.3));
+  color: #EF4444;
+  filter: drop-shadow(0 1px 3px rgba(239, 68, 68, 0.3));
+}
+
+.card-corazon-favorito:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
 }
 
 .card-corazon-favorito:hover svg {
-  color: #ff4757;
-  transform: none; /* Evitar transform en hover */
+  color: #EF4444;
+  transform: none;
 }
 
 /* Spinner para carga */
@@ -235,18 +230,18 @@
     width: 160px;
     height: 220px;
     padding: 10px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
+    border-radius: 14px;
   }
   
   .card-imagen-container {
     height: 120px; 
     margin-bottom: 10px;
-    border-radius: 8px;
+    border-radius: 10px;
   }
   
   .card-imagen-placeholder {
     height: 120px; 
-    border-radius: 8px;
+    border-radius: 10px;
   }
   
   .card-imagen {
@@ -266,7 +261,7 @@
     padding: 5px 8px;
     font-size: 11px;
     margin-top: 6px;
-    border-radius: 7px;
+    border-radius: 30px;
   }
   
   .card-corazon-favorito {
@@ -277,9 +272,9 @@
   }
   
   .card-corazon-favorito svg {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -292,18 +287,18 @@
     width: 145px;
     height: 200px;
     padding: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
   }
   
   .card-imagen-container {
     height: 100px; 
     margin-bottom: 8px;
-    border-radius: 7px;
+    border-radius: 8px;
   }
   
   .card-imagen-placeholder {
     height: 100px;
-    border-radius: 7px;
+    border-radius: 8px;
   }
   
   .card-imagen {
@@ -324,7 +319,7 @@
   }
   
   .card-btn-agregar {
-    border-radius: 6px;
+    border-radius: 25px;
   }
   
   .card-corazon-favorito {
@@ -335,8 +330,46 @@
   }
   
   .card-corazon-favorito svg {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
   }
+}
+
+.card {
+  position: relative;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #d84040;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-precios {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-precio-original {
+  font-size: 14px;
+  color: #888;
+  text-decoration: line-through;
+  margin: 0;
+}
+
+.card-precio-final {
+  font-size: 20px;
+  font-weight: 700;
+  color: #d84040;
+  margin: 0;
 }

@@ -10,3 +10,4 @@ const Favoritos = () => {
 };
 //hola
 export default Favoritos;
+

@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import "./ModificarDireccion.css";
+import "../../styles/pages/checkout/ModificarDireccion.css";
 import { useNavigate, Link } from "react-router-dom";
 import Swal from 'sweetalert2';
-import logo from "../../assets/Logo dulce hogar.png";
 import { 
   FaSearch, 
   FaMapMarkerAlt, 
@@ -15,10 +14,11 @@ import {
   FaLightbulb,
   FaTimes,
   FaCheck,
-  FaQuestionCircle,
   FaCrosshairs,
   FaMapPin
 } from 'react-icons/fa';
+import SimpleHeader from "../../components/SimpleHeader";
+import SimpleFooter from "../../components/SimpleFooter";
 
 // Fix para los iconos de Leaflet en React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -155,7 +155,7 @@ const ModificarDireccion = () => {
   useEffect(() => {
     const cargarDireccionActual = async () => {
       try {
-        const respuesta = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/usuario/perfil", {
+        const respuesta = await fetch("http://localhost:4000/api/usuario/perfil", {
           credentials: "include"
         });
         
@@ -525,7 +525,7 @@ const ModificarDireccion = () => {
     }
 
     try {
-      const perfilResponse = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/usuario/perfil", {
+      const perfilResponse = await fetch("http://localhost:4000/api/usuario/perfil", {
         credentials: "include"
       });
 
@@ -535,7 +535,7 @@ const ModificarDireccion = () => {
 
       const perfilActual = await perfilResponse.json();
 
-      const respuesta = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/usuario/perfil", {
+      const respuesta = await fetch("http://localhost:4000/api/usuario/perfil", {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -600,18 +600,7 @@ const ModificarDireccion = () => {
   return (
     <div className="direccion-page-wrapper">
       {/* Header */}
-      <header className="direccion-top-bar">
-        <div className="direccion-logo-section">
-          <img src={logo} alt="Dulce hogar logo" className="direccion-logo-img" />
-          <div className="direccion-logo-text">
-            <span className="direccion-logo-title">Dulce hogar</span>
-            <span className="direccion-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="direccion-help-icon">
-          <FaQuestionCircle />
-        </div>
-      </header>
+      <SimpleHeader />
 
       <div className="direccion-container">
         <div className="direccion-content">
@@ -799,18 +788,7 @@ const ModificarDireccion = () => {
       </div>
 
       {/* Footer */}
-      <footer className="direccion-footer">
-        <div className="direccion-footer-links">
-          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
-          <span>/</span>
-          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-        </div>
-        <div className="direccion-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };

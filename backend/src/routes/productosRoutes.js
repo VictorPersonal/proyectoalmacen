@@ -1,8 +1,17 @@
 import express from "express";
 import { supabase as supabaseDB } from "../config/supabase.js";
+import { calcularPrecioPromocional } from "../helpers/promocionesHelper.js";
 
 const router = express.Router();
 
+/* =========================================================
+   HELPERS
+========================================================= */
+const enriquecerProductosConPromociones = (productos = [], promociones = []) => {
+  return productos.map((producto) =>
+    calcularPrecioPromocional(producto, promociones)
+  );
+};
 
 /* =========================================================
    PRODUCTOS - PÚBLICO (LISTA + DETALLE)
@@ -42,7 +51,18 @@ router.get("/productos", async (req, res) => {
 
     if (error) throw error;
 
-    res.json(productos || []);
+    const { data: promociones, error: promoError } = await supabaseDB
+      .from("promociones")
+      .select("*");
+
+    if (promoError) throw promoError;
+
+    const productosConPromocion = enriquecerProductosConPromociones(
+      productos || [],
+      promociones || []
+    );
+
+    res.json(productosConPromocion);
   } catch (err) {
     console.error("❌ Error al obtener productos:", err);
     res
@@ -87,7 +107,18 @@ router.get("/productos/:id", async (req, res) => {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
 
-    res.json(producto);
+    const { data: promociones, error: promoError } = await supabaseDB
+      .from("promociones")
+      .select("*");
+
+    if (promoError) throw promoError;
+
+    const productoConPromocion = calcularPrecioPromocional(
+      producto,
+      promociones || []
+    );
+
+    res.json(productoConPromocion);
   } catch (err) {
     console.error("❌ Error al obtener producto:", err);
     res.status(500).json({ message: "Error al obtener producto" });

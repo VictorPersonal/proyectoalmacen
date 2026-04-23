@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import logo from "../../assets/Logo dulce hogar.png";
-import { FaCheckCircle, FaQuestionCircle, FaFileInvoice, FaSpinner } from "react-icons/fa";
-import "./PagoExitoso.css";
+import { FaCheckCircle, FaFileInvoice, FaSpinner } from "react-icons/fa";
+import "../../styles/pages/checkout/PagoExitoso.css";
+import SimpleHeader from "../../components/SimpleHeader";
+import SimpleFooter from "../../components/SimpleFooter";
 
 const PagoExitoso = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const PagoExitoso = () => {
 
     const obtenerFactura = async () => {
       try {
-        const res = await fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/pago/factura/${paymentId}`);
+        const res = await fetch(`http://localhost:4000/api/pago/factura/${paymentId}`);
         const data = await res.json();
 
         if (data.url) {
@@ -50,7 +51,7 @@ const PagoExitoso = () => {
         ejecutadoRef.current = true;
         console.log("🔔 Confirmando pedido por primera vez para session:", paymentId);
 
-        const res = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/pago/pedido/confirmar", {
+        const res = await fetch("http://localhost:4000/api/pago/pedido/confirmar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ payment_id: paymentId }),
@@ -82,18 +83,7 @@ const PagoExitoso = () => {
   return (
     <div className="pago-exitoso-page-wrapper">
 
-      <header className="pago-exitoso-top-bar">
-        <div className="pago-exitoso-logo-section">
-          <img src={logo} alt="Logo" className="pago-exitoso-logo-img" />
-          <div className="pago-exitoso-logo-text">
-            <span className="pago-exitoso-logo-title">Dulce hogar</span>
-            <span className="pago-exitoso-logo-subtitle">ALMACÉN DE ELECTRODOMÉSTICOS</span>
-          </div>
-        </div>
-        <div className="pago-exitoso-help-icon">
-          <FaQuestionCircle />
-        </div>
-      </header>
+      <SimpleHeader />
 
       <main className="pago-exitoso-container">
         <div className="pago-exitoso-content">
@@ -140,18 +130,7 @@ const PagoExitoso = () => {
         </div>
       </main>
 
-      <footer className="pago-exitoso-footer">
-        <div className="pago-exitoso-footer-links">
-          <Link to="/preguntas-frecuentes">Preguntas frecuentes</Link>
-          <span>/</span>
-          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-        </div>
-        <p className="pago-exitoso-footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </p>
-      </footer>
+      <SimpleFooter />
 
     </div>
   );

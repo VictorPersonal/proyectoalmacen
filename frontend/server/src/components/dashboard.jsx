@@ -14,7 +14,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import "./dashboard.css";
+import "../styles/components/dashboard.css";
 
 const Dashboard = () => {
   const [ventasMensuales, setVentasMensuales] = useState([]);
@@ -53,10 +53,10 @@ const Dashboard = () => {
 
   // 🔹 Cargar todos los datos
   const actualizarDatos = () => {
-    fetchData("https://3e34-201-182-248-71.ngrok-free.app/api/estadisticas/ventas-mensuales", setVentasMensuales);
-    fetchData("https://3e34-201-182-248-71.ngrok-free.app/api/estadisticas/productos-mas-vendidos", setProductosMasVendidos);
-    fetchData("https://3e34-201-182-248-71.ngrok-free.app/api/estadisticas/usuarios", setUsuariosPorTipo);
-    fetchData("https://3e34-201-182-248-71.ngrok-free.app/api/estadisticas/estados-pedidos", setEstadosPedidos);
+    fetchData("http://localhost:4000/api/estadisticas/ventas-mensuales", setVentasMensuales);
+    fetchData("http://localhost:4000/api/estadisticas/productos-mas-vendidos", setProductosMasVendidos);
+    fetchData("http://localhost:4000/api/estadisticas/usuarios", setUsuariosPorTipo);
+    fetchData("http://localhost:4000/api/estadisticas/estados-pedidos", setEstadosPedidos);
   };
 
   // 🔁 Refrescar cada 10 segundos
@@ -186,3 +186,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

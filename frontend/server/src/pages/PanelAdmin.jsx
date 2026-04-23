@@ -179,7 +179,7 @@ const PanelAdmin = () => {
       setNotificationsLoading(true);
 
       const res = await axios.get(
-        "https://3e34-201-182-248-71.ngrok-free.app/api/admin/pedidos",
+        "http://localhost:4000/api/admin/pedidos",
         { withCredentials: true }
       );
 
@@ -219,7 +219,7 @@ const PanelAdmin = () => {
     try {
       setLoading(true);
 
-      const res = await axios.get("https://3e34-201-182-248-71.ngrok-free.app/api/productosAdmin/admin/productos", {
+      const res = await axios.get("http://localhost:4000/api/productosAdmin/admin/productos", {
         withCredentials: true,
       });
 
@@ -250,7 +250,7 @@ const PanelAdmin = () => {
         try {
           console.log("⚠️ Intentando con endpoint público...");
           const resPublic = await axios.get(
-            "https://3e34-201-182-248-71.ngrok-free.app/api/productos",
+            "http://localhost:4000/api/productos",
             {
               withCredentials: true,
             }
@@ -281,8 +281,8 @@ const PanelAdmin = () => {
     const fetchCatalogos = async () => {
       try {
         const [resCat, resMar] = await Promise.all([
-          axios.get("https://3e34-201-182-248-71.ngrok-free.app/api/categorias"),
-          axios.get("https://3e34-201-182-248-71.ngrok-free.app/api/marcas"),
+          axios.get("http://localhost:4000/api/categorias"),
+          axios.get("http://localhost:4000/api/marcas"),
         ]);
         setCategorias(resCat.data || []);
         setMarcas(resMar.data || []);
@@ -408,7 +408,7 @@ const PanelAdmin = () => {
     if (existente) return existente.idcategoria;
 
     // Crear nueva categoría usando la columna de descripción que manejes
-    const res = await axios.post("https://3e34-201-182-248-71.ngrok-free.app/api/categorias", {
+    const res = await axios.post("http://localhost:4000/api/categorias", {
       descripcionCategoria: nombre,
     });
 
@@ -429,7 +429,7 @@ const PanelAdmin = () => {
 
     if (existente) return existente.idmarca;
 
-    const res = await axios.post("https://3e34-201-182-248-71.ngrok-free.app/api/marcas", {
+    const res = await axios.post("http://localhost:4000/api/marcas", {
       descripcionMarca: nombre,
     });
 
@@ -475,7 +475,7 @@ const PanelAdmin = () => {
       let response;
       if (editingProduct) {
         response = await axios.put(
-          `https://3e34-201-182-248-71.ngrok-free.app/api/productosAdmin/productos/${editingProduct.idproducto}/con-imagen`,
+          `http://localhost:4000/api/productosAdmin/productos/${editingProduct.idproducto}/con-imagen`,
           data,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -497,7 +497,7 @@ const PanelAdmin = () => {
         });
       } else {
         response = await axios.post(
-          "https://3e34-201-182-248-71.ngrok-free.app/api/productosAdmin/productos/con-imagen",
+          "http://localhost:4000/api/productosAdmin/productos/con-imagen",
           data,
           
           {
@@ -603,7 +603,7 @@ const PanelAdmin = () => {
         try {
           setLoading(true);
           await axios.patch(
-            `https://3e34-201-182-248-71.ngrok-free.app/api/productosAdmin/productos/${product.idproducto}/estado`,
+            `http://localhost:4000/api/productosAdmin/productos/${product.idproducto}/estado`,
             { activo: nuevoEstado },
             { withCredentials: true }
           );
@@ -731,7 +731,7 @@ const PanelAdmin = () => {
     try {
       setPedidosLoading(true);
       const res = await axios.get(
-        "https://3e34-201-182-248-71.ngrok-free.app/api/admin/pedidos",
+        "http://localhost:4000/api/admin/pedidos",
         {
           withCredentials: true,
         }
@@ -779,7 +779,7 @@ const PanelAdmin = () => {
     try {
       setPedidosLoading(true);
       const res = await axios.get(
-        `https://3e34-201-182-248-71.ngrok-free.app/api/admin/pedidos/${idpedido}`,
+        `http://localhost:4000/api/admin/pedidos/${idpedido}`,
         { withCredentials: true }
       );
       setSelectedPedido(res.data);
@@ -815,7 +815,7 @@ const PanelAdmin = () => {
     try {
       setPedidosLoading(true);
       await axios.patch(
-        `https://3e34-201-182-248-71.ngrok-free.app/api/admin/pedidos/${selectedPedido.idpedido}/estado`,
+        `http://localhost:4000/api/admin/pedidos/${selectedPedido.idpedido}/estado`,
         { estado: estadoEditando },
         { withCredentials: true }
       );

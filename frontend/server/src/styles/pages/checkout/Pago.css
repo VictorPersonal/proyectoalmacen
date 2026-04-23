@@ -1,71 +1,4 @@
-/* Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #d0cbc8;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
 /* Header */
-.pago-top-bar {
-  background-color: #c8c4c1; 
-  padding: 10px 20px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 120px; 
-}
-
-.pago-logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px; 
-}
-
-.pago-logo-img {
-  width: 90px; 
-  height: 70px; 
-}
-
-.pago-logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.pago-logo-title {
-  font-size: 24px; 
-  font-weight: bold;
-  color: #000;
-}
-
-.pago-logo-subtitle {
-  font-size: 10px; 
-  letter-spacing: 0.5px;
-  color: #000;
-  margin-top: 4px; 
-}
-
-.pago-help-icon {
-  width: 26px;
-  height: 26px;
-  border: 2px solid #000;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: #fff;
-  color: #000;
-}
 
 .pago-help-icon svg {
   width: 14px;
@@ -74,7 +7,7 @@ body {
 
 /* Container Principal */
 .pago-page-wrapper {
-  background-color: #d0cbc8;
+  background-color: #F8FAFC;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -87,7 +20,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  background-color: #d0cbc8;
+  background-color: #F8FAFC;
 }
 
 .pago-form-box {
@@ -103,7 +36,7 @@ body {
   text-align: center;
   font-size: 18px;
   font-weight: normal;
-  color: #D84040;
+  color: #22C55E;
   margin-bottom: 30px;
 }
 
@@ -117,7 +50,7 @@ body {
 
 /* Resumen de compra */
 .pago-resumen {
-  background-color: #f5f5f5;
+  background-color: #F1F5F9;
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 20px;
@@ -156,8 +89,8 @@ body {
 }
 
 .pago-metodo.pago-activo:hover {
-  background-color: #f8f9fa;
-  border-color: #D84040;
+  background-color: #F1F5F9;
+  border-color: #22C55E;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -182,12 +115,12 @@ body {
 }
 
 .pago-metodo.pago-activo .pago-metodo-icon {
-  color: #D84040;
+  color: #22C55E;
 }
 
 .pago-metodo-flecha {
   font-size: 14px;
-  color: #D84040;
+  color: #22C55E;
 }
 
 .pago-metodo-bloqueado {
@@ -204,8 +137,8 @@ body {
 
 .pago-btn-volver {
   background-color: #fff;
-  color: #D84040;
-  border: 1px solid #D84040;
+  color: #22C55E;
+  border: 1px solid #22C55E;
   padding: 10px 20px;
   font-size: 12px;
   font-weight: normal;
@@ -218,46 +151,11 @@ body {
 }
 
 .pago-btn-volver:hover {
-  background-color: #D84040;
+  background-color: #22C55E;
   color: #fff;
 }
 
 /* Footer */
-.pago-footer {
-  background-color: #b8b4b1;
-  padding: 15px 50px; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px; 
-  color: #333;
-  height: 60px; 
-}
-
-.pago-footer-links {
-  display: flex;
-  gap: 12px; 
-  align-items: center;
-}
-
-.pago-footer-links a {
-  text-decoration: none;
-  color: #333;
-  font-size: 13px; 
-}
-
-.pago-footer-links a:hover {
-  text-decoration: underline;
-}
-
-.pago-footer-links span {
-  color: #333;
-}
-
-.pago-footer-copyright {
-  color: #333;
-  font-size: 13px; 
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -271,19 +169,6 @@ body {
     padding: 30px 15px;
   }
 
-  .pago-footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    padding: 15px 20px; 
-    height: auto; 
-  }
-
-  .pago-top-bar {
-    padding: 10px 20px; 
-    min-height: 100px; 
-  }
-
   .pago-metodo-info {
     font-size: 13px;
   }
@@ -292,18 +177,11 @@ body {
     font-size: 16px;
   }
   
-  .pago-logo-img {
-    width: 80px; 
-    height: 60px; 
-  }
+
   
-  .pago-logo-title {
-    font-size: 20px; 
-  }
+
   
-  .pago-logo-subtitle {
-    font-size: 9px; 
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -326,18 +204,10 @@ body {
     min-width: 140px;
   }
 
-  .pago-logo-title {
-    font-size: 18px; 
-  }
   
-  .pago-logo-subtitle {
-    font-size: 8px; 
-  }
+
   
-  .pago-footer {
-    gap: 10px;
-    padding: 15px 20px;
-  }
+
 }
 
 /* Estados de carga y deshabilitado */
@@ -357,11 +227,11 @@ body {
 
 /* Mejoras de accesibilidad */
 .pago-metodo.pago-activo:focus {
-  outline: 2px solid #D84040;
+  outline: 2px solid #22C55E;
   outline-offset: 2px;
 }
 
 .pago-btn-volver:focus {
-  outline: 2px solid #D84040;
+  outline: 2px solid #22C55E;
   outline-offset: 2px;
 }

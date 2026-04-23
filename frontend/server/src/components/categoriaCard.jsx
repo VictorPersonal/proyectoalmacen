@@ -12,3 +12,4 @@ const CategoriaCard = ({ id, descripcion }) => {
 };
 
 export default CategoriaCard;
+

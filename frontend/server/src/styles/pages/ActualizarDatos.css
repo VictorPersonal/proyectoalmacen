@@ -1,9 +1,4 @@
 /* ===== RESET Y BASE ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 html, body, #root, .actualizar-page-wrapper {
     height: 100%;
@@ -12,78 +7,15 @@ html, body, #root, .actualizar-page-wrapper {
     padding: 0;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #c8c4c1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-}
-
 /* ===== ESTRUCTURA GENERAL ===== */
 .actualizar-page-wrapper {
-    background-color: #c8c4c1;
+    background-color: #F8FAFC;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 /* ===== HEADER (CONSISTENTE) ===== */
-.actualizar-top-bar {
-    background-color: #c8c4c1;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    flex-shrink: 0;
-    min-height: 120px;
-}
-
-.actualizar-logo-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.actualizar-logo-img {
-    width: 90px;
-    height: 70px;
-}
-
-.actualizar-logo-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.actualizar-logo-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #000;
-}
-
-.actualizar-logo-subtitle {
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    color: #000;
-    margin-top: 4px;
-}
-
-.actualizar-help-icon {
-    width: 26px;
-    height: 26px;
-    border: 2px solid #000;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: #fff;
-}
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .actualizar-container {
@@ -93,32 +25,32 @@ body {
     justify-content: center;
     align-items: center;
     padding: 40px 20px;
-    background-color: #edeae8;
+    background-color: #F8FAFC;
     min-height: calc(100vh - 120px - 60px);
 }
 
 /* ===== FORMULARIO ===== */
 .actualizar-form-wrapper {
-    background-color: #ffffff;
-    border-radius: 12px;
+    background-color: #FFFFFF;
+    border-radius: 15px;
     padding: 35px 45px;
     width: 100%;
     max-width: 650px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .actualizar-form-title {
     text-align: center;
     font-size: 22px;
     font-weight: normal;
-    color: #D84040;
+    color: #22C55E;
     margin-bottom: 25px;
 }
 
 /* ===== MENSAJES ===== */
 .actualizar-mensaje {
     padding: 10px 12px;
-    border-radius: 6px;
+    border-radius: 12px;
     margin-bottom: 20px;
     text-align: center;
     font-weight: 500;
@@ -126,21 +58,21 @@ body {
 }
 
 .actualizar-mensaje-exito {
-    background-color: #e2f5e2;
-    color: #2e7d32;
-    border: 1px solid #2e7d32;
+    background-color: #F0FDF4;
+    color: #22C55E;
+    border: 1px solid #22C55E;
 }
 
 .actualizar-mensaje-error {
-    background-color: #fdecea;
-    color: #c62828;
-    border: 1px solid #c62828;
+    background-color: #FEF2F2;
+    color: #EF4444;
+    border: 1px solid #EF4444;
 }
 
 .actualizar-cargando {
     text-align: center;
     padding: 12px;
-    color: #666;
+    color: #475569;
     font-style: italic;
     font-size: 14px;
 }
@@ -170,39 +102,42 @@ body {
 
 .actualizar-form-group label {
     font-size: 13px;
-    color: #000;
+    color: #1E293B;
     font-weight: 500;
 }
 
 .actualizar-form-group input {
-    padding: 10px 14px;
-    border: 1px solid #999;
-    border-radius: 5px;
+    padding: 12px 16px;
+    border: 1px solid #E2E8F0;
+    border-radius: 15px;
     font-size: 14px;
-    background-color: #fff;
+    background-color: #FFFFFF;
+    color: #1E293B;
     outline: none;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
 }
 
 .actualizar-form-group input:focus {
-    border-color: #D84040;
+    border-color: #22C55E;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .actualizar-form-group input::placeholder {
-    color: #999;
-    font-size: 12px;
+    color: #94A3B8;
+    font-size: 13px;
 }
 
 /* ===== CAMPOS BLOQUEADOS ===== */
 .actualizar-campo-bloqueado {
-    background-color: #f5f5f5 !important;
-    color: #666;
+    background-color: #F1F5F9 !important;
+    color: #475569 !important;
     cursor: not-allowed;
+    border-color: #E2E8F0 !important;
 }
 
 .actualizar-texto-ayuda {
     font-size: 11px;
-    color: #666;
+    color: #475569;
     margin-top: 2px;
     font-style: italic;
 }
@@ -217,97 +152,64 @@ body {
 }
 
 .actualizar-btn-actualizar {
-    background-color: #D84040;
-    color: #fff;
-    border: 1px solid #D84040;
-    padding: 10px 25px;
+    background-color: #22C55E;
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 25px;
     font-size: 14px;
-    border-radius: 5px;
+    font-weight: 600;
+    border-radius: 15px;
     cursor: pointer;
     transition: all 0.3s;
     min-width: 160px;
 }
 
 .actualizar-btn-actualizar:hover:not(:disabled) {
-    background-color: #c03939;
-    border-color: #c03939;
+    background-color: #16A34A;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .actualizar-btn-actualizar:disabled {
-    background-color: #cccccc;
-    border-color: #cccccc;
+    background-color: #94A3B8;
+    border-color: #94A3B8;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .actualizar-btn-cancelar {
-    background-color: #fff;
-    color: #666;
-    border: 1px solid #999;
-    padding: 10px 25px;
+    background-color: transparent;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+    padding: 12px 25px;
     font-size: 14px;
-    border-radius: 5px;
+    font-weight: 500;
+    border-radius: 15px;
     cursor: pointer;
     transition: all 0.3s;
     min-width: 120px;
 }
 
 .actualizar-btn-cancelar:hover {
-    background-color: #f5f5f5;
-    border-color: #666;
+    background-color: #F1F5F9;
+    border-color: #22C55E;
+    color: #22C55E;
 }
 
 /* ===== INFORMACIÓN DE AYUDA ===== */
 .actualizar-info-ayuda {
     text-align: center;
     margin-top: 20px;
-    color: #666;
+    color: #475569;
     font-size: 12px;
 }
 
 .actualizar-info-ayuda small {
-    color: #666;
+    color: #475569;
 }
 
 /* ========== FOOTER CONSISTENTE ========== */
-.actualizar-footer {
-    background-color: #b8b4b1;
-    padding: 15px 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    color: #333;
-    width: 100%;
-    flex-shrink: 0;
-    margin-top: auto;
-    height: 60px;
-    position: relative;
-}
-
-.actualizar-footer-links {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.actualizar-footer-links a {
-    text-decoration: none;
-    color: #333;
-    font-size: 13px;
-}
-
-.actualizar-footer-links a:hover {
-    text-decoration: underline;
-}
-
-.actualizar-footer-links span {
-    color: #333;
-}
-
-.actualizar-footer-copyright {
-    color: #333;
-    font-size: 13px;
-}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
@@ -321,6 +223,7 @@ body {
         padding: 30px 35px;
         max-width: 100%;
         margin: 10px 0;
+        border-radius: 15px;
     }
     
     .actualizar-campos-grid {
@@ -338,32 +241,6 @@ body {
         width: 100%;
         min-width: auto;
     }
-
-    .actualizar-footer {
-        flex-direction: column;
-        gap: 8px;
-        text-align: center;
-        padding: 15px 20px;
-        height: auto;
-    }
-
-    .actualizar-top-bar {
-        padding: 10px 20px;
-        min-height: 100px;
-    }
-    
-    .actualizar-logo-img {
-        width: 80px;
-        height: 60px;
-    }
-    
-    .actualizar-logo-title {
-        font-size: 20px;
-    }
-    
-    .actualizar-logo-subtitle {
-        font-size: 9px;
-    }
 }
 
 @media (max-width: 480px) {
@@ -373,6 +250,7 @@ body {
     
     .actualizar-form-wrapper {
         padding: 25px 30px;
+        border-radius: 15px;
     }
     
     .actualizar-form-title {
@@ -381,24 +259,11 @@ body {
     }
     
     .actualizar-form-group input {
-        padding: 8px 12px;
+        padding: 10px 14px;
     }
     
     .actualizar-btn-actualizar,
     .actualizar-btn-cancelar {
-        padding: 8px 20px;
-    }
-    
-    .actualizar-logo-title {
-        font-size: 18px;
-    }
-    
-    .actualizar-logo-subtitle {
-        font-size: 8px;
-    }
-    
-    .actualizar-footer {
-        gap: 10px;
-        padding: 15px 20px;
+        padding: 10px 20px;
     }
 }

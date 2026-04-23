@@ -1,5 +1,5 @@
 import React from "react";
-import "./productoCard.css";
+import "../../styles/components/productoCard.css";
 
 const ProductoCard = ({ producto }) => {
   // Obtener la primera imagen del array producto_imagen

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./DescripcionProducto.css";
+import "../styles/components/DescripcionProducto.css";
 import Swal from "sweetalert2";
 import { FaStar, FaHeart, FaShoppingCart, FaArrowLeft, FaExclamationTriangle } from "react-icons/fa";
 import { SiVisa, SiMastercard, SiAmericanexpress, SiJcb } from "react-icons/si";
@@ -59,7 +59,7 @@ const DescripcionProducto = () => {
         return;
       }
 
-      const response = await fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/favoritos/verificar/${productoId}`, {
+      const response = await fetch(`http://localhost:4000/api/favoritos/verificar/${productoId}`, {
         method: "GET",
         credentials: "include",
       });
@@ -78,7 +78,7 @@ const DescripcionProducto = () => {
 
   const cargarProductoDesdeAPI = async () => {
     try {
-      const response = await fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/productos/${id}`);
+      const response = await fetch(`http://localhost:4000/api/productos/${id}`);
       if (!response.ok) {
         throw new Error('Producto no encontrado');
       }
@@ -145,7 +145,7 @@ const DescripcionProducto = () => {
 
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/favoritos/${productoId}`, {
+          const response = await fetch(`http://localhost:4000/api/favoritos/${productoId}`, {
             method: "DELETE",
             credentials: "include",
             headers: {
@@ -189,7 +189,7 @@ const DescripcionProducto = () => {
           imagen: producto.producto_imagen?.[0]?.url || "",
         };
 
-        const response = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/favoritos", {
+        const response = await fetch("http://localhost:4000/api/favoritos", {
           method: "POST",
           credentials: "include",
           headers: {
@@ -273,7 +273,7 @@ const DescripcionProducto = () => {
       };
 
       const res = await axios.post(
-        "https://3e34-201-182-248-71.ngrok-free.app/api/carrito/agregar",
+        "http://localhost:4000/api/carrito/agregar",
         productoData,
         { withCredentials: true }
       );

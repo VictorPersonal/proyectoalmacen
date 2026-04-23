@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Home.css";
+import "../styles/pages/Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight } from "react-icons/fa";
@@ -7,6 +7,7 @@ import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
 import Carrito from "../components/Carrito";
+import SimpleFooter from "../components/SimpleFooter";
 
 const Home = () => {
   const [menuMasInfo, setMenuMasInfo] = useState(false);
@@ -244,7 +245,7 @@ const Home = () => {
       const [_, response] = await Promise.all([
         minLoadingTime,
         fetch(
-          `https://3e34-201-182-248-71.ngrok-free.app/api/productos?search=${encodeURIComponent(
+          `http://localhost:4000/api/productos?search=${encodeURIComponent(
             query
           )}&soloActivos=true`
         )
@@ -316,7 +317,7 @@ const Home = () => {
     try {
       const [_, response] = await Promise.all([
         minLoadingTime,
-        fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/categorias/${idCategoria}/productos`) //Revisar si borrar /categorias
+        fetch(`http://localhost:4000/api/categorias/${idCategoria}/productos`) //Revisar si borrar /categorias
       ]);
 
       const data = await response.json();
@@ -368,7 +369,7 @@ const Home = () => {
             </div>
             <div className="logo-text" id="logo-text">
               <h1>Dulce hogar</h1>
-              <p>ALMACÉN DE ELECTRODOMÉSTICOS</p>
+              <p>Tradición y calidad</p>
             </div>
           </div>
 
@@ -671,19 +672,7 @@ const Home = () => {
       )}
 
       {/* FOOTER */}
-      <footer id="footer">
-        <div className="footer-links">
-          <Link to="/consejo-de-seguridad">Consejo de Seguridad</Link>
-          <span>/</span>
-          <Link to="/terminos-y-condiciones">Términos y Condiciones</Link>
-          <span>/</span>
-          <Link to="/preguntas-frecuentes">Preguntas Frecuentes</Link>
-        </div>
-
-        <div className="footer-copyright">
-          © 2025 FDO, todos los derechos reservados
-        </div>
-      </footer>
+      <SimpleFooter />
     </div>
   );
 };

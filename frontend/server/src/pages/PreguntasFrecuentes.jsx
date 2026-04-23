@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './PreguntasFrecuentes.css';
+import '../styles/pages/PreguntasFrecuentes.css';
 import { 
   FaPhone, 
   FaWhatsapp, 

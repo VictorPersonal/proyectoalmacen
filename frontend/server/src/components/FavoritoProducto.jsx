@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaTrashAlt, FaShoppingCart, FaHeart } from "react-icons/fa";
 import { RiErrorWarningLine } from "react-icons/ri";
 import Swal from "sweetalert2";
-import "./FavoritoProducto.css";
+import "../styles/components/FavoritoProducto.css";
 
 const FavoritoProducto = () => {
   const [favoritos, setFavoritos] = useState([]);
@@ -51,7 +51,7 @@ const FavoritoProducto = () => {
 
   const obtenerFavoritos = async () => {
     try {
-      const response = await fetch("https://3e34-201-182-248-71.ngrok-free.app/api/favoritos", {
+      const response = await fetch("http://localhost:4000/api/favoritos", {
         method: "GET",
         credentials: "include",
       });
@@ -81,7 +81,7 @@ const FavoritoProducto = () => {
     }
 
     try {
-      const response = await fetch(`https://3e34-201-182-248-71.ngrok-free.app/api/favoritos/${idproducto}`, {
+      const response = await fetch(`http://localhost:4000/api/favoritos/${idproducto}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
