@@ -18,6 +18,7 @@ import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
 import DescripcionProducto from "./components/DescripcionProducto";
 import Promociones from "./pages/Promociones";
 import ConsejodeSeguridad from "./pages/ConsejodeSeguridad";
+import WhatsAppButton from "./components/WhatsAppButton";
 
 
 
@@ -66,6 +67,7 @@ function App() {
   return (
       <Router>
         <AppWrapper />
+        <WhatsAppButton />
       </Router>
   );
 }
