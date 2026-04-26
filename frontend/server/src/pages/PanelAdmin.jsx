@@ -24,9 +24,17 @@ import {
   FaShoppingCart,
   FaClipboardList,
   FaBell,
+  FaTags,
+  FaTrash,
 } from "react-icons/fa";
 
-const ESTADOS_PEDIDO = ["Pendiente", "Pagado", "En camino", "Entregado", "Cancelado"];
+const ESTADOS_PEDIDO = [
+  "Pendiente",
+  "Pagado",
+  "En camino",
+  "Entregado",
+  "Cancelado",
+];
 
 const PanelAdmin = () => {
   const [currentSection, setCurrentSection] = useState("productos");
@@ -43,29 +51,55 @@ const PanelAdmin = () => {
   const [marcas, setMarcas] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 ESTADO PARA PEDIDOS (ADMIN)
+  // Procesamiento de imágenes
+  const [processingImages, setProcessingImages] = useState([
+    false,
+    false,
+    false,
+    false,
+  ]);
+  const [autoRemoveBg, setAutoRemoveBg] = useState(true);
+
+  // Pedidos
   const [pedidos, setPedidos] = useState([]);
   const [pedidosLoading, setPedidosLoading] = useState(false);
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [estadoEditando, setEstadoEditando] = useState("");
   const [showPedidoModal, setShowPedidoModal] = useState(false);
 
-  const navigate = useNavigate();
-  const profileRef = useRef(null);
-
-   // 🔔 NOTIFICACIONES
+  // Notificaciones
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
 
-  // 🔹 El formulario ahora usa nombre de categoría y marca, no IDs directos
+  // Promociones
+  const [promociones, setPromociones] = useState([]);
+  const [promoModalVisible, setPromoModalVisible] = useState(false);
+  const [editingPromo, setEditingPromo] = useState(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  const [promoForm, setPromoForm] = useState({
+    nombre: "",
+    descripcion: "",
+    valor_descuento: "",
+    scope: "global",
+    idproducto: "",
+    idcategoria: "",
+    fecha_inicio: "",
+    fecha_fin: "",
+    activo_manual: true,
+  });
+
+  const navigate = useNavigate();
+  const profileRef = useRef(null);
+
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
     stock: "",
     descripcion: "",
-    categoriaNombre: "", // texto visible para el usuario
-    marcaNombre: "", // texto visible para el usuario
+    categoriaNombre: "",
+    marcaNombre: "",
     imagenes: [],
   });
 
@@ -170,29 +204,96 @@ const PanelAdmin = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  /* =========================================================
+     HELPERS IMÁGENES
+  ========================================================= */
+  const resetProcessingImages = () => {
+    setProcessingImages([false, false, false, false]);
+  };
 
-    // =========================================================
-  // 🔔 NOTIFICACIONES (pedidos en estado Pendiente)
-  // =========================================================
+  const fileFromBlob = (blob, originalName = "imagen") => {
+    const safeName = originalName.replace(/\.[^/.]+$/, "");
+    return new File([blob], `${safeName}-sin-fondo.png`, {
+      type: "image/png",
+    });
+  };
+
+  const removeBackgroundFromImage = async (file) => {
+    const data = new FormData();
+    data.append("image", file);
+
+    const response = await axios.post(
+      "http://localhost:4000/api/images/remove-background",
+      data,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        responseType: "blob",
+        timeout: 60000,
+        withCredentials: true,
+      }
+    );
+
+    return fileFromBlob(response.data, file.name);
+  };
+
+  const previewImage = (file) => {
+    if (!file) return null;
+    return URL.createObjectURL(file);
+  };
+
+  /* =========================================================
+     HELPERS PROMOCIONES
+  ========================================================= */
+  const formatDateTimeLocal = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - offset * 60000);
+    return localDate.toISOString().slice(0, 16);
+  };
+
+  const resetPromoForm = () => {
+    setPromoForm({
+      nombre: "",
+      descripcion: "",
+      valor_descuento: "",
+      scope: "global",
+      idproducto: "",
+      idcategoria: "",
+      fecha_inicio: "",
+      fecha_fin: "",
+      activo_manual: true,
+    });
+  };
+
+  const handlePromoChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setPromoForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  /* =========================================================
+     NOTIFICACIONES
+  ========================================================= */
   const fetchNotifications = async () => {
     try {
       setNotificationsLoading(true);
 
-      const res = await axios.get(
-        "http://localhost:4000/api/admin/pedidos",
-        { withCredentials: true }
-      );
+      const res = await axios.get("http://localhost:4000/api/admin/pedidos", {
+        withCredentials: true,
+      });
 
       const pedidosData = res.data || [];
-
-      // Notificamos solo pedidos en estado "Pendiente"
-      const pendientes = pedidosData.filter(
-        (p) => p.estado === "Pendiente"
-      );
+      const pendientes = pedidosData.filter((p) => p.estado === "Pendiente");
 
       setNotifications(pendientes);
     } catch (err) {
-      console.error("Error al obtener notificaciones:", err.response?.data || err.message);
+      console.error(
+        "Error al obtener notificaciones:",
+        err.response?.data || err.message
+      );
       Swal.fire({
         title: "Error",
         text: "No se pudieron cargar las notificaciones",
@@ -205,7 +306,6 @@ const PanelAdmin = () => {
   };
 
   const toggleNotifications = () => {
-    // Cuando se abre el panel, recargamos las notificaciones
     if (!showNotifications) {
       fetchNotifications();
     }
@@ -219,9 +319,12 @@ const PanelAdmin = () => {
     try {
       setLoading(true);
 
-      const res = await axios.get("http://localhost:4000/api/productosAdmin/admin/productos", {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        "http://localhost:4000/api/productosAdmin/admin/productos",
+        {
+          withCredentials: true,
+        }
+      );
 
       setProducts(res.data);
     } catch (err) {
@@ -248,7 +351,6 @@ const PanelAdmin = () => {
         });
       } else {
         try {
-          console.log("⚠️ Intentando con endpoint público...");
           const resPublic = await axios.get(
             "http://localhost:4000/api/productos",
             {
@@ -256,7 +358,7 @@ const PanelAdmin = () => {
             }
           );
           setProducts(resPublic.data);
-        } catch (fallbackErr) {
+        } catch {
           Swal.fire({
             title: "Error",
             text: "No se pudieron cargar los productos",
@@ -275,7 +377,7 @@ const PanelAdmin = () => {
   }, []);
 
   /* =========================================================
-     TRAER CATEGORÍAS Y MARCAS (id + descripción)
+     TRAER CATEGORÍAS Y MARCAS
   ========================================================= */
   useEffect(() => {
     const fetchCatalogos = async () => {
@@ -296,12 +398,38 @@ const PanelAdmin = () => {
     fetchCatalogos();
   }, []);
 
-  // cuando cambie el término de búsqueda, volver a página 1
+  /* =========================================================
+     TRAER PROMOCIONES
+  ========================================================= */
+  const fetchPromociones = async () => {
+    try {
+      setPromoLoading(true);
+      const res = await axios.get("http://localhost:4000/api/promociones", {
+        withCredentials: true,
+      });
+      setPromociones(res.data || []);
+    } catch (err) {
+      console.error("Error promociones:", err.response?.data || err.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudieron cargar las promociones",
+      });
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentSection === "promociones") {
+      fetchPromociones();
+    }
+  }, [currentSection]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  // limpiar el buscador cuando cambias de sección
   useEffect(() => {
     setSearchTerm("");
   }, [currentSection]);
@@ -315,21 +443,71 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     IMÁGENES MÚLTIPLES
+     IMÁGENES MÚLTIPLES + REMOVE BACKGROUND
   ========================================================= */
-  const handleImageChange = (e, index) => {
+  const handleImageChange = async (e, index) => {
     const files = e.target.files;
-    if (files && files[0]) {
+    if (!files || !files[0]) return;
+
+    const selectedFile = files[0];
+
+    try {
+      const updatedProcessing = [...processingImages];
+      updatedProcessing[index] = true;
+      setProcessingImages(updatedProcessing);
+
+      let finalFile = selectedFile;
+
+      if (autoRemoveBg) {
+        finalFile = await removeBackgroundFromImage(selectedFile);
+
+        Swal.fire({
+          title: "Imagen procesada",
+          text: `Se quitó el fondo de la imagen ${index + 1}`,
+          icon: "success",
+          timer: 1400,
+          showConfirmButton: false,
+        });
+      }
+
       const newImages = [...(formData.imagenes || [])];
-      newImages[index] = files[0];
-      setFormData({ ...formData, imagenes: newImages });
+      newImages[index] = finalFile;
+
+      setFormData((prev) => ({
+        ...prev,
+        imagenes: newImages,
+      }));
+    } catch (err) {
+      console.error(
+        "Error al procesar imagen:",
+        err.response?.data || err.message
+      );
+
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo quitar el fondo. Se usará la imagen original.",
+        icon: "warning",
+        confirmButtonText: "Entendido",
+      });
+
+      const newImages = [...(formData.imagenes || [])];
+      newImages[index] = selectedFile;
+
+      setFormData((prev) => ({
+        ...prev,
+        imagenes: newImages,
+      }));
+    } finally {
+      const updatedProcessing = [...processingImages];
+      updatedProcessing[index] = false;
+      setProcessingImages(updatedProcessing);
     }
   };
 
   const removeImage = (index) => {
     const newImages = [...(formData.imagenes || [])];
     newImages[index] = null;
-    setFormData({ ...formData, imagenes: newImages });
+    setFormData((prev) => ({ ...prev, imagenes: newImages }));
   };
 
   /* =========================================================
@@ -340,40 +518,26 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     HELPERS CATEGORÍA / MARCA (id <-> descripción)
+     HELPERS CATEGORÍA / MARCA
   ========================================================= */
-
-  // Obtener texto legible de categoría para mostrar en tabla o al editar
   const getNombreCategoria = (productOrId) => {
-    // Si viene el objeto producto
     if (productOrId && typeof productOrId === "object") {
       const p = productOrId;
-
-      // si el producto ya viene con la descripción directa
       if (p.descripcionCategoria) return p.descripcionCategoria;
 
-      // si solo trae el idcategoria, buscamos en el arreglo categorias
       const id = p.idcategoria;
-      const cat = categorias.find(
-        (c) => String(c.idcategoria) === String(id)
-      );
+      const cat = categorias.find((c) => String(c.idcategoria) === String(id));
       return cat ? cat.descripcionCategoria : id;
     }
 
-    // Si viene solo el ID
     const id = productOrId;
-    const cat = categorias.find(
-      (c) => String(c.idcategoria) === String(id)
-    );
+    const cat = categorias.find((c) => String(c.idcategoria) === String(id));
     return cat ? cat.descripcionCategoria : id;
   };
 
   const getNombreMarca = (productOrId) => {
-    // Si viene el objeto producto completo
     if (productOrId && typeof productOrId === "object") {
       const p = productOrId;
-
-      // Si el producto ya trae la descripción de la marca
       if (p.descripcionMarca) return p.descripcionMarca;
 
       const id = p.idmarca;
@@ -383,7 +547,6 @@ const PanelAdmin = () => {
       return m ? m.descripcionMarca : String(id);
     }
 
-    // Si viene solo el ID
     const id = productOrId;
     if (!id) return "";
 
@@ -391,12 +554,11 @@ const PanelAdmin = () => {
     return m ? m.descripcionMarca : String(id);
   };
 
-  // Buscar o crear categoría según su descripción
   const obtenerOCrearCategoria = async (nombreCategoria) => {
     const nombre = (nombreCategoria || "").trim();
     if (!nombre) return null;
 
-    let existente = categorias.find((c) => {
+    const existente = categorias.find((c) => {
       const desc =
         c.descripcionCategoria ||
         c.descripionCategoria ||
@@ -407,7 +569,6 @@ const PanelAdmin = () => {
 
     if (existente) return existente.idcategoria;
 
-    // Crear nueva categoría usando la columna de descripción que manejes
     const res = await axios.post("http://localhost:4000/api/categorias", {
       descripcionCategoria: nombre,
     });
@@ -417,12 +578,11 @@ const PanelAdmin = () => {
     return nueva.idcategoria;
   };
 
-  // Buscar o crear marca según su descripción
   const obtenerOCrearMarca = async (nombreMarca) => {
     const nombre = (nombreMarca || "").trim();
     if (!nombre) return null;
 
-    let existente = marcas.find((m) => {
+    const existente = marcas.find((m) => {
       const desc = m.descripcionMarca || m.descripcion || "";
       return desc.toLowerCase() === nombre.toLowerCase();
     });
@@ -446,16 +606,15 @@ const PanelAdmin = () => {
     setLoading(true);
 
     try {
-      // Resolver nombres de categoría / marca a IDs reales
       const idCategoria = await obtenerOCrearCategoria(
         formData.categoriaNombre
       );
+
       const idMarca = formData.marcaNombre
         ? await obtenerOCrearMarca(formData.marcaNombre)
         : null;
 
       const data = new FormData();
-
       data.append("nombre", formData.nombre);
       data.append("precio", formData.precio);
       data.append("stock", formData.stock);
@@ -473,6 +632,7 @@ const PanelAdmin = () => {
       }
 
       let response;
+
       if (editingProduct) {
         response = await axios.put(
           `http://localhost:4000/api/productosAdmin/productos/${editingProduct.idproducto}/con-imagen`,
@@ -480,7 +640,7 @@ const PanelAdmin = () => {
           {
             headers: { "Content-Type": "multipart/form-data" },
             timeout: 30000,
-            withCredentials: true //Todas estas variables con withCredentials son para validar el token
+            withCredentials: true,
           }
         );
 
@@ -499,11 +659,10 @@ const PanelAdmin = () => {
         response = await axios.post(
           "http://localhost:4000/api/productosAdmin/productos/con-imagen",
           data,
-          
           {
             headers: { "Content-Type": "multipart/form-data" },
             timeout: 30000,
-            withCredentials: true
+            withCredentials: true,
           }
         );
 
@@ -524,6 +683,7 @@ const PanelAdmin = () => {
 
       setModalVisible(false);
       setEditingProduct(null);
+      resetProcessingImages();
       setFormData({
         nombre: "",
         precio: "",
@@ -553,10 +713,11 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     PREPARAR EDICIÓN
+     PREPARAR EDICIÓN PRODUCTO
   ========================================================= */
   const handleEdit = (product) => {
     setEditingProduct(product);
+    resetProcessingImages();
     setFormData({
       nombre: product.nombre,
       precio: product.precio,
@@ -639,7 +800,7 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     IMÁGENES DEL PRODUCTO
+     HELPERS PRODUCTO
   ========================================================= */
   const getPrimeraImagen = (product) => {
     if (product.producto_imagen && product.producto_imagen.length > 0) {
@@ -657,6 +818,178 @@ const PanelAdmin = () => {
 
   const tieneImagenes = (product) => {
     return product.producto_imagen && product.producto_imagen.length > 0;
+  };
+
+  /* =========================================================
+     CRUD PROMOCIONES
+  ========================================================= */
+  const handleSavePromo = async () => {
+    const descuento = Number(promoForm.valor_descuento);
+
+    if (!promoForm.nombre.trim()) {
+      Swal.fire("Error", "El nombre es obligatorio", "error");
+      return;
+    }
+
+    if (!promoForm.valor_descuento) {
+      Swal.fire("Error", "Debes ingresar el descuento", "error");
+      return;
+    }
+
+    if (!promoForm.fecha_inicio || !promoForm.fecha_fin) {
+      Swal.fire("Error", "Debes ingresar fecha de inicio y fin", "error");
+      return;
+    }
+
+    if (promoForm.scope === "producto" && !promoForm.idproducto) {
+      Swal.fire("Error", "Debes seleccionar un producto", "error");
+      return;
+    }
+
+    if (promoForm.scope === "categoria" && !promoForm.idcategoria) {
+      Swal.fire("Error", "Debes seleccionar una categoría", "error");
+      return;
+    }
+
+    if (descuento > 50) {
+      const confirm = await Swal.fire({
+        title: "Descuento alto",
+        text: `Estás aplicando ${descuento}% de descuento. ¿Seguro que deseas continuar?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí aplicar",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (!confirm.isConfirmed) return;
+    }
+
+    try {
+      setPromoLoading(true);
+
+      const payload = {
+        nombre: promoForm.nombre,
+        descripcion: promoForm.descripcion,
+        valor_descuento: Number(promoForm.valor_descuento),
+        scope: promoForm.scope,
+        idproducto:
+          promoForm.scope === "producto" && promoForm.idproducto
+            ? Number(promoForm.idproducto)
+            : null,
+        idcategoria:
+          promoForm.scope === "categoria" && promoForm.idcategoria
+            ? Number(promoForm.idcategoria)
+            : null,
+        fecha_inicio: promoForm.fecha_inicio,
+        fecha_fin: promoForm.fecha_fin,
+        activo_manual: promoForm.activo_manual,
+      };
+
+      if (editingPromo) {
+        await axios.put(
+          `http://localhost:4000/api/promociones/${editingPromo.idpromocion}`,
+          payload,
+          { withCredentials: true }
+        );
+      } else {
+        await axios.post("http://localhost:4000/api/promociones", payload, {
+          withCredentials: true,
+        });
+      }
+
+      Swal.fire("Éxito", "Promoción guardada correctamente", "success");
+
+      setPromoModalVisible(false);
+      setEditingPromo(null);
+      resetPromoForm();
+      fetchPromociones();
+    } catch (err) {
+      console.error("Error guardando promoción:", err.response?.data || err);
+
+      const mensaje =
+        err.response?.data?.errores?.join(" | ") ||
+        err.response?.data?.message ||
+        "No se pudo guardar la promoción";
+
+      Swal.fire("Error", mensaje, "error");
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const handleEditPromo = (promo) => {
+    setEditingPromo(promo);
+    setPromoForm({
+      nombre: promo.nombre || "",
+      descripcion: promo.descripcion || "",
+      valor_descuento: promo.valor_descuento || "",
+      scope: promo.scope || "global",
+      idproducto: promo.idproducto || "",
+      idcategoria: promo.idcategoria || "",
+      fecha_inicio: formatDateTimeLocal(promo.fecha_inicio),
+      fecha_fin: formatDateTimeLocal(promo.fecha_fin),
+      activo_manual:
+        promo.activo_manual === undefined ? true : promo.activo_manual,
+    });
+    setPromoModalVisible(true);
+  };
+
+  const togglePromoEstado = async (promo) => {
+    try {
+      await axios.patch(
+        `http://localhost:4000/api/promociones/${promo.idpromocion}/estado`,
+        { activo_manual: !promo.activo_manual },
+        { withCredentials: true }
+      );
+
+      Swal.fire({
+        title: "Actualizado",
+        text: `Promoción ${
+          promo.activo_manual ? "desactivada" : "activada"
+        } correctamente`,
+        icon: "success",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+
+      fetchPromociones();
+    } catch (err) {
+      console.error("Error al actualizar promoción:", err);
+      Swal.fire("Error", "No se pudo actualizar la promoción", "error");
+    }
+  };
+
+  const deletePromo = async (promo) => {
+    const confirm = await Swal.fire({
+      title: "Eliminar promoción",
+      text: `¿Deseas eliminar "${promo.nombre}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.delete(
+        `http://localhost:4000/api/promociones/${promo.idpromocion}`,
+        { withCredentials: true }
+      );
+
+      Swal.fire({
+        title: "Eliminada",
+        text: "La promoción fue eliminada correctamente",
+        icon: "success",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+
+      fetchPromociones();
+    } catch (err) {
+      console.error("Error eliminando promoción:", err);
+      Swal.fire("Error", "No se pudo eliminar la promoción", "error");
+    }
   };
 
   /* =========================================================
@@ -686,7 +1019,14 @@ const PanelAdmin = () => {
   };
 
   /* =========================================================
-     PAGINACIÓN CON TECLADO (PRODUCTOS)
+     FILTRO PROMOCIONES
+  ========================================================= */
+  const filteredPromociones = promociones.filter((promo) =>
+    promo.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  /* =========================================================
+     PAGINACIÓN CON TECLADO
   ========================================================= */
   useEffect(() => {
     if (currentSection !== "productos") return;
@@ -710,32 +1050,14 @@ const PanelAdmin = () => {
   }, [currentPage, totalPages, currentSection]);
 
   /* =========================================================
-     LIMPIAR URLs DE OBJETOS AL CERRAR MODAL
-  ========================================================= */
-  useEffect(() => {
-    return () => {
-      if (formData.imagenes) {
-        formData.imagenes.forEach((img) => {
-          if (img && typeof img === "object") {
-            URL.revokeObjectURL(URL.createObjectURL(img));
-          }
-        });
-      }
-    };
-  }, [modalVisible]);
-
-  /* =========================================================
-     PEDIDOS - FETCH & HELPERS
+     PEDIDOS
   ========================================================= */
   const fetchPedidos = async () => {
     try {
       setPedidosLoading(true);
-      const res = await axios.get(
-        "http://localhost:4000/api/admin/pedidos",
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await axios.get("http://localhost:4000/api/admin/pedidos", {
+        withCredentials: true,
+      });
       setPedidos(res.data || []);
     } catch (err) {
       console.error(
@@ -753,14 +1075,12 @@ const PanelAdmin = () => {
     }
   };
 
-  // cargar pedidos al entrar a la sección
   useEffect(() => {
     if (currentSection === "pedidos" && pedidos.length === 0) {
       fetchPedidos();
     }
   }, [currentSection, pedidos.length]);
 
-  // filtro de pedidos (por número o cliente)
   const filteredPedidos = pedidos.filter((p) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -803,6 +1123,7 @@ const PanelAdmin = () => {
 
   const handleGuardarEstadoPedido = async () => {
     if (!selectedPedido) return;
+
     if (!estadoEditando) {
       Swal.fire({
         title: "Estado requerido",
@@ -814,13 +1135,13 @@ const PanelAdmin = () => {
 
     try {
       setPedidosLoading(true);
+
       await axios.patch(
         `http://localhost:4000/api/admin/pedidos/${selectedPedido.idpedido}/estado`,
         { estado: estadoEditando },
         { withCredentials: true }
       );
 
-      // actualizar en la tabla
       setPedidos((prev) =>
         prev.map((p) =>
           p.idpedido === selectedPedido.idpedido
@@ -855,13 +1176,9 @@ const PanelAdmin = () => {
     }
   };
 
-  /* =========================================================
-     RENDER
-  ========================================================= */
   return (
     <div className="admin-panel">
       <aside className="sidebar">
-        {/* Perfil con menú de opciones */}
         <div
           className="admin-profile profile-clickable"
           onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -889,7 +1206,6 @@ const PanelAdmin = () => {
         </div>
 
         <nav className="sidebar-nav">
-          {/* 👇 NAVBAR ACTUALIZADO CON 3 ELEMENTOS */}
           <button
             type="button"
             className={`nav-item ${
@@ -915,6 +1231,17 @@ const PanelAdmin = () => {
           <button
             type="button"
             className={`nav-item ${
+              currentSection === "promociones" ? "active" : ""
+            }`}
+            onClick={() => setCurrentSection("promociones")}
+          >
+            <FaTags className="nav-icon" />
+            Promociones
+          </button>
+
+          <button
+            type="button"
+            className={`nav-item ${
               currentSection === "dashboard" ? "active" : ""
             }`}
             onClick={() => setCurrentSection("dashboard")}
@@ -925,7 +1252,6 @@ const PanelAdmin = () => {
         </nav>
       </aside>
 
-      {/* MODAL AYUDA */}
       {showHelp && (
         <div className="modal">
           <div className="modal-content help-modal">
@@ -934,9 +1260,9 @@ const PanelAdmin = () => {
               Ayuda del Administrador
             </h3>
             <p>
-              Desde aquí puedes gestionar todos los productos del sistema.
-              Puedes agregar hasta 4 imágenes por producto, editar información y
-              activar/desactivar productos según la disponibilidad de stock.
+              Desde aquí puedes gestionar productos, pedidos y promociones.
+              También puedes programar descuentos por porcentaje con fecha de
+              inicio y fin.
             </p>
             <button className="btn btn--add" onClick={() => setShowHelp(false)}>
               <FaTimes className="btn-icon" />
@@ -948,27 +1274,22 @@ const PanelAdmin = () => {
 
       <main className="main-content">
         <div className="top-buttons">
-          {/* 🔔 Botón de notificaciones */}
           <button
-              className="notif-btn"
-              onClick={toggleNotifications}
-              title="Notificaciones"
-            >
-              <FaBell size={18} />
-              {notifications.length > 0 && (
-                <span className="notif-badge">
-                  {notifications.length}
-                </span>
-              )}
-            </button>
+            className="notif-btn"
+            onClick={toggleNotifications}
+            title="Notificaciones"
+          >
+            <FaBell size={18} />
+            {notifications.length > 0 && (
+              <span className="notif-badge">{notifications.length}</span>
+            )}
+          </button>
 
-            {/* Botón de ayuda existente */}
-            <button className="help-btn" onClick={() => setShowHelp(true)}>
-              <FaQuestionCircle size={18} />
-            </button>
-          </div>
+          <button className="help-btn" onClick={() => setShowHelp(true)}>
+            <FaQuestionCircle size={18} />
+          </button>
+        </div>
 
-        {/* Panel de notificaciones */}
         {showNotifications && (
           <div className="notifications-panel">
             <div className="notifications-header">
@@ -987,9 +1308,7 @@ const PanelAdmin = () => {
                 <span>Cargando notificaciones...</span>
               </div>
             ) : notifications.length === 0 ? (
-              <p className="notifications-empty">
-                No hay pedidos pendientes.
-              </p>
+              <p className="notifications-empty">No hay pedidos pendientes.</p>
             ) : (
               <ul className="notifications-list">
                 {notifications.map((pedido) => (
@@ -1006,9 +1325,7 @@ const PanelAdmin = () => {
                       <span className="notification-total">
                         ${pedido.total.toLocaleString()}
                       </span>
-                      <span className="notification-date">
-                        {pedido.fecha}
-                      </span>
+                      <span className="notification-date">{pedido.fecha}</span>
                     </div>
                     <button
                       className="notification-btn"
@@ -1026,14 +1343,8 @@ const PanelAdmin = () => {
           </div>
         )}
 
-
-
-        {/* =====================================================
-            SECCIÓN PRODUCTOS
-        ===================================================== */}
         {currentSection === "productos" && (
           <>
-            {/* Buscador + agregar */}
             <div className="search-wrapper">
               <div className="search-container">
                 <FaSearch className="search-icon" />
@@ -1049,6 +1360,7 @@ const PanelAdmin = () => {
                 className="btn btn--add-secondary"
                 onClick={() => {
                   setEditingProduct(null);
+                  resetProcessingImages();
                   setFormData({
                     nombre: "",
                     precio: "",
@@ -1067,7 +1379,6 @@ const PanelAdmin = () => {
               </button>
             </div>
 
-            {/* Loading indicator */}
             {loading && (
               <div className="loading-indicator">
                 <FaSpinner className="loading-spinner" />
@@ -1075,7 +1386,6 @@ const PanelAdmin = () => {
               </div>
             )}
 
-            {/* Tabla de productos */}
             <div className="table-wrapper">
               <table className="products-table">
                 <thead>
@@ -1117,7 +1427,6 @@ const PanelAdmin = () => {
                               }}
                               onError={(e) => {
                                 e.target.style.display = "none";
-                                e.target.nextSibling.style.display = "flex";
                               }}
                             />
                           ) : (
@@ -1129,7 +1438,6 @@ const PanelAdmin = () => {
                         <td>{prod.nombre}</td>
                         <td>${Number(prod.precio).toFixed(2)}</td>
                         <td>{prod.stock}</td>
-                        {/* 🔹 Aquí ya mostramos la descripción, no el ID */}
                         <td>{getNombreCategoria(prod)}</td>
                         <td>
                           <span
@@ -1205,7 +1513,6 @@ const PanelAdmin = () => {
               </table>
             </div>
 
-            {/* Paginación */}
             <div className="pagination">
               <button
                 className="page-btn"
@@ -1237,9 +1544,6 @@ const PanelAdmin = () => {
           </>
         )}
 
-        {/* =====================================================
-            SECCIÓN DE PEDIDOS (REAL)
-        ===================================================== */}
         {currentSection === "pedidos" && (
           <div className="pedidos-section">
             <div className="section-header">
@@ -1250,7 +1554,6 @@ const PanelAdmin = () => {
               <p>Visualiza y administra todos los pedidos del sistema.</p>
             </div>
 
-            {/* Buscador de pedidos */}
             <div className="search-wrapper">
               <div className="search-container">
                 <FaSearch className="search-icon" />
@@ -1263,7 +1566,6 @@ const PanelAdmin = () => {
               </div>
             </div>
 
-            {/* Loading */}
             {pedidosLoading && (
               <div className="loading-indicator">
                 <FaSpinner className="loading-spinner" />
@@ -1271,7 +1573,6 @@ const PanelAdmin = () => {
               </div>
             )}
 
-            {/* Tabla de pedidos */}
             <div className="table-wrapper">
               <table className="pedidos-table">
                 <thead>
@@ -1308,9 +1609,7 @@ const PanelAdmin = () => {
                           </span>
                         </td>
                         <td>
-                          <span
-                            className={getEstadoBadgeClass(pedido.estado)}
-                          >
+                          <span className={getEstadoBadgeClass(pedido.estado)}>
                             {pedido.estado}
                           </span>
                         </td>
@@ -1340,10 +1639,137 @@ const PanelAdmin = () => {
           </div>
         )}
 
+        {currentSection === "promociones" && (
+          <div className="promos-section">
+            <div className="section-header">
+              <h2>
+                <FaTags className="section-icon" />
+                Gestión de Promociones
+              </h2>
+              <p>Programa descuentos por producto, categoría o globales.</p>
+            </div>
+
+            <div className="search-wrapper">
+              <div className="search-container">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Buscar promoción"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+
+              <button
+                className="btn btn--add-secondary"
+                onClick={() => {
+                  setEditingPromo(null);
+                  resetPromoForm();
+                  setPromoModalVisible(true);
+                }}
+                disabled={promoLoading}
+              >
+                <FaPlus className="btn-icon" />
+                Nueva promoción
+              </button>
+            </div>
+
+            {promoLoading && (
+              <div className="loading-indicator">
+                <FaSpinner className="loading-spinner" />
+                <span>Cargando promociones...</span>
+              </div>
+            )}
+
+            <div className="table-wrapper">
+              <table className="products-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descuento</th>
+                    <th>Scope</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPromociones.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="no-products">
+                        {searchTerm
+                          ? "No se encontraron promociones"
+                          : "No hay promociones registradas"}
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredPromociones.map((promo) => (
+                      <tr key={promo.idpromocion}>
+                        <td>{promo.idpromocion}</td>
+                        <td>{promo.nombre}</td>
+                        <td>{promo.valor_descuento}%</td>
+                        <td>{promo.scope}</td>
+                        <td>
+                          {new Date(promo.fecha_inicio).toLocaleString("es-CO")}
+                        </td>
+                        <td>
+                          {new Date(promo.fecha_fin).toLocaleString("es-CO")}
+                        </td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              promo.activo_manual
+                                ? "status-active"
+                                : "status-inactive"
+                            }`}
+                          >
+                            {promo.activo_manual ? "Activa" : "Desactivada"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn btn--edit"
+                              onClick={() => handleEditPromo(promo)}
+                            >
+                              <FaEdit className="btn-icon" />
+                              Editar
+                            </button>
+
+                            <button
+                              className={`btn btn--status ${
+                                promo.activo_manual
+                                  ? "btn--inactive"
+                                  : "btn--add"
+                              }`}
+                              onClick={() => togglePromoEstado(promo)}
+                            >
+                              {promo.activo_manual ? "Desactivar" : "Activar"}
+                            </button>
+
+                            <button
+                              className="btn btn--delete"
+                              onClick={() => deletePromo(promo)}
+                            >
+                              <FaTrash className="btn-icon" />
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {currentSection === "dashboard" && <Dashboard />}
       </main>
 
-      {/* MODAL CREAR / EDITAR PRODUCTO CON 4 IMÁGENES */}
       {modalVisible && (
         <div className="modal">
           <div className="modal-content">
@@ -1358,6 +1784,7 @@ const PanelAdmin = () => {
                 </>
               )}
             </h3>
+
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -1368,6 +1795,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <input
                 type="number"
                 name="precio"
@@ -1379,6 +1807,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <input
                 type="number"
                 name="stock"
@@ -1389,6 +1818,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <textarea
                 name="descripcion"
                 placeholder="Descripción del producto"
@@ -1398,7 +1828,6 @@ const PanelAdmin = () => {
                 disabled={loading}
               />
 
-              {/* 🔹 Categoría por nombre, con autocompletado */}
               <input
                 type="text"
                 name="categoriaNombre"
@@ -1409,6 +1838,7 @@ const PanelAdmin = () => {
                 required
                 disabled={loading}
               />
+
               <datalist id="categoria-options">
                 {categorias.map((cat) => (
                   <option
@@ -1422,7 +1852,6 @@ const PanelAdmin = () => {
                 ))}
               </datalist>
 
-              {/* 🔹 Marca por nombre, con autocompletado */}
               <input
                 type="text"
                 name="marcaNombre"
@@ -1432,6 +1861,7 @@ const PanelAdmin = () => {
                 onChange={handleChange}
                 disabled={loading}
               />
+
               <datalist id="marca-options">
                 {marcas.map((mar) => (
                   <option
@@ -1441,16 +1871,35 @@ const PanelAdmin = () => {
                 ))}
               </datalist>
 
-              {/* SECCIÓN DE 4 IMÁGENES */}
               <div className="image-upload-section">
                 <h4>
                   <FaImage className="section-icon" />
                   Imágenes del Producto (máximo 4)
                 </h4>
+
                 <p className="image-upload-info">
                   Puedes subir hasta 4 imágenes. La primera imagen será la
                   principal.
                 </p>
+
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "12px",
+                    fontSize: "14px",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={autoRemoveBg}
+                    onChange={(e) => setAutoRemoveBg(e.target.checked)}
+                    disabled={loading}
+                  />
+                  Quitar fondo automáticamente al subir imagen
+                </label>
+
                 <div className="image-grid">
                   {[0, 1, 2, 3].map((index) => (
                     <div
@@ -1461,12 +1910,17 @@ const PanelAdmin = () => {
                           : ""
                       }`}
                     >
+                      {processingImages[index] && (
+                        <div className="image-processing-overlay">
+                          <FaSpinner className="loading-spinner spinning" />
+                          <span>Procesando...</span>
+                        </div>
+                      )}
+
                       {formData.imagenes && formData.imagenes[index] ? (
                         <>
                           <img
-                            src={URL.createObjectURL(
-                              formData.imagenes[index]
-                            )}
+                            src={previewImage(formData.imagenes[index])}
                             alt={`Vista ${index + 1}`}
                             className="image-preview"
                           />
@@ -1474,7 +1928,7 @@ const PanelAdmin = () => {
                             type="button"
                             className="remove-image-btn"
                             onClick={() => removeImage(index)}
-                            disabled={loading}
+                            disabled={loading || processingImages[index]}
                           >
                             <FaTimes />
                           </button>
@@ -1485,12 +1939,13 @@ const PanelAdmin = () => {
                           <span>Imagen {index + 1}</span>
                         </div>
                       )}
+
                       <input
                         type="file"
                         className="image-upload-input"
-                        accept="image/*"
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
                         onChange={(e) => handleImageChange(e, index)}
-                        disabled={loading}
+                        disabled={loading || processingImages[index]}
                       />
                     </div>
                   ))}
@@ -1501,7 +1956,7 @@ const PanelAdmin = () => {
                 <button
                   type="submit"
                   className="btn btn--add"
-                  disabled={loading}
+                  disabled={loading || processingImages.some(Boolean)}
                 >
                   {loading ? (
                     <>
@@ -1515,12 +1970,14 @@ const PanelAdmin = () => {
                     </>
                   )}
                 </button>
+
                 <button
                   type="button"
                   className="btn btn--delete"
                   onClick={() => {
                     setModalVisible(false);
                     setEditingProduct(null);
+                    resetProcessingImages();
                   }}
                   disabled={loading}
                 >
@@ -1533,7 +1990,171 @@ const PanelAdmin = () => {
         </div>
       )}
 
-      {/* MODAL DETALLE PEDIDO */}
+      {promoModalVisible && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>
+              {editingPromo ? (
+                <>
+                  <FaEdit className="modal-icon" /> Editar Promoción
+                </>
+              ) : (
+                <>
+                  <FaPlus className="modal-icon" /> Nueva Promoción
+                </>
+              )}
+            </h3>
+
+            <input
+              type="text"
+              name="nombre"
+              placeholder="Nombre de la promoción"
+              value={promoForm.nombre}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <textarea
+              name="descripcion"
+              placeholder="Descripción"
+              value={promoForm.descripcion}
+              onChange={handlePromoChange}
+              rows="3"
+              disabled={promoLoading}
+            />
+
+            <input
+              type="number"
+              name="valor_descuento"
+              placeholder="Descuento (%)"
+              min="1"
+              max="90"
+              value={promoForm.valor_descuento}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <select
+              name="scope"
+              value={promoForm.scope}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            >
+              <option value="global">Global</option>
+              <option value="producto">Producto</option>
+              <option value="categoria">Categoría</option>
+            </select>
+
+            {promoForm.scope === "producto" && (
+              <select
+                name="idproducto"
+                value={promoForm.idproducto}
+                onChange={handlePromoChange}
+                disabled={promoLoading}
+              >
+                <option value="">Selecciona un producto</option>
+                {products.map((prod) => (
+                  <option key={prod.idproducto} value={prod.idproducto}>
+                    {prod.nombre}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {promoForm.scope === "categoria" && (
+              <select
+                name="idcategoria"
+                value={promoForm.idcategoria}
+                onChange={handlePromoChange}
+                disabled={promoLoading}
+              >
+                <option value="">Selecciona una categoría</option>
+                {categorias.map((cat) => (
+                  <option key={cat.idcategoria} value={cat.idcategoria}>
+                    {cat.descripcionCategoria || cat.descripcion}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <label style={{ marginTop: "8px", fontWeight: "600" }}>
+              Fecha y hora de inicio
+            </label>
+            <input
+              type="datetime-local"
+              name="fecha_inicio"
+              value={promoForm.fecha_inicio}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <label style={{ marginTop: "8px", fontWeight: "600" }}>
+              Fecha y hora de fin
+            </label>
+            <input
+              type="datetime-local"
+              name="fecha_fin"
+              value={promoForm.fecha_fin}
+              onChange={handlePromoChange}
+              disabled={promoLoading}
+            />
+
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginTop: "10px",
+              }}
+            >
+              <input
+                type="checkbox"
+                name="activo_manual"
+                checked={promoForm.activo_manual}
+                onChange={handlePromoChange}
+                disabled={promoLoading}
+              />
+              Activar promoción manualmente
+            </label>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn btn--add"
+                onClick={handleSavePromo}
+                disabled={promoLoading}
+              >
+                {promoLoading ? (
+                  <>
+                    <FaSpinner className="btn-icon spinning" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="btn-icon" />
+                    Guardar
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className="btn btn--delete"
+                onClick={() => {
+                  setPromoModalVisible(false);
+                  setEditingPromo(null);
+                  resetPromoForm();
+                }}
+                disabled={promoLoading}
+              >
+                <FaTimes className="btn-icon" />
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showPedidoModal && selectedPedido && (
         <div className="modal">
           <div className="modal-content pedido-modal">
@@ -1545,16 +2166,31 @@ const PanelAdmin = () => {
             <div className="pedido-detalle-grid">
               <div className="pedido-detalle-col">
                 <h4>Cliente</h4>
-                <p><strong>Nombre:</strong> {selectedPedido.cliente}</p>
-                <p><strong>Correo:</strong> {selectedPedido.correo || "N/D"}</p>
-                <p><strong>Teléfono:</strong> {selectedPedido.telefono || "N/D"}</p>
+                <p>
+                  <strong>Nombre:</strong> {selectedPedido.cliente}
+                </p>
+                <p>
+                  <strong>Correo:</strong> {selectedPedido.correo || "N/D"}
+                </p>
+                <p>
+                  <strong>Teléfono:</strong> {selectedPedido.telefono || "N/D"}
+                </p>
               </div>
+
               <div className="pedido-detalle-col">
                 <h4>Envío</h4>
-                <p><strong>Dirección:</strong> {selectedPedido.direccion || "Sin dirección"}</p>
-                <p><strong>Ciudad:</strong> {selectedPedido.ciudad || "N/D"}</p>
-                <p><strong>Fecha:</strong> {selectedPedido.fecha}</p>
+                <p>
+                  <strong>Dirección:</strong>{" "}
+                  {selectedPedido.direccion || "Sin dirección"}
+                </p>
+                <p>
+                  <strong>Ciudad:</strong> {selectedPedido.ciudad || "N/D"}
+                </p>
+                <p>
+                  <strong>Fecha:</strong> {selectedPedido.fecha}
+                </p>
               </div>
+
               <div className="pedido-detalle-col">
                 <h4>Resumen</h4>
                 <p>
@@ -1567,10 +2203,9 @@ const PanelAdmin = () => {
                     {selectedPedido.estado}
                   </span>
                 </p>
+
                 <div className="estado-selector">
-                  <label htmlFor="estadoPedido">
-                    Cambiar estado:
-                  </label>
+                  <label htmlFor="estadoPedido">Cambiar estado:</label>
                   <select
                     id="estadoPedido"
                     value={estadoEditando}
@@ -1607,6 +2242,7 @@ const PanelAdmin = () => {
                   </>
                 )}
               </button>
+
               <button
                 type="button"
                 className="btn btn--delete"
