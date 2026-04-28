@@ -1,12 +1,3 @@
-/* Reset general */
-
-html, body, #root, .registro-page-wrapper {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
 /* Estructura de página */
 .registro-page-wrapper {
   background-color: #F8FAFC;

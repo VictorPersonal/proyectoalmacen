@@ -1,40 +1,65 @@
-:root {
+/* ===== RESET GLOBAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== HTML & BODY ===== */
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-width: 320px;
+  background-color: #F8FAFC;
+  display: flex;
+  flex-direction: column;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light;
   color: #1E293B;
-  background-color: #F8FAFC;
-
+  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ===== ROOT ===== */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #F8FAFC;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== LINKS ===== */
 a {
   font-weight: 500;
   color: #22C55E;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #16A34A;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
+/* ===== TÍTULOS ===== */
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
+/* ===== BOTONES GLOBALES ===== */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -44,12 +69,91 @@ button {
   font-family: inherit;
   background-color: #F1F5F9;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.3s ease;
 }
+
 button:hover {
   border-color: #22C55E;
+  background-color: #F8FAFC;
 }
+
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid #22C55E;
+  outline-offset: 2px;
 }
+
+/* ===== PALETA DE COLORES GLOBAL (opcional) ===== */
+:root {
+  --verde-principal: #22C55E;
+  --verde-oscuro: #16A34A;
+  --verde-mas-oscuro: #15803D;
+  --gris-oscuro: #1E293B;
+  --gris-medio: #475569;
+  --gris-claro: #E2E8F0;
+  --gris-muy-claro: #F8FAFC;
+  --blanco: #FFFFFF;
+  --rojo-error: #EF4444;
+  --rojo-claro: #FEF2F2;
+  --verde-exito: #22C55E;
+  --verde-claro: #F0FDF4;
+}
+
+/* ===== SCROLLBAR (opcional, mejora estética) ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #E2E8F0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #22C55E;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #16A34A;
+}
+
+/* ===== UTILIDADES GLOBALES (opcional) ===== */
+.text-center {
+  text-align: center;
+}
+
+.text-green {
+  color: #22C55E;
+}
+
+.text-gray {
+  color: #475569;
+}
+
+.bg-white {
+  background-color: #FFFFFF;
+}
+
+.bg-gray {
+  background-color: #F8FAFC;
+}
+
+.mt-1 { margin-top: 5px; }
+.mt-2 { margin-top: 10px; }
+.mt-3 { margin-top: 15px; }
+.mt-4 { margin-top: 20px; }
+.mt-5 { margin-top: 25px; }
+
+.mb-1 { margin-bottom: 5px; }
+.mb-2 { margin-bottom: 10px; }
+.mb-3 { margin-bottom: 15px; }
+.mb-4 { margin-bottom: 20px; }
+.mb-5 { margin-bottom: 25px; }
+
+.p-1 { padding: 5px; }
+.p-2 { padding: 10px; }
+.p-3 { padding: 15px; }
+.p-4 { padding: 20px; }
+.p-5 { padding: 25px; }

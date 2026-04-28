@@ -304,38 +304,38 @@ const Home = () => {
   };
 
   // FUNCIÓN NUEVA PARA CARGAR PRODUCTOS POR CATEGORÍA
-  const cargarProductosPorCategoria = async (idCategoria) => {
+    const cargarProductosPorCategoria = async (idCategoria) => {
     setCategoriaSeleccionada(idCategoria);   
-    
     setCargando(true);
-    
-    const minLoadingTime = new Promise(resolve => setTimeout(resolve, 2000));
     
     setBusqueda("");
     setMensajeCategoria("");
 
     try {
-      const [_, response] = await Promise.all([
-        minLoadingTime,
-        fetch(`http://localhost:4000/api/categorias/${idCategoria}/productos`) //Revisar si borrar /categorias
-      ]);
-
+      const response = await fetch(`http://localhost:4000/api/productos`);
       const data = await response.json();
-
-      if (response.status === 404 || data.message === "No hay productos en esta categoría") {
-        setProductos([]);
-        setProductosFiltrados([]);
+      
+      console.log("🔍 Productos recibidos (primeros 3):", data.slice(0, 3));
+      console.log("🔍 ¿El primer producto tiene promoción?", data[0]?.tiene_promocion);
+      
+      // Filtrar por categoría
+      const productosFiltradosPorCategoria = data.filter(
+        producto => Number(producto.idcategoria) === Number(idCategoria)
+      );
+      
+      console.log(`✅ Filtrados categoría ${idCategoria}:`, productosFiltradosPorCategoria.length);
+      console.log("🎯 Primer producto filtrado:", productosFiltradosPorCategoria[0]);
+      console.log("🎯 ¿Tiene promoción?", productosFiltradosPorCategoria[0]?.tiene_promocion);
+      
+      setProductos(productosFiltradosPorCategoria);
+      setProductosFiltrados(productosFiltradosPorCategoria);
+      
+      if (productosFiltradosPorCategoria.length === 0) {
         setMensajeCategoria("No se encontraron productos para esta categoría.");
-        return;
       }
-
-      const productosData = Array.isArray(data) ? data : [];
-      setProductos(productosData);
-      setProductosFiltrados(productosData);
-
+      
     } catch (err) {
-      setProductos([]);
-      setProductosFiltrados([]);
+      console.error("Error cargando productos:", err);
       setMensajeCategoria("Error al cargar productos.");
     } finally {
       setCargando(false);

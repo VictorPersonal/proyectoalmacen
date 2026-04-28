@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FaTrashAlt, FaShoppingCart, FaHeart } from "react-icons/fa";
 import { RiErrorWarningLine } from "react-icons/ri";
 import Swal from "sweetalert2";
+import SimpleHeader from "./SimpleHeader";
+import SimpleFooter from "./SimpleFooter";
 import "../styles/components/FavoritoProducto.css";
 
 const FavoritoProducto = () => {
@@ -15,37 +18,37 @@ const FavoritoProducto = () => {
 
   const mostrarExito = (mensaje) => {
     Swal.fire({
-      icon: 'success',
-      title: '¡Éxito!',
+      icon: "success",
+      title: "¡Éxito!",
       text: mensaje,
-      confirmButtonColor: '#D84040',
-      confirmButtonText: 'Aceptar',
+      confirmButtonColor: "#22C55E",
+      confirmButtonText: "Aceptar",
       timer: 2000,
-      timerProgressBar: true
+      timerProgressBar: true,
     });
   };
 
   const mostrarError = (mensaje) => {
     Swal.fire({
-      icon: 'error',
-      title: 'Error',
+      icon: "error",
+      title: "Error",
       text: mensaje,
-      confirmButtonColor: '#D84040',
-      confirmButtonText: 'Entendido'
+      confirmButtonColor: "#22C55E",
+      confirmButtonText: "Entendido",
     });
   };
 
-  const mostrarConfirmacion = (titulo, texto, icono = 'warning') => {
+  const mostrarConfirmacion = (titulo, texto, icono = "warning") => {
     return Swal.fire({
       title: titulo,
       text: texto,
       icon: icono,
       showCancelButton: true,
-      confirmButtonColor: '#D84040',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true
+      confirmButtonColor: "#22C55E",
+      cancelButtonColor: "#475569",
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
     });
   };
 
@@ -76,28 +79,25 @@ const FavoritoProducto = () => {
       `¿Estás seguro de eliminar "${nombreProducto}" de favoritos?`
     );
 
-    if (!result.isConfirmed) {
-      return;
-    }
+    if (!result.isConfirmed) return;
 
     try {
-      const response = await fetch(`http://localhost:4000/api/favoritos/${idproducto}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:4000/api/favoritos/${idproducto}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al eliminar favorito");
       }
 
-      setFavoritos(favoritos.filter(item => item.idproducto !== idproducto));
-      
+      setFavoritos(favoritos.filter((item) => item.idproducto !== idproducto));
       mostrarExito("Producto eliminado de favoritos correctamente.");
-
     } catch (error) {
       console.error("❌ Error al eliminar favorito:", error);
       mostrarError(`Error: ${error.message}`);
@@ -108,7 +108,7 @@ const FavoritoProducto = () => {
     const result = await mostrarConfirmacion(
       "¿Agregar al carrito?",
       `¿Quieres agregar "${nombreProducto}" al carrito de compras?`,
-      'question'
+      "question"
     );
 
     if (result.isConfirmed) {
@@ -118,72 +118,112 @@ const FavoritoProducto = () => {
 
   if (loading) {
     return (
-      <div className="favoritos-loading-container">
-        <FaHeart className="favoritos-loading-icon" />
-        <p className="favoritos-mensaje-vacio">Cargando favoritos...</p>
-      </div>
+      <>
+        <SimpleHeader />
+        <main className="favoritos-main">
+          <div className="favoritos-loading-container">
+            <div className="favoritos-spinner"></div>
+            <p className="favoritos-loading-text">Cargando favoritos...</p>
+          </div>
+        </main>
+        <SimpleFooter />
+      </>
     );
   }
 
   return (
-    <div className="favoritos-container">
-      <h2 className="favoritos-titulo-favoritos">
-        <FaHeart className="favoritos-titulo-icono" /> Mis Productos Favoritos
-      </h2>
+    <>
+      <SimpleHeader />
 
-      {mensaje.texto && (
-        <div className={`favoritos-mensaje favoritos-${mensaje.tipo}`}>
-          {mensaje.tipo === "error" && <RiErrorWarningLine />}
-          {mensaje.texto}
-        </div>
-      )}
+      <main className="favoritos-main">
+        <div className="favoritos-container">
+          <h2 className="favoritos-titulo-favoritos">
+            <FaHeart className="favoritos-titulo-icono" /> Mis Productos Favoritos
+          </h2>
 
-      {favoritos.length === 0 ? (
-        <div className="favoritos-empty-favoritos">
-          <FaHeart className="favoritos-empty-icon" />
-          <p className="favoritos-mensaje-vacio">No tienes productos en favoritos.</p>
-        </div>
-      ) : (
-        <div className="favoritos-grid">
-          {favoritos.map((item) => (
-            <div key={item.idfavorito} className="favorito-card">
-              <div className="favorito-imagen-container">
-                <img
-                  src={item.imagen || "https://via.placeholder.com/300x200"}
-                  alt={item.nombre}
-                  className="favorito-imagen"
-                />
-                <div className="favorito-acciones">
-                  <button
-                    className="favoritos-btn-comprar-ahora"
-                    onClick={() => comprarAhora(item.idproducto, item.nombre)}
-                    title="Comprar ahora"
-                  >
-                    <FaShoppingCart /> Comprar ahora
-                  </button>
-                  <button
-                    className="favoritos-btn-eliminar"
-                    onClick={() => eliminarFavorito(item.idproducto, item.nombre)}
-                    title="Eliminar de favoritos"
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              </div>
-              <div className="favorito-info">
-                <h3 className="favoritos-nombre-producto">{item.nombre}</h3>
-                <p className="favoritos-precio">${parseFloat(item.precio).toFixed(2)}</p>
-                <div className="favoritos-producto-detalles">
-                  {item.descripcion && (
-                    <p className="favoritos-descripcion">{item.descripcion.substring(0, 100)}...</p>
-                  )}
-                </div>
-              </div>
+          {mensaje.texto && (
+            <div className={`favoritos-mensaje favoritos-${mensaje.tipo}`}>
+              {mensaje.tipo === "error" && <RiErrorWarningLine />}
+              {mensaje.texto}
             </div>
-          ))}
+          )}
+
+          {favoritos.length === 0 ? (
+            <div className="favoritos-empty-favoritos">
+              <FaHeart className="favoritos-empty-icon" />
+              <p className="favoritos-mensaje-vacio">
+                No tienes productos en favoritos.
+              </p>
+              <Link to="/" className="favoritos-explorar-btn">
+                Explorar productos
+              </Link>
+            </div>
+          ) : (
+            <>
+              <p className="favoritos-count">
+                {favoritos.length} producto
+                {favoritos.length !== 1 ? "s" : ""} en tu lista
+              </p>
+              <div className="favoritos-grid">
+                {favoritos.map((item) => (
+                  <div key={item.idfavorito} className="favorito-card">
+                    <div className="favorito-imagen-container">
+                      <img
+                        src={
+                          item.imagen ||
+                          "https://via.placeholder.com/300x200?text=Sin+imagen"
+                        }
+                        alt={item.nombre}
+                        className="favorito-imagen"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://via.placeholder.com/300x200?text=Sin+imagen";
+                        }}
+                      />
+                      <div className="favorito-acciones">
+                        <button
+                          className="favoritos-btn-comprar-ahora"
+                          onClick={() =>
+                            comprarAhora(item.idproducto, item.nombre)
+                          }
+                          title="Comprar ahora"
+                        >
+                          <FaShoppingCart /> Comprar ahora
+                        </button>
+                        <button
+                          className="favoritos-btn-eliminar"
+                          onClick={() =>
+                            eliminarFavorito(item.idproducto, item.nombre)
+                          }
+                          title="Eliminar de favoritos"
+                        >
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="favorito-info">
+                      <h3 className="favoritos-nombre-producto">
+                        {item.nombre}
+                      </h3>
+                      <p className="favoritos-precio">
+                        ${parseFloat(item.precio).toLocaleString("es-CO")}
+                      </p>
+                      {item.descripcion && (
+                        <p className="favoritos-descripcion">
+                          {item.descripcion.substring(0, 80)}...
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
-      )}
-    </div>
+      </main>
+
+      <SimpleFooter />
+    </>
   );
 };
 
