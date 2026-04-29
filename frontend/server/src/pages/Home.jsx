@@ -464,9 +464,9 @@ const Home = () => {
             <Link to="/promociones" className="nav-link">
               Promociones
             </Link>
-            <a href="#" className="nav-link">
+            <Link to="/contacto" className="nav-link">
               Contacto
-            </a>
+            </Link>
             <a href="#" className="nav-link">
               Ayuda
             </a>
@@ -573,50 +573,7 @@ const Home = () => {
             </button>
           </section>
 
-          {busqueda.trim().length === 0 && (
-            <div className="info-toggle-wrapper">
-              <button
-                className={`info-toggle-btn ${menuMasInfo ? 'abierto' : ''}`}
-                onClick={() => setMenuMasInfo(!menuMasInfo)}
-              >
-                Más información ▾
-              </button>
 
-              {menuMasInfo && (
-                <div className="info-panel">
-                  <div className="info-column">
-                    <h4>Acerca de</h4>
-                    <Link to="/Acerca-de/Dulce-Hogar">Dulce Hogar</Link>
-                  </div>
-
-                  <div className="info-column">
-                    <h4>Redes sociales</h4>
-                    <a
-                      href="https://www.facebook.com/dulce.hogar.3192479"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Facebook
-                    </a>
-                    <a
-                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Instagram
-                    </a>
-                    <a
-                      href="https://wa.me/573103749429?text=Hola,+quiero+más+información"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      WhatsApp
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </main>
       ) : (
         /* Mostrar productos ya sea por búsqueda o por categoría */
