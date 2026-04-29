@@ -4,7 +4,7 @@ import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import RecuperarContrasena from "./pages/RecuperarContrasena";
 import RestablecerContrasena from "./pages/RestablecerContrasena";
-import PanelAdmin from "./pages/PanelAdmin"; 
+import PanelAdmin from "./pages/PanelAdmin";
 import ActualizarDatos from "./pages/ActualizarDatos";
 import FormaEntrega from "./pages/Checkout/FormaEntrega";
 import Pago from "./pages/Checkout/Pago";
@@ -12,7 +12,7 @@ import Favoritos from "./pages/Favorito";
 import Categorias from "./pages/Categoriaspages";
 import TerminosYCondiciones from "./pages/Terminosycondiciones";
 import PagoExitoso from "./pages/Checkout/PagoExitoso";
-{/*import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";*/}
+import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";
 import ContactoDH from "./pages/Contacto";
 import ModificarDireccion from "./pages/Checkout/ModificarDireccion";
 import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
@@ -44,7 +44,7 @@ function AppWrapper() {
         <Route path="/checkout/forma-entrega/pago" element={<Pago />} />
         <Route path="/terminos-y-condiciones" element={<TerminosYCondiciones />} />
         <Route path="/checkout/forma-entrega/pago/exitoso" element={<PagoExitoso />} />
-        {/*<Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />*/}
+        <Route path="/Acerca-de/Dulce-Hogar" element={<HistoriaDulceHogar />} />
         <Route path="/contacto" element={<ContactoDH />} />
         <Route path="/categorias" element={<Categorias />} />
         <Route path="/modificar-direccion" element={<ModificarDireccion />} />

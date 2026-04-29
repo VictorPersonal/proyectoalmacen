@@ -1,0 +1,497 @@
+
+.contacto-wrapper {
+    background-color: #F8FAFC;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ─── HERO ─── */
+.contacto-hero {
+    background: linear-gradient(135deg, #15803D 0%, #16A34A 50%, #22C55E 100%);
+    padding: 70px 24px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.contacto-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+}
+
+.contacto-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+}
+
+.contacto-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.contacto-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: #fff;
+    margin: 0 0 14px;
+    line-height: 1.15;
+}
+
+.contacto-hero p {
+    color: rgba(255,255,255,0.85);
+    font-size: 16px;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ─── LAYOUT PRINCIPAL ─── */
+.contacto-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 56px 24px 64px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+}
+
+/* ─── COLUMNA IZQUIERDA ─── */
+.contacto-col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ─── TARJETA GENÉRICA ─── */
+.contacto-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    border: 1px solid #E2E8F0;
+}
+
+.contacto-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #1E293B;
+    margin: 0 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.contacto-card-title svg {
+    color: #22C55E;
+}
+
+/* ─── INFO DE CONTACTO ─── */
+.contacto-info-list {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contacto-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.contacto-info-icon {
+    width: 40px; height: 40px;
+    background: #F0FDF4;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: #22C55E;
+    font-size: 16px;
+}
+
+.contacto-info-text strong {
+    display: block;
+    font-size: 13px;
+    color: #64748B;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.contacto-info-text span {
+    font-size: 15px;
+    color: #1E293B;
+    font-weight: 400;
+}
+
+/* ─── REDES SOCIALES ─── */
+.contacto-redes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contacto-red {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: all 0.25s ease;
+    border: 2px solid transparent;
+}
+
+.contacto-red-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.contacto-red:hover .contacto-red-icon {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.contacto-red-label {
+    flex: 1;
+    color: #1E293B;
+}
+
+.contacto-red-arrow {
+    color: #94A3B8;
+    font-size: 13px;
+    transition: transform 0.2s ease;
+}
+
+.contacto-red:hover .contacto-red-arrow {
+    transform: translateX(4px);
+    color: #475569;
+}
+
+/* Facebook */
+.contacto-red-facebook {
+    background: #F0F4FF;
+    border-color: #DBEAFE;
+}
+.contacto-red-facebook:hover {
+    background: #EFF6FF;
+    border-color: #3B82F6;
+}
+.contacto-red-facebook .contacto-red-icon {
+    background: #1877F2;
+    color: #fff;
+}
+
+/* Instagram */
+.contacto-red-instagram {
+    background: #FFF0F8;
+    border-color: #FBCFE8;
+}
+.contacto-red-instagram:hover {
+    background: #FDF2F8;
+    border-color: #EC4899;
+}
+.contacto-red-instagram .contacto-red-icon {
+    background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF);
+    color: #fff;
+}
+
+/* WhatsApp */
+.contacto-red-whatsapp {
+    background: #F0FDF4;
+    border-color: #BBF7D0;
+}
+.contacto-red-whatsapp:hover {
+    background: #DCFCE7;
+    border-color: #22C55E;
+}
+.contacto-red-whatsapp .contacto-red-icon {
+    background: #25D366;
+    color: #fff;
+}
+
+/* ─── BANNER HISTORIA ─── */
+.contacto-historia-banner {
+    background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.contacto-historia-banner:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.contacto-historia-banner::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.15);
+}
+
+.contacto-historia-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34,197,94,0.2);
+    color: #4ADE80;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(34,197,94,0.3);
+}
+
+.contacto-historia-banner h3 {
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 22px;
+    margin: 0 0 8px;
+}
+
+.contacto-historia-banner p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+.contacto-historia-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #22C55E;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.contacto-historia-banner:hover .contacto-historia-btn {
+    background: #16A34A;
+}
+
+/* ─── FORMULARIO ─── */
+.contacto-col-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.contacto-form-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    border: 1px solid #E2E8F0;
+    flex: 1;
+}
+
+.contacto-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 6px;
+}
+
+.contacto-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.contacto-form-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.contacto-form-label svg {
+    color: #22C55E;
+    font-size: 13px;
+}
+
+.contacto-form-input,
+.contacto-form-textarea {
+    padding: 12px 16px;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1E293B;
+    background: #FAFAFA;
+    outline: none;
+    transition: all 0.2s ease;
+    resize: none;
+}
+
+.contacto-form-input:focus,
+.contacto-form-textarea:focus {
+    border-color: #22C55E;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+}
+
+.contacto-form-input::placeholder,
+.contacto-form-textarea::placeholder {
+    color: #94A3B8;
+}
+
+.contacto-form-textarea {
+    min-height: 130px;
+}
+
+.contacto-form-btn {
+    background: linear-gradient(135deg, #16A34A, #22C55E);
+    color: #fff;
+    border: none;
+    padding: 13px 24px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: all 0.25s ease;
+    margin-top: 4px;
+}
+
+.contacto-form-btn:hover {
+    background: linear-gradient(135deg, #15803D, #16A34A);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(22,163,74,0.35);
+}
+
+/* ─── ÉXITO ─── */
+.contacto-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    animation: fadeInUp 0.4s ease;
+}
+
+.contacto-success-icon {
+    width: 64px; height: 64px;
+    background: #F0FDF4;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    color: #22C55E;
+    border: 2px solid #BBF7D0;
+}
+
+.contacto-success h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #1E293B;
+    margin: 0;
+}
+
+.contacto-success p {
+    color: #64748B;
+    font-size: 14px;
+    margin: 0;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── HORARIO ─── */
+.contacto-horario-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 14px;
+}
+
+.contacto-horario-row:last-child {
+    border-bottom: none;
+}
+
+.contacto-horario-dia {
+    color: #475569;
+    font-weight: 500;
+}
+
+.contacto-horario-hora {
+    color: #1E293B;
+    font-weight: 600;
+}
+
+.contacto-horario-cerrado {
+    color: #EF4444;
+    font-weight: 600;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 860px) {
+    .contacto-main {
+    grid-template-columns: 1fr;
+    padding: 36px 20px 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contacto-hero {
+    padding: 50px 16px 60px;
+    }
+    .contacto-card, .contacto-form-card {
+    padding: 20px 18px;
+    }
+    .contacto-historia-banner {
+    padding: 22px 18px;
+    }
+}
