@@ -12,11 +12,17 @@
 }
 
 /* ===== ESTRUCTURA PRINCIPAL ===== */
+.favoritos-page-wrapper {
+  background-color: #F8FAFC;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .favoritos-main {
-  flex: 1;
+  flex: 1; /* ← Esto hace que crezca y ocupe TODO el espacio disponible */
   padding: 40px 20px;
   background-color: #F8FAFC;
-  min-height: calc(100vh - 180px); /* descuenta header + footer */
   width: 100%;
   box-sizing: border-box;
 }

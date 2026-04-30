@@ -40,48 +40,51 @@ body {
     width: 100%;
 }
 
-/* ===== CONTENEDOR PRINCIPAL ===== */
+/* ===== CONTENEDOR PRINCIPAL - IGUAL QUE DIRECCIÓN ===== */
 .actualizar-container {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 40px 20px;
     background-color: #F8FAFC;
     width: 100%;
     box-sizing: border-box;
     margin: 0;
+    min-height: 0;
 }
 
-/* ===== FORMULARIO - SOLO MÁS ANCHO ===== */
+/* ===== FORMULARIO - TAMAÑO PERFECTO (NI GRANDE NI PEQUEÑO) ===== */
 .actualizar-form-wrapper {
     background-color: #FFFFFF;
-    border-radius: 16px;
-    padding: 15px 20px; /* ← ALTO: se mantiene pequeño */
+    border-radius: 20px;
+    padding: 25px 30px;
     width: 100%;
-    max-width: 500px; /* ← ANCHO: aumentado */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    margin: 10px auto;
+    max-width: 550px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
 }
 
 .actualizar-form-title {
     text-align: center;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 600;
     color: #1E293B;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 /* ===== MENSAJES ===== */
 .actualizar-mensaje {
-    padding: 6px 10px;
-    border-radius: 10px;
-    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 16px;
     text-align: center;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .actualizar-mensaje-exito {
@@ -98,29 +101,29 @@ body {
 
 .actualizar-cargando {
     text-align: center;
-    padding: 8px;
+    padding: 10px;
     color: #475569;
     font-style: italic;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 /* ===== FORMULARIO ===== */
 .actualizar-form {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .actualizar-campos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px; /* ← Espacio entre columnas aumentado */
+    gap: 15px;
 }
 
 .actualizar-form-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .actualizar-form-group.actualizar-direccion-completa {
@@ -128,17 +131,17 @@ body {
 }
 
 .actualizar-form-group label {
-    font-size: 11px;
+    font-size: 13px;
     color: #1E293B;
     font-weight: 600;
 }
 
 .actualizar-form-group input,
 .actualizar-form-group select {
-    padding: 6px 10px;
+    padding: 10px 14px;
     border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    font-size: 12px;
+    border-radius: 12px;
+    font-size: 14px;
     background-color: #FFFFFF;
     color: #1E293B;
     outline: none;
@@ -148,12 +151,12 @@ body {
 .actualizar-form-group input:focus,
 .actualizar-form-group select:focus {
     border-color: #22C55E;
-    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .actualizar-form-group input::placeholder {
     color: #94A3B8;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 /* ===== CAMPOS BLOQUEADOS ===== */
@@ -165,37 +168,37 @@ body {
 }
 
 .actualizar-texto-ayuda {
-    font-size: 9px;
+    font-size: 11px;
     color: #475569;
-    margin-top: 2px;
+    margin-top: 3px;
     font-style: italic;
 }
 
 /* ===== BOTONES ===== */
 .actualizar-botones-accion {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: center;
-    margin-top: 12px;
+    margin-top: 18px;
 }
 
 .actualizar-btn-actualizar {
     background-color: #22C55E;
     color: #FFFFFF;
     border: none;
-    padding: 6px 16px;
-    font-size: 12px;
+    padding: 10px 24px;
+    font-size: 14px;
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s;
-    min-width: 120px; /* ← Botones más anchos también */
+    min-width: 140px;
 }
 
 .actualizar-btn-actualizar:hover:not(:disabled) {
     background-color: #16A34A;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .actualizar-btn-actualizar:active:not(:disabled) {
@@ -213,13 +216,13 @@ body {
     background-color: transparent;
     color: #475569;
     border: 1px solid #E2E8F0;
-    padding: 6px 16px;
-    font-size: 12px;
+    padding: 10px 24px;
+    font-size: 14px;
     font-weight: 500;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s;
-    min-width: 120px;
+    min-width: 140px;
 }
 
 .actualizar-btn-cancelar:hover {
@@ -236,11 +239,11 @@ body {
 /* ===== INFORMACIÓN DE AYUDA ===== */
 .actualizar-info-ayuda {
     text-align: center;
-    margin-top: 12px;
-    padding-top: 8px;
+    margin-top: 18px;
+    padding-top: 12px;
     border-top: 1px solid #E2E8F0;
     color: #475569;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 .actualizar-info-ayuda small {
@@ -252,11 +255,11 @@ body {
     border: 2px solid #FFFFFF;
     border-top: 2px solid transparent;
     border-radius: 50%;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     animation: spin 1s linear infinite;
     display: inline-block;
-    margin-right: 4px;
+    margin-right: 6px;
 }
 
 @keyframes spin {
@@ -267,23 +270,23 @@ body {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .actualizar-container {
-        padding: 15px;
+        padding: 30px 15px;
     }
     
     .actualizar-form-wrapper {
-        padding: 15px;
+        padding: 20px 25px;
         max-width: 100%;
-        margin: 10px auto;
+        margin: 0 auto;
     }
     
     .actualizar-campos-grid {
         grid-template-columns: 1fr;
-        gap: 8px;
+        gap: 12px;
     }
     
     .actualizar-botones-accion {
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
     }
     
     .actualizar-btn-actualizar,
@@ -293,39 +296,40 @@ body {
     }
     
     .actualizar-form-title {
-        font-size: 16px;
-        margin-bottom: 12px;
+        font-size: 20px;
+        margin-bottom: 18px;
     }
 }
 
 @media (max-width: 480px) {
     .actualizar-container {
-        padding: 10px;
+        padding: 20px 15px;
     }
     
     .actualizar-form-wrapper {
-        padding: 12px;
-        margin: 8px auto;
+        padding: 15px;
+        max-width: 100%;
+        margin: 0 auto;
     }
     
     .actualizar-form-title {
-        font-size: 16px;
-        margin-bottom: 12px;
+        font-size: 18px;
+        margin-bottom: 15px;
     }
     
     .actualizar-form-group input,
     .actualizar-form-group select {
-        padding: 6px 8px;
-        font-size: 11px;
+        padding: 8px 12px;
+        font-size: 13px;
     }
     
     .actualizar-btn-actualizar,
     .actualizar-btn-cancelar {
-        padding: 6px 12px;
-        font-size: 11px;
+        padding: 8px 20px;
+        font-size: 13px;
     }
     
     .actualizar-form-group label {
-        font-size: 10px;
+        font-size: 12px;
     }
 }
