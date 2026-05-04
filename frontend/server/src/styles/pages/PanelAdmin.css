@@ -1222,3 +1222,273 @@
   border-radius: 8px;
   font-weight: 600;
 }
+
+
+/* ====== PROMOCIONES - TABLA RESPONSIVE ====== */
+
+.promos-section {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.promos-section .search-wrapper {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.promos-section .search-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.promos-section .btn--add-secondary {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Contenedor que sí permite scroll horizontal */
+.promos-section .table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 16px;
+}
+
+/* Tabla más ancha que el contenedor para activar scroll */
+.promos-section .products-table {
+  min-width: 1250px;
+  width: 1250px;
+  table-layout: fixed;
+}
+
+/* Celdas */
+.promos-section .products-table th,
+.promos-section .products-table td {
+  padding: 14px 12px;
+  vertical-align: middle;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Anchos por columna */
+.promos-section .products-table th:nth-child(1),
+.promos-section .products-table td:nth-child(1) {
+  width: 50px;
+}
+
+.promos-section .products-table th:nth-child(2),
+.promos-section .products-table td:nth-child(2) {
+  width: 140px;
+}
+
+.promos-section .products-table th:nth-child(3),
+.promos-section .products-table td:nth-child(3) {
+  width: 100px;
+}
+
+.promos-section .products-table th:nth-child(4),
+.promos-section .products-table td:nth-child(4) {
+  width: 110px;
+}
+
+.promos-section .products-table th:nth-child(5),
+.promos-section .products-table td:nth-child(5),
+.promos-section .products-table th:nth-child(6),
+.promos-section .products-table td:nth-child(6) {
+  width: 160px;
+  white-space: normal;
+}
+
+.promos-section .products-table th:nth-child(7),
+.promos-section .products-table td:nth-child(7) {
+  width: 120px;
+}
+
+.promos-section .products-table th:nth-child(8),
+.promos-section .products-table td:nth-child(8) {
+  width: 140px;
+}
+
+.promos-section .products-table th:nth-child(9),
+.promos-section .products-table td:nth-child(9) {
+  width: 160px;
+}
+
+.promos-section .products-table th:nth-child(10),
+.promos-section .products-table td:nth-child(10) {
+  width: 170px;
+}
+
+/* Botones de acciones */
+.promos-section .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.promos-section .action-buttons .btn {
+  width: 100%;
+  min-width: 120px;
+  justify-content: center;
+  padding: 8px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Estados */
+.promos-section .status-badge,
+.promos-section .status-active,
+.promos-section .status-inactive,
+.promos-section .status-pending,
+.promos-section .status-expired {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 105px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Scrollbar visible */
+.promos-section .table-wrapper::-webkit-scrollbar {
+  height: 10px;
+}
+
+.promos-section .table-wrapper::-webkit-scrollbar-track {
+  background: #e5e5e5;
+  border-radius: 10px;
+}
+
+.promos-section .table-wrapper::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 10px;
+}
+
+.promos-section .table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* ===== FIX DEFINITIVO TABLA PROMOCIONES ===== */
+
+.main-content {
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.promos-section {
+  width: 100% !important;
+  max-width: calc(100vw - 220px) !important;
+  overflow: hidden !important;
+}
+
+.promos-section .search-wrapper {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.promos-section .table-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: scroll !important;
+  overflow-y: visible !important;
+  display: block !important;
+  padding-bottom: 18px !important;
+}
+
+.promos-section .products-table {
+  width: 1350px !important;
+  min-width: 1350px !important;
+  max-width: none !important;
+  table-layout: fixed !important;
+}
+
+.promos-section .products-table th,
+.promos-section .products-table td {
+  padding: 14px 12px !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+
+.promos-section .products-table th:nth-child(1),
+.promos-section .products-table td:nth-child(1) {
+  width: 50px !important;
+}
+
+.promos-section .products-table th:nth-child(2),
+.promos-section .products-table td:nth-child(2) {
+  width: 140px !important;
+}
+
+.promos-section .products-table th:nth-child(3),
+.promos-section .products-table td:nth-child(3) {
+  width: 100px !important;
+}
+
+.promos-section .products-table th:nth-child(4),
+.promos-section .products-table td:nth-child(4) {
+  width: 120px !important;
+}
+
+.promos-section .products-table th:nth-child(5),
+.promos-section .products-table td:nth-child(5),
+.promos-section .products-table th:nth-child(6),
+.promos-section .products-table td:nth-child(6) {
+  width: 170px !important;
+  white-space: normal !important;
+}
+
+.promos-section .products-table th:nth-child(7),
+.promos-section .products-table td:nth-child(7) {
+  width: 130px !important;
+}
+
+.promos-section .products-table th:nth-child(8),
+.promos-section .products-table td:nth-child(8) {
+  width: 150px !important;
+}
+
+.promos-section .products-table th:nth-child(9),
+.promos-section .products-table td:nth-child(9) {
+  width: 170px !important;
+}
+
+.promos-section .products-table th:nth-child(10),
+.promos-section .products-table td:nth-child(10) {
+  width: 190px !important;
+}
+
+.promos-section .action-buttons {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+}
+
+.promos-section .action-buttons .btn {
+  width: 130px !important;
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+  justify-content: center !important;
+}
+
+/* Scroll visible */
+.promos-section .table-wrapper::-webkit-scrollbar {
+  height: 12px !important;
+}
+
+.promos-section .table-wrapper::-webkit-scrollbar-track {
+  background: #d9d9d9 !important;
+  border-radius: 10px !important;
+}
+
+.promos-section .table-wrapper::-webkit-scrollbar-thumb {
+  background: #777 !important;
+  border-radius: 10px !important;
+}

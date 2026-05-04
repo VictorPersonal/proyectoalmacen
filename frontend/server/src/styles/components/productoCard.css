@@ -373,3 +373,38 @@
   color: #d84040;
   margin: 0;
 }
+
+.card {
+  position: relative;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #d84040;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.precio-original {
+  text-decoration: line-through;
+  color: gray;
+  margin: 0;
+}
+
+.precio-descuento {
+  color: #d84040;
+  font-weight: bold;
+  font-size: 18px;
+  margin: 0;
+}
+
+.promo-timer {
+  font-size: 12px;
+  color: #ff5722;
+  margin-top: 5px;
+}

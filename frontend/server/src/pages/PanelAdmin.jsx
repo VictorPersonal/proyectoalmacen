@@ -103,6 +103,8 @@ const PanelAdmin = () => {
     imagenes: [],
   });
 
+  const [, setPromoClock] = useState(Date.now());
+
   /* =========================================================
      BLOQUEAR BOTÓN ATRÁS SOLO EN ADMIN
   ========================================================= */
@@ -240,6 +242,17 @@ const PanelAdmin = () => {
     if (!file) return null;
     return URL.createObjectURL(file);
   };
+
+
+  useEffect(() => {
+    if (currentSection !== "promociones") return;
+
+    const interval = setInterval(() => {
+      setPromoClock(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [currentSection]);
 
   /* =========================================================
      HELPERS PROMOCIONES
@@ -1176,6 +1189,54 @@ const PanelAdmin = () => {
     }
   };
 
+  const getPromoEstadoReal = (promo) => {
+    const ahora = new Date();
+    const inicio = new Date(promo.fecha_inicio);
+    const fin = new Date(promo.fecha_fin);
+
+    if (!promo.activo_manual) {
+      return { texto: "Desactivada", clase: "status-inactive" };
+    }
+
+    if (ahora < inicio) {
+      return { texto: "Programada", clase: "status-pending" };
+    }
+
+    if (ahora >= inicio && ahora <= fin) {
+      return { texto: "Activa ahora", clase: "status-active" };
+    }
+
+    return { texto: "Vencida", clase: "status-expired" };
+  };
+
+  const getPromoCountdown = (promo) => {
+    const ahora = new Date();
+    const inicio = new Date(promo.fecha_inicio);
+    const fin = new Date(promo.fecha_fin);
+
+    let diff = 0;
+    let texto = "";
+
+    if (!promo.activo_manual) return "Desactivada";
+
+    if (ahora < inicio) {
+      diff = inicio - ahora;
+      texto = "Empieza en";
+    } else if (ahora >= inicio && ahora <= fin) {
+      diff = fin - ahora;
+      texto = "Termina en";
+    } else {
+      return "Finalizada";
+    }
+
+    const s = Math.floor(diff / 1000);
+    const h = String(Math.floor(s / 3600)).padStart(2, "0");
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+    const sec = String(s % 60).padStart(2, "0");
+
+    return `${texto} ${h}:${m}:${sec}`;
+  };
+
   return (
     <div className="admin-panel">
       <aside className="sidebar">
@@ -1689,16 +1750,15 @@ const PanelAdmin = () => {
                     <th>Nombre</th>
                     <th>Descuento</th>
                     <th>Scope</th>
-                    <th>Inicio</th>
-                    <th>Fin</th>
-                    <th>Estado</th>
+                    <th>Estado real</th>
+                    <th>Tiempo</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPromociones.length === 0 ? (
                     <tr>
-                      <td colSpan="8" className="no-products">
+                      <td colSpan="10" className="no-products">
                         {searchTerm
                           ? "No se encontraron promociones"
                           : "No hay promociones registradas"}
@@ -1711,54 +1771,40 @@ const PanelAdmin = () => {
                         <td>{promo.nombre}</td>
                         <td>{promo.valor_descuento}%</td>
                         <td>{promo.scope}</td>
+
+
                         <td>
-                          {new Date(promo.fecha_inicio).toLocaleString("es-CO")}
+                          {(() => {
+                            const estado = getPromoEstadoReal(promo);
+                            return <span className={estado.clase}>{estado.texto}</span>;
+                          })()}
                         </td>
-                        <td>
-                          {new Date(promo.fecha_fin).toLocaleString("es-CO")}
-                        </td>
-                        <td>
-                          <span
-                            className={`status-badge ${
-                              promo.activo_manual
-                                ? "status-active"
-                                : "status-inactive"
-                            }`}
-                          >
-                            {promo.activo_manual ? "Activa" : "Desactivada"}
-                          </span>
-                        </td>
+
+                        <td>{getPromoCountdown(promo)}</td>
+
                         <td>
                           <div className="action-buttons">
-                            <button
-                              className="btn btn--edit"
-                              onClick={() => handleEditPromo(promo)}
-                            >
+                            <button className="btn btn--edit" onClick={() => handleEditPromo(promo)}>
                               <FaEdit className="btn-icon" />
                               Editar
                             </button>
 
                             <button
                               className={`btn btn--status ${
-                                promo.activo_manual
-                                  ? "btn--inactive"
-                                  : "btn--add"
+                                promo.activo_manual ? "btn--inactive" : "btn--add"
                               }`}
                               onClick={() => togglePromoEstado(promo)}
                             >
                               {promo.activo_manual ? "Desactivar" : "Activar"}
                             </button>
 
-                            <button
-                              className="btn btn--delete"
-                              onClick={() => deletePromo(promo)}
-                            >
+                            <button className="btn btn--delete" onClick={() => deletePromo(promo)}>
                               <FaTrash className="btn-icon" />
                               Eliminar
                             </button>
                           </div>
                         </td>
-                      </tr>
+                      </tr> 
                     ))
                   )}
                 </tbody>
