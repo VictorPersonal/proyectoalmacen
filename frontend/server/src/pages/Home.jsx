@@ -404,7 +404,7 @@ const Home = () => {
             </button>
           </div>
 
-          <div className="nav-links" id="nav-links">
+          <div className="nav-links" id="nav-links"> {/*Se deve mover el contenido de este div*/ }
             <div className="categorias-menu">
               <button className="nav-link categorias-btn" onClick={toggleMenu}>
                 Categorías ∨
@@ -473,7 +473,7 @@ const Home = () => {
           </div>
         </nav>
 
-        <div className="auth-links" id="auth-links">
+        <div className="auth-links" id="auth-links"> {/*Se deve mover el contenido de este div*/ }
           {usuarioLogueado ? (
             <div className="perfil-menu">
               <button className="perfil-btn" onClick={togglePerfilMenu}>
