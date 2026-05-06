@@ -464,7 +464,76 @@ const Home = () => {
         </div>
 
 
+
+
         </nav>
+
+        {/* ← nav-links FUERA del nav, pero dentro del header */}
+        <div className="nav-links" id="nav-links"> {/*Se deve mover el contenido de este div*/ }
+          <div className="categorias-menu">
+            <button className="nav-link categorias-btn" onClick={toggleMenu}>
+              Categorías ∨
+            </button>
+
+            {menuAbierto && (
+              <div className="menu-desplegable">
+                <div className="categorias-lista">
+                  {categorias.map((categoria, index) => (
+                    <div key={index} className="categoria-item-container">
+                      {categoria.subcategorias.length > 1 ? (
+                        <div
+                          className="categoria-item con-submenu"
+                          onMouseEnter={() => toggleSubmenu(index)}
+                          onMouseLeave={() => setSubmenuAbierto(null)}
+                        >
+                          <span>{categoria.nombre}</span>
+                          <FaChevronRight className="submenu-icon" />
+
+                          {submenuAbierto === index && (
+                            <div className="submenu">
+                              {categoria.subcategorias.map((sub, i) => (
+                                <button
+                                  key={i}
+                                  className="submenu-item"
+                                  onClick={() => {
+                                    cargarProductosPorCategoria(sub.id);
+                                    setMenuAbierto(false);
+                                  }}
+                                >
+                                  {sub.nombre}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          className="categoria-item"
+                          onClick={() => {
+                            cargarProductosPorCategoria(
+                              categoria.subcategorias[0].id
+                            );
+                            setMenuAbierto(false);
+                          }}
+                        >
+                          {categoria.nombre}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Link to="/promociones" className="nav-link">
+            Promociones
+          </Link>
+
+          <a href="#" className="nav-link">
+            Ayuda
+          </a>
+        </div>
 
       </header>
 

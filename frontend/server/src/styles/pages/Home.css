@@ -11,9 +11,9 @@ header {
 
 .navbar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 8px 20px;
   width: 100%;
 }
 
@@ -142,7 +142,8 @@ header {
   gap: 20px;
   justify-content: center;
   width: 100%;
-  padding: 6px 0 4px 0;
+  padding: 4px 0 8px 0;
+  
 }
 
 .nav-link {
