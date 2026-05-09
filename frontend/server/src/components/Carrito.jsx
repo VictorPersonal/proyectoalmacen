@@ -57,16 +57,28 @@ const Carrito = ({ abierto, onCerrar }) => {
                 ? resProducto.data.producto_imagen[0].url 
                 : null;
               
+              const precioAplicado = Number(
+                resProducto.data.precio_final || productoCarrito.precio_final || productoCarrito.precio || 0
+              );
+
+              const cantidad = Number(productoCarrito.cantidad || 1);
+
               return {
                 id: productoCarrito.idproducto,
                 idproducto: productoCarrito.idproducto,
                 nombre: productoCarrito.nombre,
-                precio: productoCarrito.precio,
-                stock: resProducto.data.stock, 
+                precio: precioAplicado,
+                precio_original: Number(resProducto.data.precio_original || productoCarrito.precio_original || precioAplicado),
+                precio_final: precioAplicado,
+                descuento_porcentaje: Number(resProducto.data.descuento_porcentaje || productoCarrito.descuento_porcentaje || 0),
+                tiene_promocion: Boolean(resProducto.data.tiene_promocion || productoCarrito.tiene_promocion),
+                promocion_nombre: resProducto.data.promocion_nombre || productoCarrito.promocion_nombre || null,
+                promocion_fecha_fin: resProducto.data.promocion_fecha_fin || productoCarrito.promocion_fecha_fin || null,
+                stock: resProducto.data.stock,
                 producto_imagen: resProducto.data.producto_imagen || [],
                 imagen_url: primeraImagen,
-                cantidad: productoCarrito.cantidad,
-                subtotal: productoCarrito.subtotal
+                cantidad,
+                subtotal: precioAplicado * cantidad,
               };
             } catch (error) {
               console.error(`❌ Error obteniendo producto ${productoCarrito.idproducto}:`, error);
@@ -368,9 +380,27 @@ const Carrito = ({ abierto, onCerrar }) => {
                       <h4 className="carrito-product-name">
                         {producto.nombre || "Producto sin nombre"}
                       </h4>
-                      <p className="carrito-product-unit-price">
-                        ${(producto.subtotal / producto.cantidad).toFixed(2)} c/u
-                      </p>
+                      <div className="carrito-product-unit-price">
+                        {producto.tiene_promocion ? (
+                          <>
+                            <span className="carrito-old-price">
+                              ${Number(producto.precio_original).toLocaleString("es-CO")} c/u
+                            </span>
+                            <span className="carrito-new-price">
+                              ${Number(producto.precio_final).toLocaleString("es-CO")} c/u
+                            </span>
+                          </>
+                        ) : (
+                          <span>
+                            ${Number(producto.precio).toLocaleString("es-CO")} c/u
+                          </span>
+                        )}
+                      </div>
+                        {producto.tiene_promocion && (
+                          <span className="carrito-promo-badge">
+                            -{producto.descuento_porcentaje}% aplicado
+                          </span>
+                        )}
                       
                       {/* Controles de cantidad con validación de stock */}
                       <div className="carrito-quantity-controls">
@@ -415,7 +445,7 @@ const Carrito = ({ abierto, onCerrar }) => {
                       <div className="carrito-subtotal-container">
                         <span className="carrito-subtotal-label">Subtotal</span>
                         <span className="carrito-product-subtotal">
-                          ${producto.subtotal}
+                          ${Number(producto.subtotal || 0).toLocaleString("es-CO")}
                         </span>
                       </div>
                       <button

@@ -18,6 +18,32 @@ const FormaEntrega = () => {
   const location = useLocation();
   const ejecutadoRef = useRef(false);
 
+  const normalizarProductoConPromo = (producto, cantidadBase = 1) => {
+    const cantidad = Number(producto.cantidad || cantidadBase || 1);
+
+    const precioAplicado = Number(
+      producto.precio_final ||
+        producto.precioFinal ||
+        producto.precio ||
+        0
+    );
+
+    return {
+      ...producto,
+      id: producto.id || producto.idproducto,
+      idproducto: producto.idproducto || producto.id,
+      precio: precioAplicado,
+      precio_final: precioAplicado,
+      precio_original: Number(producto.precio_original || producto.precio || precioAplicado),
+      descuento_porcentaje: Number(producto.descuento_porcentaje || 0),
+      tiene_promocion: Boolean(producto.tiene_promocion),
+      promocion_nombre: producto.promocion_nombre || null,
+      promocion_fecha_fin: producto.promocion_fecha_fin || null,
+      cantidad,
+      subtotal: precioAplicado * cantidad,
+    };
+  };
+
   useEffect(() => {
     const cargarDatos = async () => {
       if (ejecutadoRef.current) {
@@ -30,36 +56,35 @@ const FormaEntrega = () => {
         setLoading(true);
 
         const compraState = location.state;
-        console.log("🔄 Estado de la compra (solo una vez):", compraState);
+        console.log("🔄 Estado de la compra:", compraState);
 
         if (compraState?.compraTipo === "directa") {
-          console.log("🛒 Modo: COMPRA DIRECTA (solo una vez)");
           setTipoCompra("directa");
 
           const compraDirecta = compraState.compraData;
-          const productosConSubtotal = compraDirecta.productos.map(
-            (producto) => ({
-              ...producto,
-              subtotal: producto.precio * producto.cantidad,
-            })
+
+          const productosConSubtotal = (compraDirecta.productos || []).map(
+            (producto) => normalizarProductoConPromo(producto, producto.cantidad)
           );
 
           setProductos(productosConSubtotal);
-          setSubtotal(compraDirecta.total);
+
+          const totalSubtotal = productosConSubtotal.reduce(
+            (total, producto) => total + Number(producto.subtotal || 0),
+            0
+          );
+
+          setSubtotal(totalSubtotal);
         } else {
-          console.log("🛒 Modo: CARRITO NORMAL (solo una vez)");
           setTipoCompra("carrito");
 
-          const respuestaCarrito = await fetch(
-            "http://localhost:4000/api/carrito",
-            {
-              credentials: "include",
-            }
-          );
+          const respuestaCarrito = await fetch("http://localhost:4000/api/carrito", {
+            credentials: "include",
+          });
 
           if (respuestaCarrito.ok) {
             const carrito = await respuestaCarrito.json();
-            console.log("✅ Carrito completo obtenido (solo una vez):", carrito);
+            console.log("✅ Carrito completo obtenido:", carrito);
 
             if (carrito.length > 0) {
               const productosProcesados = await Promise.all(
@@ -72,67 +97,81 @@ const FormaEntrega = () => {
                     if (respuestaProducto.ok) {
                       const productoCompleto = await respuestaProducto.json();
 
+                      const precioAplicado = Number(
+                        productoCompleto.precio_final ||
+                          itemCarrito.precio_final ||
+                          itemCarrito.precio ||
+                          productoCompleto.precio ||
+                          0
+                      );
+
+                      const cantidad = Number(itemCarrito.cantidad || 1);
+
                       return {
                         id: itemCarrito.idproducto,
+                        idproducto: itemCarrito.idproducto,
                         nombre:
                           productoCompleto.nombre ||
                           itemCarrito.nombre ||
                           "Producto sin nombre",
-                        precio:
-                          productoCompleto.precio || itemCarrito.precio || 0,
-                        cantidad: itemCarrito.cantidad || 1,
-                        subtotal:
-                          itemCarrito.subtotal ||
-                          productoCompleto.precio *
-                            (itemCarrito.cantidad || 1),
-                        imagen_url: productoCompleto.imagen_url,
-                      };
-                    } else {
-                      return {
-                        id: itemCarrito.idproducto,
-                        nombre: itemCarrito.nombre || "Producto sin nombre",
-                        precio: itemCarrito.precio || 0,
-                        cantidad: itemCarrito.cantidad || 1,
-                        subtotal: itemCarrito.subtotal || 0,
-                        imagen_url: null,
+                        precio: precioAplicado,
+                        precio_original: Number(
+                          productoCompleto.precio_original ||
+                            itemCarrito.precio_original ||
+                            precioAplicado
+                        ),
+                        precio_final: precioAplicado,
+                        descuento_porcentaje: Number(
+                          productoCompleto.descuento_porcentaje ||
+                            itemCarrito.descuento_porcentaje ||
+                            0
+                        ),
+                        tiene_promocion: Boolean(
+                          productoCompleto.tiene_promocion ||
+                            itemCarrito.tiene_promocion
+                        ),
+                        promocion_nombre:
+                          productoCompleto.promocion_nombre ||
+                          itemCarrito.promocion_nombre ||
+                          null,
+                        promocion_fecha_fin:
+                          productoCompleto.promocion_fecha_fin ||
+                          itemCarrito.promocion_fecha_fin ||
+                          null,
+                        cantidad,
+                        subtotal: precioAplicado * cantidad,
+                        imagen_url:
+                          productoCompleto.imagen_url ||
+                          itemCarrito.imagen_url ||
+                          productoCompleto.producto_imagen?.[0]?.url ||
+                          null,
                       };
                     }
+
+                    return normalizarProductoConPromo(itemCarrito);
                   } catch (error) {
                     console.error(
                       `❌ Error obteniendo producto ${itemCarrito.idproducto}:`,
                       error
                     );
-                    return {
-                      id: itemCarrito.idproducto,
-                      nombre: itemCarrito.nombre || "Producto sin nombre",
-                      precio: itemCarrito.precio || 0,
-                      cantidad: itemCarrito.cantidad || 1,
-                      subtotal: itemCarrito.subtotal || 0,
-                      imagen_url: null,
-                    };
+                    return normalizarProductoConPromo(itemCarrito);
                   }
                 })
               );
 
-              console.log(
-                "✅ Productos del carrito (solo una vez):",
-                productosProcesados
-              );
               setProductos(productosProcesados);
 
               const totalSubtotal = productosProcesados.reduce(
-                (total, producto) =>
-                  total + parseFloat(producto.subtotal || 0),
+                (total, producto) => total + Number(producto.subtotal || 0),
                 0
               );
+
               setSubtotal(totalSubtotal);
             } else {
-              console.log("✅ Carrito vacío (solo una vez)");
               setProductos([]);
               setSubtotal(0);
             }
           } else {
-            console.log("❌ Error al obtener carrito");
             setProductos([]);
             setSubtotal(0);
           }
@@ -150,12 +189,12 @@ const FormaEntrega = () => {
 
         if (respuestaUsuario.ok) {
           const datosUsuario = await respuestaUsuario.json();
-          console.log("✅ Datos del usuario (solo una vez):", datosUsuario);
 
           if (datosUsuario.direccion) {
             direccionCompleta = datosUsuario.direccion;
-            if (datosUsuario.ciudad)
+            if (datosUsuario.ciudad) {
               direccionCompleta += `, ${datosUsuario.ciudad}`;
+            }
           }
 
           idDireccionUsuario = datosUsuario.iddireccion;
@@ -180,14 +219,6 @@ const FormaEntrega = () => {
     const costoEnvio = opcion === "domicilio" ? 15400 : 0;
     const total = subtotal + costoEnvio;
 
-    console.log("🚀 Datos al continuar (solo una vez):", {
-      tipoCompra,
-      productos: productos.map((p) => p.nombre),
-      subtotal,
-      costoEnvio,
-      total,
-    });
-
     Swal.fire({
       title: "¿Confirmar dirección de entrega?",
       html: `
@@ -195,31 +226,42 @@ const FormaEntrega = () => {
           <p><strong>Tipo de compra:</strong> ${
             tipoCompra === "directa" ? "Compra directa" : "Desde carrito"
           }</p>
+
           <p><strong>Dirección seleccionada:</strong></p>
           <p style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0;">
             ${direccionUsuario}
           </p>
+
           <p><strong>Productos:</strong></p>
           <ul style="text-align: left; margin: 10px 0; padding-left: 20px;">
             ${productos
-              .map(
-                (producto) =>
-                  `<li>${producto.nombre} - ${
-                    producto.cantidad
-                  } x $${(producto.precio || 0).toLocaleString()}</li>`
-              )
+              .map((producto) => {
+                const lineaPromo = producto.tiene_promocion
+                  ? ` <span style="color:#d84040;">(-${producto.descuento_porcentaje}% aplicado)</span>`
+                  : "";
+
+                return `<li>
+                  ${producto.nombre} - ${producto.cantidad} x $${Number(
+                  producto.precio_final || producto.precio || 0
+                ).toLocaleString("es-CO")}${lineaPromo}
+                </li>`;
+              })
               .join("")}
           </ul>
-          <p><strong>Subtotal productos:</strong> $${subtotal.toLocaleString()}</p>
+
+          <p><strong>Subtotal productos:</strong> $${subtotal.toLocaleString("es-CO")}</p>
+
           <p><strong>Tipo de entrega:</strong> ${
             opcion === "domicilio" ? "Envío a domicilio" : "Recoger en tienda"
           }</p>
+
           ${
             opcion === "domicilio"
               ? `<p><strong>Costo de envío:</strong> $15.400</p>`
               : ""
           }
-          <p><strong>Total a pagar:</strong> $${total.toLocaleString()}</p>
+
+          <p><strong>Total a pagar:</strong> $${total.toLocaleString("es-CO")}</p>
         </div>
       `,
       icon: "question",
@@ -233,11 +275,11 @@ const FormaEntrega = () => {
       if (result.isConfirmed) {
         navigate("/checkout/forma-entrega/pago", {
           state: {
-            tipoCompra: tipoCompra,
-            productos: productos,
-            subtotal: subtotal,
-            costoEnvio: costoEnvio,
-            total: total,
+            tipoCompra,
+            productos,
+            subtotal,
+            costoEnvio,
+            total,
             iddireccion: idDireccion,
           },
         });
@@ -260,21 +302,23 @@ const FormaEntrega = () => {
         <SimpleHeader />
 
         <div className="entrega-container">
-          {/* BOTÓN DE VOLVER EN LA VERSIÓN DE LOADING TAMBIÉN */}
           <button className="entrega-btn-volver" onClick={handleVolverProducto}>
-            ← 
+            ←
           </button>
 
           <div className="entrega-left">
             <h2 className="entrega-titulo">Elige la forma de entrega</h2>
+
             <div className="entrega-opcion">
               <div className="entrega-opcion-header">
                 <input type="radio" checked readOnly />
                 <h3>Enviar a domicilio</h3>
                 <span className="entrega-precio">$15.400</span>
               </div>
+
               <p className="entrega-direccion">Cargando dirección...</p>
               <p className="entrega-tipo">Residencial</p>
+
               <a
                 href="#"
                 className="entrega-modificar"
@@ -283,6 +327,7 @@ const FormaEntrega = () => {
                 Modificar domicilio o elegir otro
               </a>
             </div>
+
             <div className="entrega-btn-continuar-container">
               <button className="entrega-btn-continuar" disabled>
                 Cargando...
@@ -293,15 +338,19 @@ const FormaEntrega = () => {
           <div className="entrega-right">
             <div className="entrega-resumen-compra">
               <h3>Resumen de compra</h3>
+
               <div className="entrega-resumen-item">
                 <span>Productos</span>
                 <span>Cargando...</span>
               </div>
+
               <div className="entrega-resumen-item">
                 <span>Envío</span>
                 <span>$15.400</span>
               </div>
+
               <hr />
+
               <div className="entrega-resumen-total">
                 <span>Total</span>
                 <strong>Cargando...</strong>
@@ -310,7 +359,6 @@ const FormaEntrega = () => {
           </div>
         </div>
 
-        {/* FOOTER ACTUALIZADO */}
         <SimpleFooter />
       </div>
     );
@@ -320,12 +368,9 @@ const FormaEntrega = () => {
     <div className="entrega-page-wrapper">
       <SimpleHeader />
 
-      {/* ELIMINADO: <div className="entrega-back-wrapper"> */}
-
       <div className="entrega-container">
-        {/* BOTÓN DE VOLVER DENTRO DEL CONTENEDOR PRINCIPAL */}
         <button className="entrega-btn-volver" onClick={handleVolverProducto}>
-          ← 
+          ←
         </button>
 
         <div className="entrega-left">
@@ -346,8 +391,10 @@ const FormaEntrega = () => {
               <h3>Enviar a domicilio</h3>
               <span className="entrega-precio">$15.400</span>
             </div>
+
             <p className="entrega-direccion">{direccionUsuario}</p>
             <p className="entrega-tipo">Residencial</p>
+
             <a
               href="#"
               className="entrega-modificar"
@@ -372,20 +419,22 @@ const FormaEntrega = () => {
               <div key={index} className="entrega-resumen-item">
                 <span>
                   {producto.nombre} ({producto.cantidad}x)
+                  {producto.tiene_promocion && (
+                    <small style={{ color: "#d84040", marginLeft: "6px" }}>
+                      -{producto.descuento_porcentaje}%
+                    </small>
+                  )}
                 </span>
+
                 <span>
-                  $
-                  {(
-                    (producto.subtotal ||
-                      producto.precio * producto.cantidad) || 0
-                  ).toLocaleString()}
+                  ${Number(producto.subtotal || 0).toLocaleString("es-CO")}
                 </span>
               </div>
             ))}
 
             <div className="entrega-resumen-item">
               <span>Subtotal</span>
-              <span>${(subtotal || 0).toLocaleString()}</span>
+              <span>${Number(subtotal || 0).toLocaleString("es-CO")}</span>
             </div>
 
             <div className="entrega-resumen-item">
@@ -394,20 +443,20 @@ const FormaEntrega = () => {
             </div>
 
             <hr />
+
             <div className="entrega-resumen-total">
               <span>Total</span>
               <strong>
                 $
-                {(
+                {Number(
                   (subtotal || 0) + (opcion === "domicilio" ? 15400 : 0)
-                ).toLocaleString()}
+                ).toLocaleString("es-CO")}
               </strong>
             </div>
           </div>
         </div>
       </div>
 
-      {/* FOOTER ACTUALIZADO */}
       <SimpleFooter />
     </div>
   );

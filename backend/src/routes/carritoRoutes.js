@@ -1,107 +1,92 @@
 import express from "express";
 import { supabase } from "../config/db.js";
-import {verificarToken} from "../controller/authMiddleware.js" 
+import { verificarToken } from "../controller/authMiddleware.js";
+import { calcularPrecioPromocional } from "../helpers/promocionesHelper.js";
 
 const router = express.Router();
 
-// ====================================================================
-// Helper: obtener carrito completo con producto y subtotal
-// ====================================================================
-async function obtenerCarritoCompleto(cedula) {
-  try {
-    const { data, error } = await supabase
-      .from("carrito")
-      .select(`
-        idproducto,
-        cantidad,
-        producto:producto (
-          nombre,
-          precio,
-          stock
-        )
-      `)
-      .eq("cedula", cedula);
-
-    if (error) throw error;
-
-    const carritoConSubtotal = (data || []).map((item) => ({
-      idproducto: item.idproducto,
-      cantidad: item.cantidad,
-      nombre: item.producto?.nombre || "Producto no encontrado",
-      precio: item.producto?.precio || 0,
-      stock: item.producto?.stock || 0,
-      subtotal: (item.producto?.precio || 0) * item.cantidad,
-    }));
-
-    return carritoConSubtotal;
-  } catch (error) {
-    console.error("Error obteniendo carrito completo:", error);
-    throw error;
-  }
+async function obtenerPromociones() {
+  const { data, error } = await supabase.from("promociones").select("*");
+  if (error) throw error;
+  return data || [];
 }
 
-/* =========================================================
-   CARRITO (RUTAS PROTEGIDAS)
-========================================================= */
+async function obtenerCarritoCompleto(cedula) {
+  const { data: carritoItems, error: errCarrito } = await supabase
+    .from("carrito")
+    .select("idproducto, cantidad")
+    .eq("cedula", cedula);
+
+  if (errCarrito) throw errCarrito;
+
+  if (!carritoItems || carritoItems.length === 0) return [];
+
+  const ids = carritoItems.map((i) => i.idproducto);
+
+  const { data: productos, error: errProductos } = await supabase
+    .from("producto")
+    .select("idproducto, nombre, precio, descripcion, stock, idcategoria, idmarca")
+    .in("idproducto", ids);
+
+  if (errProductos) throw errProductos;
+
+  const { data: imagenes, error: errImagenes } = await supabase
+    .from("producto_imagen")
+    .select("idproducto, url")
+    .in("idproducto", ids);
+
+  if (errImagenes) throw errImagenes;
+
+  const promociones = await obtenerPromociones();
+
+  return carritoItems.map((item) => {
+    const prod = productos.find((p) => p.idproducto === item.idproducto);
+    if (!prod) {
+      return {
+        idproducto: item.idproducto,
+        cantidad: item.cantidad,
+        nombre: "Producto no encontrado",
+        precio: 0,
+        precio_original: 0,
+        precio_final: 0,
+        descuento_porcentaje: 0,
+        tiene_promocion: false,
+        subtotal: 0,
+        imagen_url: null,
+      };
+    }
+
+    const prodPromo = calcularPrecioPromocional(prod, promociones);
+    const precioAplicado = Number(prodPromo.precio_final || prodPromo.precio || 0);
+
+    const imgs = (imagenes || []).filter((i) => i.idproducto === item.idproducto);
+
+    return {
+      idproducto: item.idproducto,
+      cantidad: item.cantidad,
+      nombre: prodPromo.nombre,
+      precio: precioAplicado,
+      precio_original: Number(prodPromo.precio_original || prodPromo.precio || 0),
+      precio_final: precioAplicado,
+      descuento_porcentaje: Number(prodPromo.descuento_porcentaje || 0),
+      tiene_promocion: Boolean(prodPromo.tiene_promocion),
+      promocion_nombre: prodPromo.promocion_nombre || null,
+      promocion_fecha_fin: prodPromo.promocion_fecha_fin || null,
+      stock: prodPromo.stock || 0,
+      subtotal: precioAplicado * item.cantidad,
+      imagen_url: imgs[0]?.url || null,
+      producto_imagen: imgs.map((i) => ({ url: i.url })),
+    };
+  });
+}
 
 router.use("/", verificarToken);
 
-// Obtener 
 router.get("/", async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
-    const { data: carritoItems, error: errCarrito } = await supabase
-      .from("carrito")
-      .select("idproducto, cantidad")
-      .eq("cedula", cedula);
-
-    if (errCarrito) throw errCarrito;
-
-    if (!carritoItems || carritoItems.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    const ids = carritoItems.map((i) => i.idproducto);
-
-    const { data: productos, error: errProductos } = await supabase
-      .from("producto")
-      .select("idproducto, nombre, precio, descripcion, stock")
-      .in("idproducto", ids);
-
-    if (errProductos) throw errProductos;
-
-    const { data: imagenes, error: errImagenes } = await supabase
-      .from("producto_imagen")
-      .select("idproducto, url")
-      .in("idproducto", ids);
-
-    if (errImagenes) throw errImagenes;
-
-    const prodConImagenes = (productos || []).map((p) => {
-      const imgs = (imagenes || []).filter(
-        (i) => i.idproducto === p.idproducto
-      );
-      return {
-        ...p,
-        imagenes: imgs.map((i) => i.url),
-      };
-    });
-
-    const carrito = carritoItems.map((item) => {
-      const prod = prodConImagenes.find(
-        (p) => p.idproducto === item.idproducto
-      );
-      return {
-        idproducto: item.idproducto,
-        nombre: prod?.nombre,
-        precio: prod?.precio,
-        cantidad: item.cantidad,
-        subtotal: prod?.precio * item.cantidad,
-        imagen_url: prod?.imagenes?.[0] || null,
-      };
-    });
-
+    const carrito = await obtenerCarritoCompleto(cedula);
     res.status(200).json(carrito);
   } catch (error) {
     console.error("❌ Error al obtener carrito:", error);
@@ -109,18 +94,23 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Agregar / actualizar producto en carrito
 router.post("/agregar", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
 
   if (!idproducto || !cantidad) {
-    return res
-      .status(400)
-      .json({ message: "Faltan datos: idproducto o cantidad" });
+    return res.status(400).json({ message: "Faltan datos: idproducto o cantidad" });
   }
 
   try {
+    const { data: producto, error: productoError } = await supabase
+      .from("producto")
+      .select("stock, nombre")
+      .eq("idproducto", idproducto)
+      .single();
+
+    if (productoError) throw productoError;
+
     const { data: existe, error: existeError } = await supabase
       .from("carrito")
       .select("cantidad")
@@ -130,8 +120,15 @@ router.post("/agregar", async (req, res) => {
 
     if (existeError) throw existeError;
 
+    const nuevaCantidad = existe ? existe.cantidad + Number(cantidad) : Number(cantidad);
+
+    if (nuevaCantidad > producto.stock) {
+      return res.status(400).json({
+        message: `Stock insuficiente. Solo hay ${producto.stock} unidades disponibles de "${producto.nombre}".`,
+      });
+    }
+
     if (existe) {
-      const nuevaCantidad = existe.cantidad + cantidad;
       const { error: updateError } = await supabase
         .from("carrito")
         .update({ cantidad: nuevaCantidad })
@@ -142,25 +139,21 @@ router.post("/agregar", async (req, res) => {
     } else {
       const { error: insertError } = await supabase
         .from("carrito")
-        .insert([{ cedula, idproducto, cantidad }]);
+        .insert([{ cedula, idproducto, cantidad: nuevaCantidad }]);
 
       if (insertError) throw insertError;
     }
 
-    res
-      .status(200)
-      .json({ message: "Producto agregado correctamente al carrito" });
+    res.status(200).json({
+      message: "Producto agregado correctamente al carrito",
+      carrito: await obtenerCarritoCompleto(cedula),
+    });
   } catch (error) {
     console.error("❌ Error al agregar producto al carrito:", error.message);
-    res
-      .status(500)
-      .json({ message: "Error al agregar producto al carrito" });
+    res.status(500).json({ message: "Error al agregar producto al carrito" });
   }
 });
 
-// ====================================================================
-// ✏️ Actualizar cantidad en el carrito CON VALIDACIÓN DE STOCK
-// ====================================================================
 router.put("/actualizar", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto, cantidad } = req.body;
@@ -168,12 +161,10 @@ router.put("/actualizar", async (req, res) => {
   try {
     if (!idproducto || cantidad < 0) {
       return res.status(400).json({
-        message:
-          "Datos inválidos. Se requiere idproducto y una cantidad válida (>= 0).",
+        message: "Datos inválidos. Se requiere idproducto y cantidad válida.",
       });
     }
 
-    // 1. Validar stock disponible
     const { data: productoData, error: productoError } = await supabase
       .from("producto")
       .select("stock, nombre")
@@ -181,18 +172,13 @@ router.put("/actualizar", async (req, res) => {
       .single();
 
     if (productoError) throw productoError;
-    if (!productoData) {
-      return res.status(404).json({ message: "Producto no encontrado" });
-    }
 
-    // 2. Validar que la cantidad no exceda el stock
     if (cantidad > productoData.stock) {
       return res.status(400).json({
         message: `Stock insuficiente. Solo hay ${productoData.stock} unidades disponibles de "${productoData.nombre}".`,
       });
     }
 
-    // 3. Si cantidad es 0, eliminar del carrito
     if (cantidad === 0) {
       const { error: deleteError } = await supabase
         .from("carrito")
@@ -208,7 +194,6 @@ router.put("/actualizar", async (req, res) => {
       });
     }
 
-    // 4. Actualizar cantidad
     const { error: errorUpdate } = await supabase
       .from("carrito")
       .update({ cantidad })
@@ -217,12 +202,7 @@ router.put("/actualizar", async (req, res) => {
 
     if (errorUpdate) throw errorUpdate;
 
-    // 5. Obtener carrito actualizado
     const carrito = await obtenerCarritoCompleto(cedula);
-
-    console.log(
-      `✅ Carrito actualizado correctamente. Productos: ${carrito.length}`
-    );
 
     return res.status(200).json({
       message: "Cantidad actualizada correctamente",
@@ -231,18 +211,13 @@ router.put("/actualizar", async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error al actualizar carrito:", error);
-
     return res.status(500).json({
       message: "Error interno del servidor al actualizar el carrito",
-      // Si quieres ocultar el detalle en producción, cambia esta lógica
       error: process.env.NODE_ENV === "development" ? error.message : undefined,
-      hint: "Verifica la conexión con la base de datos y los datos enviados",
     });
   }
 });
 
-
-// Eliminar producto del carrito
 router.delete("/eliminar/:idproducto", async (req, res) => {
   const cedula = req.usuario.id;
   const { idproducto } = req.params;
@@ -258,32 +233,21 @@ router.delete("/eliminar/:idproducto", async (req, res) => {
     if (error) throw error;
 
     if (count === 0) {
-      return res
-        .status(404)
-        .json({ message: "Producto no encontrado en el carrito" });
+      return res.status(404).json({ message: "Producto no encontrado en el carrito" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Producto eliminado correctamente del carrito" });
+    res.status(200).json({ message: "Producto eliminado correctamente del carrito" });
   } catch (error) {
-    console.error("❌ Error al eliminar producto del carrito:", error.message);
-    res
-      .status(500)
-      .json({ message: "Error al eliminar producto del carrito" });
+    console.error("❌ Error al eliminar producto:", error.message);
+    res.status(500).json({ message: "Error al eliminar producto del carrito" });
   }
 });
 
-// Vaciar carrito
 router.delete("/vaciar", async (req, res) => {
   const cedula = req.usuario.id;
 
   try {
-    const { error } = await supabase
-      .from("carrito")
-      .delete()
-      .eq("cedula", cedula);
-
+    const { error } = await supabase.from("carrito").delete().eq("cedula", cedula);
     if (error) throw error;
 
     res.status(200).json({ message: "Carrito vaciado exitosamente" });
@@ -292,6 +256,5 @@ router.delete("/vaciar", async (req, res) => {
     res.status(500).json({ message: "Error al vaciar carrito" });
   }
 });
-
 
 export default router;

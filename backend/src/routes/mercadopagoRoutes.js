@@ -5,63 +5,138 @@ import { supabase } from "../config/db.js";
 import {
   MercadoPagoConfig,
   Preference,
-  Payment
+  Payment,
 } from "mercadopago";
+
+import { calcularPrecioPromocional } from "../helpers/promocionesHelper.js";
 
 dotenv.config();
 
 const router = express.Router();
 
-// ==============================
-// CONFIGURAR MERCADO PAGO
-// ==============================
+/* =========================================================
+   HELPER: RECALCULAR PRODUCTOS CON PROMOCIONES
+========================================================= */
+const recalcularProductosParaPago = async (productos = []) => {
+  const ids = productos
+    .map((p) => p.idproducto || p.id)
+    .filter(Boolean);
 
+  if (ids.length === 0) {
+    throw new Error("No hay productos válidos para recalcular");
+  }
 
-// ==============================
-// CREAR PREFERENCIA DE PAGO
-// ==============================
+  const { data: productosDB, error: productosError } = await supabase
+    .from("producto")
+    .select("idproducto, nombre, precio, stock, idcategoria, idmarca")
+    .in("idproducto", ids);
+
+  if (productosError) throw productosError;
+
+  const { data: promociones, error: promosError } = await supabase
+    .from("promociones")
+    .select("*");
+
+  if (promosError) throw promosError;
+
+  return productos.map((p) => {
+    const id = p.idproducto || p.id;
+
+    const productoDB = productosDB.find(
+      (prod) => String(prod.idproducto) === String(id)
+    );
+
+    if (!productoDB) {
+      throw new Error(`Producto ${id} no encontrado`);
+    }
+
+    const cantidad = Number(p.cantidad || 1);
+
+    if (cantidad <= 0) {
+      throw new Error(`Cantidad inválida para ${productoDB.nombre}`);
+    }
+
+    if (cantidad > productoDB.stock) {
+      throw new Error(`Stock insuficiente para ${productoDB.nombre}`);
+    }
+
+    const productoConPromo = calcularPrecioPromocional(
+      productoDB,
+      promociones || []
+    );
+
+    const precioAplicado = Number(
+      productoConPromo.precio_final || productoConPromo.precio || 0
+    );
+
+    return {
+      idproducto: productoDB.idproducto,
+      id: productoDB.idproducto,
+      nombre: productoDB.nombre,
+      cantidad,
+      precio: precioAplicado,
+      precio_original: Number(
+        productoConPromo.precio_original || productoDB.precio || 0
+      ),
+      precio_final: precioAplicado,
+      descuento_porcentaje: Number(
+        productoConPromo.descuento_porcentaje || 0
+      ),
+      tiene_promocion: Boolean(productoConPromo.tiene_promocion),
+      promocion_nombre: productoConPromo.promocion_nombre || null,
+      subtotal: precioAplicado * cantidad,
+    };
+  });
+};
+
+/* =========================================================
+   CREAR PREFERENCIA DE PAGO
+========================================================= */
 router.post("/crear-preferencia", async (req, res) => {
-  
-  
   try {
-    
-    console.log("TOKEN ACTUAL:", process.env.MP_ACCESS_TOKEN);
-
     const client = new MercadoPagoConfig({
       accessToken: process.env.MP_ACCESS_TOKEN,
     });
+
     const {
       productos = [],
       iddireccion = null,
-      source = "producto"
+      source = "producto",
     } = req.body;
 
     if (!productos || productos.length === 0) {
       return res.status(400).json({
-        error: "No hay productos en la compra"
+        error: "No hay productos en la compra",
       });
     }
 
-    const items = productos.map((p) => ({
+    const productosRecalculados = await recalcularProductosParaPago(productos);
+
+    const items = productosRecalculados.map((p) => ({
       title: p.nombre,
       quantity: Number(p.cantidad),
-      unit_price: Number(p.precio),
+      unit_price: Number(p.precio_final),
       currency_id: "COP",
     }));
+
+    const totalRecalculado = productosRecalculados.reduce(
+      (acc, p) => acc + Number(p.subtotal || 0),
+      0
+    );
 
     const preference = {
       items,
       metadata: {
-        productos,
+        productos: productosRecalculados,
         iddireccion,
         source,
+        total_productos: totalRecalculado,
       },
       back_urls: {
         success: "http://localhost:5173/pago/exitoso",
         failure: "http://localhost:5173/pago/error",
         pending: "http://localhost:5173/pago/pendiente",
       },
-      //auto_return: "approved","Si voy a redirigir automáticamente, necesito garantizar que la URL de destino existe y es alcanzable"
     };
 
     console.log("PREFERENCE COMPLETA:", JSON.stringify(preference, null, 2));
@@ -69,30 +144,33 @@ router.post("/crear-preferencia", async (req, res) => {
     const preferenceClient = new Preference(client);
 
     const response = await preferenceClient.create({
-      body: preference
+      body: preference,
     });
 
     res.json({
       url: response.init_point,
+      productos: productosRecalculados,
+      total: totalRecalculado,
     });
-
   } catch (error) {
     console.error("Error creando preferencia:", error);
+
     res.status(500).json({
       error: "Error creando preferencia de pago",
+      detalle: error.message,
     });
   }
 });
 
-
-// ==============================
-// CONFIRMAR PEDIDO
-// ==============================
+/* =========================================================
+   CONFIRMAR PEDIDO
+========================================================= */
 router.post("/pedido/confirmar", async (req, res) => {
   try {
     const client = new MercadoPagoConfig({
       accessToken: process.env.MP_ACCESS_TOKEN,
     });
+
     const { payment_id } = req.body;
 
     if (!payment_id) {
@@ -104,7 +182,7 @@ router.post("/pedido/confirmar", async (req, res) => {
     const paymentClient = new Payment(client);
 
     const payment = await paymentClient.get({
-      id: payment_id
+      id: payment_id,
     });
 
     if (!payment) {
@@ -133,9 +211,6 @@ router.post("/pedido/confirmar", async (req, res) => {
       });
     }
 
-    // ==============================
-    // BUSCAR USUARIO
-    // ==============================
     const { data: usuario, error: usuarioError } = await supabase
       .from("usuario")
       .select("cedula")
@@ -150,9 +225,6 @@ router.post("/pedido/confirmar", async (req, res) => {
 
     const cedula = usuario.cedula;
 
-    // ==============================
-    // CREAR PEDIDO
-    // ==============================
     const { data: pedido, error: pedidoError } = await supabase
       .from("pedido")
       .insert([
@@ -174,15 +246,13 @@ router.post("/pedido/confirmar", async (req, res) => {
       });
     }
 
-    // ==============================
-    // INSERTAR DETALLE PEDIDO
-    // ==============================
     const detalles = productos.map((p) => ({
-      idproducto: p.id,
-      cantidad: p.cantidad,
+      idproducto: p.idproducto || p.id,
+      cantidad: Number(p.cantidad),
       idpedido: pedido.idpedido,
       cedula,
-      subtotal: Number(p.precio) * Number(p.cantidad),
+      subtotal:
+        Number(p.precio_final || p.precio || 0) * Number(p.cantidad || 1),
     }));
 
     const { error: detalleError } = await supabase
@@ -200,23 +270,23 @@ router.post("/pedido/confirmar", async (req, res) => {
       success: true,
       message: "Pedido registrado correctamente",
       pedido,
+      detalles,
     });
-
   } catch (error) {
     console.error("Error confirmando pedido:", error);
+
     res.status(500).json({
       error: "Error confirmando pedido",
+      detalle: error.message,
     });
   }
 });
 
-
-// ==============================
-// WEBHOOK MERCADO PAGO (OPCIONAL)
-// ==============================
+/* =========================================================
+   WEBHOOK MERCADO PAGO
+========================================================= */
 router.post("/webhook", async (req, res) => {
   try {
-
     const client = new MercadoPagoConfig({
       accessToken: process.env.MP_ACCESS_TOKEN,
     });
@@ -224,11 +294,10 @@ router.post("/webhook", async (req, res) => {
     const { type, data } = req.body;
 
     if (type === "payment") {
-
       const paymentClient = new Payment(client);
 
       const payment = await paymentClient.get({
-        id: data.id
+        id: data.id,
       });
 
       if (payment.status === "approved") {
@@ -237,7 +306,6 @@ router.post("/webhook", async (req, res) => {
     }
 
     res.sendStatus(200);
-
   } catch (error) {
     console.error("Webhook error:", error);
     res.sendStatus(500);

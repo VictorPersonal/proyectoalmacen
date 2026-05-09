@@ -5,11 +5,7 @@ export const obtenerPromocionAplicable = (producto, promociones = []) => {
     const inicio = new Date(promo.fecha_inicio);
     const fin = new Date(promo.fecha_fin);
 
-    return (
-      promo.activo_manual === true &&
-      ahora >= inicio &&
-      ahora <= fin
-    );
+    return promo.activo_manual === true && ahora >= inicio && ahora <= fin;
   });
 
   const aplicables = vigentes.filter((promo) => {
@@ -52,8 +48,7 @@ export const obtenerPromocionAplicable = (producto, promociones = []) => {
 
 export const calcularPrecioPromocional = (producto, promociones = []) => {
   const promo = obtenerPromocionAplicable(producto, promociones);
-
-  const precioOriginal = Number(producto.precio);
+  const precioOriginal = Number(producto.precio || 0);
 
   if (!promo) {
     return {
@@ -63,10 +58,11 @@ export const calcularPrecioPromocional = (producto, promociones = []) => {
       precio_final: precioOriginal,
       tiene_promocion: false,
       promocion_nombre: null,
+      promocion_fecha_fin: null,
     };
   }
 
-  const descuento = Number(promo.valor_descuento);
+  const descuento = Number(promo.valor_descuento || 0);
   const precioFinal = Number(
     (precioOriginal * (1 - descuento / 100)).toFixed(2)
   );
@@ -78,5 +74,6 @@ export const calcularPrecioPromocional = (producto, promociones = []) => {
     precio_final: precioFinal,
     tiene_promocion: true,
     promocion_nombre: promo.nombre,
+    promocion_fecha_fin: promo.fecha_fin,
   };
 };
