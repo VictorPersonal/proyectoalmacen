@@ -4,7 +4,7 @@ import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import RecuperarContrasena from "./pages/RecuperarContrasena";
 import RestablecerContrasena from "./pages/RestablecerContrasena";
-import PanelAdmin from "./pages/PanelAdmin"; 
+import PanelAdmin from "./pages/PanelAdmin";
 import ActualizarDatos from "./pages/ActualizarDatos";
 import FormaEntrega from "./pages/Checkout/FormaEntrega";
 import Pago from "./pages/Checkout/Pago";
@@ -13,6 +13,7 @@ import Categorias from "./pages/Categoriaspages";
 import TerminosYCondiciones from "./pages/Terminosycondiciones";
 import PagoExitoso from "./pages/Checkout/PagoExitoso";
 import HistoriaDulceHogar from "./pages/HistoriaDulceHogar";
+
 import ModificarDireccion from "./pages/Checkout/ModificarDireccion";
 import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
 import DescripcionProducto from "./components/DescripcionProducto";

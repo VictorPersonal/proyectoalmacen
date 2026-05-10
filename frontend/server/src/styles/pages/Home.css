@@ -1,8 +1,10 @@
 /* ========== HEADER ========== */
 header {
+  display: flex;
   background-color: #16A34A;
-  padding: 10px 20px;
+  padding: 8px 20px;
   width: 100%;
+  flex-direction: column;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -11,7 +13,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 8px 20px;
   width: 100%;
 }
 
@@ -58,10 +60,10 @@ header {
   background-color: #fff;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
-  padding: 6px 12px;
+  padding: 12px 12px;
   width: 600px;    
   max-width: 55%;  
-  margin: 0 20px;
+  margin: 10px 20px;
   height: 38px;
   position: relative;
 }
@@ -138,6 +140,10 @@ header {
   display: flex;
   align-items: center;
   gap: 20px;
+  justify-content: center;
+  width: 100%;
+  padding: 4px 0 8px 0;
+  
 }
 
 .nav-link {
@@ -158,11 +164,12 @@ header {
 .auth-links {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
+  padding: 2% 0 0 0;
+  width: autho; 
   justify-content: flex-end;
-  padding: 8px 30px 8px 20px;
-  width: 100%;
 }
+
 
 .auth-links a {
   text-decoration: none;
