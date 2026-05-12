@@ -1,7 +1,4 @@
-/* ========== SIMPLE HEADER (logo + ícono ayuda) ========== */
-/* Usado en: Login, Registro, RecuperarContrasena, RestablecerContrasena,
-   ActualizarDatos, FormaEntrega, Pago, PagoExitoso, ModificarDireccion */
-
+/* ========== SIMPLE HEADER (Login, Registro, RecuperarContrasena, etc.) ========== */
 .simple-header {
   background-color: #16A34A;
   padding: 10px 20px;
@@ -34,16 +31,18 @@
 .simple-header-logo-text {
   display: flex;
   flex-direction: column;
-  text-align: center;
+  text-align: center; /* CAMBIADO: centrado como en el Home */
 }
 
+/* TÍTULO - MISMO COLOR QUE EL HOME (#244397) */
 .simple-header-logo-title {
   font-size: 24px;
   font-weight: bold;
-  color: #415faf;
+  color: #244397;
   margin: 0;
 }
 
+/* SUBTÍTULO - MISMO COLOR QUE EL HOME (#F0FDF4) */
 .simple-header-logo-subtitle {
   font-size: 10px;
   letter-spacing: 0.5px;
@@ -65,6 +64,7 @@
   background-color: transparent;
   color: #FFFFFF;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .simple-header-help-icon:hover {
@@ -90,6 +90,12 @@
   
   .simple-header-logo-subtitle {
     font-size: 8px;
+  }
+  
+  .simple-header-help-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
   }
 }
 

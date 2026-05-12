@@ -4,7 +4,7 @@ import "../styles/components/SimpleHeader.css";
 
 const SimpleHeader = () => {
   return (
-    <header className="simple-header">
+    <div className="simple-header">
       <div className="simple-header-logo-section">
         <img src={logo} alt="Dulce hogar logo" className="simple-header-logo-img" />
         <div className="simple-header-logo-text">
@@ -13,9 +13,8 @@ const SimpleHeader = () => {
         </div>
       </div>
       <div className="simple-header-help-icon">?</div>
-    </header>
+    </div>
   );
 };
 
 export default SimpleHeader;
-
