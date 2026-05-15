@@ -674,3 +674,51 @@
   50% { opacity: 0.8; }
   100% { opacity: 1; }
 }
+
+.producto-precio-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0 10px;
+}
+
+.producto-descuento-badge {
+  width: fit-content;
+  background: #d84040;
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.producto-precio-original {
+  text-decoration: line-through;
+  color: #888 !important;
+  -webkit-text-fill-color: #888 !important;
+  font-size: 15px;
+  margin: 0;
+}
+
+.producto-precio-final {
+  color: #d84040 !important;
+  -webkit-text-fill-color: #d84040 !important;
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.producto-precio-normal {
+  color: #111 !important;
+  -webkit-text-fill-color: #111 !important;
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.producto-promocion-nombre {
+  color: #555 !important;
+  -webkit-text-fill-color: #555 !important;
+  font-size: 13px;
+}

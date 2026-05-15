@@ -320,7 +320,7 @@ const DescripcionProducto = () => {
     }
   };
 
-  // 🔹 Función para comprar ahora CON VALIDACIÓN DE STOCK
+  // 🔹 Función para comprar ahora CON VALIDACIÓN DE STOCK Y PROMOCIÓN
   const handleComprarAhora = () => {
     if (ejecutadoRef.current) {
       console.log("⏭️ Compra ya en proceso...");
@@ -340,7 +340,6 @@ const DescripcionProducto = () => {
       return;
     }
 
-    // Validar que haya stock disponible
     if (producto.stock <= 0) {
       Swal.fire({
         icon: "error",
@@ -352,13 +351,12 @@ const DescripcionProducto = () => {
       return;
     }
 
-    // Validar que la cantidad no exceda el stock
     if (cantidad > producto.stock) {
       Swal.fire({
         icon: "warning",
         title: "Stock insuficiente",
         html: `Solo hay <strong>${producto.stock}</strong> unidades disponibles.<br>
-               Por favor, selecciona una cantidad menor o igual al stock disponible.`,
+              Por favor, selecciona una cantidad menor o igual al stock disponible.`,
         confirmButtonText: "Entendido",
         padding: "1.5rem",
       });
@@ -368,34 +366,52 @@ const DescripcionProducto = () => {
     try {
       ejecutadoRef.current = true;
 
-      console.log("🛒 Iniciando compra directa (solo una vez)");
+      const precioAplicado = Number(
+        producto.precio_final || producto.precio || 0
+      );
+
+      const precioOriginal = Number(
+        producto.precio_original || producto.precio || precioAplicado
+      );
+
+      const productoCompra = {
+        id: producto.id_producto || producto.id || producto.idproducto,
+        idproducto: producto.id_producto || producto.id || producto.idproducto,
+        nombre: producto.nombre,
+        precio: precioAplicado,
+        precio_final: precioAplicado,
+        precio_original: precioOriginal,
+        descuento_porcentaje: Number(producto.descuento_porcentaje || 0),
+        tiene_promocion: Boolean(producto.tiene_promocion),
+        promocion_nombre: producto.promocion_nombre || null,
+        promocion_fecha_fin: producto.promocion_fecha_fin || null,
+        cantidad,
+        subtotal: precioAplicado * cantidad,
+        imagen_url: producto.producto_imagen?.[0]?.url,
+        descripcion:
+          producto.descripcion ||
+          producto.descripcion_producto ||
+          producto.descripcion_text ||
+          "",
+        stock: producto.stock,
+      };
 
       const compraDirecta = {
         tipo: "compra_directa",
-        productos: [
-          {
-            id: producto.id_producto || producto.id || producto.idproducto,
-            nombre: producto.nombre,
-            precio: producto.precio,
-            cantidad: cantidad,
-            imagen_url: producto.producto_imagen?.[0]?.url,
-            descripcion: producto.descripcion || producto.descripcion_producto || producto.descripcion_text,
-            stock: producto.stock
-          }
-        ],
-        total: producto.precio * cantidad,
-        cantidadTotal: cantidad
+        productos: [productoCompra],
+        subtotal: precioAplicado * cantidad,
+        total: precioAplicado * cantidad,
+        cantidadTotal: cantidad,
       };
 
-      console.log("📦 Datos de compra directa:", compraDirecta);
+      console.log("📦 Datos de compra directa con promoción:", compraDirecta);
 
       navigate("/checkout/forma-entrega", {
         state: {
           compraTipo: "directa",
-          compraData: compraDirecta
-        }
+          compraData: compraDirecta,
+        },
       });
-
     } catch (error) {
       console.error("❌ Error en compra directa:", error);
       ejecutadoRef.current = false;
@@ -553,6 +569,34 @@ const DescripcionProducto = () => {
               Este producto no tiene descripción disponible.
             </p>
           )}
+
+          <div className="producto-precio-box">
+            {producto.tiene_promocion ? (
+              <>
+                <span className="producto-descuento-badge">
+                  -{producto.descuento_porcentaje}% OFF
+                </span>
+
+                <p className="producto-precio-original">
+                  ${Number(producto.precio_original || producto.precio).toLocaleString("es-CO")}
+                </p>
+
+                <p className="producto-precio-final">
+                  ${Number(producto.precio_final || producto.precio).toLocaleString("es-CO")}
+                </p>
+
+                {producto.promocion_nombre && (
+                  <small className="producto-promocion-nombre">
+                    Promo: {producto.promocion_nombre}
+                  </small>
+                )}
+              </>
+            ) : (
+              <p className="producto-precio-normal">
+                ${Number(producto.precio || 0).toLocaleString("es-CO")}
+              </p>
+            )}
+          </div>
 
           <div className="producto-calificacion">
             {[...Array(5)].map((_, i) => (
