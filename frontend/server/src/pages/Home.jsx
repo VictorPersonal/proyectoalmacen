@@ -404,76 +404,7 @@ const Home = () => {
             </button>
           </div>
 
-          <div className="nav-links" id="nav-links">
-            <div className="categorias-menu">
-              <button className="nav-link categorias-btn" onClick={toggleMenu}>
-                Categorías ∨
-              </button>
-
-              {menuAbierto && (
-                <div className="menu-desplegable">
-                  <div className="categorias-lista">
-                    {categorias.map((categoria, index) => (
-                      <div key={index} className="categoria-item-container">
-                        {categoria.subcategorias.length > 1 ? (
-                          <div
-                            className="categoria-item con-submenu"
-                            onMouseEnter={() => toggleSubmenu(index)}
-                            onMouseLeave={() => setSubmenuAbierto(null)}
-                          >
-                            <span>{categoria.nombre}</span>
-                            <FaChevronRight className="submenu-icon" />
-
-                            {submenuAbierto === index && (
-                              <div className="submenu">
-                                {categoria.subcategorias.map((sub, i) => (
-                                  <button
-                                    key={i}
-                                    className="submenu-item"
-                                    onClick={() => {
-                                      cargarProductosPorCategoria(sub.id);
-                                      setMenuAbierto(false);
-                                    }}
-                                  >
-                                    {sub.nombre}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <button
-                            className="categoria-item"
-                            onClick={() => {
-                              cargarProductosPorCategoria(
-                                categoria.subcategorias[0].id
-                              );
-                              setMenuAbierto(false);
-                            }}
-                          >
-                            {categoria.nombre}
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <Link to="/promociones" className="nav-link">
-              Promociones
-            </Link>
-            <a href="#" className="nav-link">
-              Contacto
-            </a>
-            <a href="#" className="nav-link">
-              Ayuda
-            </a>
-          </div>
-        </nav>
-
-        <div className="auth-links" id="auth-links">
+        <div className="auth-links" id="auth-links"> {/*Se deve mover el contenido de este div*/ }
           {usuarioLogueado ? (
             <div className="perfil-menu">
               <button className="perfil-btn" onClick={togglePerfilMenu}>
@@ -531,6 +462,79 @@ const Home = () => {
             <FaShoppingCart />
           </div>
         </div>
+
+
+
+
+        </nav>
+
+        {/* ← nav-links FUERA del nav, pero dentro del header */}
+        <div className="nav-links" id="nav-links"> {/*Se deve mover el contenido de este div*/ }
+          <div className="categorias-menu">
+            <button className="nav-link categorias-btn" onClick={toggleMenu}>
+              Categorías ∨
+            </button>
+
+            {menuAbierto && (
+              <div className="menu-desplegable">
+                <div className="categorias-lista">
+                  {categorias.map((categoria, index) => (
+                    <div key={index} className="categoria-item-container">
+                      {categoria.subcategorias.length > 1 ? (
+                        <div
+                          className="categoria-item con-submenu"
+                          onMouseEnter={() => toggleSubmenu(index)}
+                          onMouseLeave={() => setSubmenuAbierto(null)}
+                        >
+                          <span>{categoria.nombre}</span>
+                          <FaChevronRight className="submenu-icon" />
+
+                          {submenuAbierto === index && (
+                            <div className="submenu">
+                              {categoria.subcategorias.map((sub, i) => (
+                                <button
+                                  key={i}
+                                  className="submenu-item"
+                                  onClick={() => {
+                                    cargarProductosPorCategoria(sub.id);
+                                    setMenuAbierto(false);
+                                  }}
+                                >
+                                  {sub.nombre}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          className="categoria-item"
+                          onClick={() => {
+                            cargarProductosPorCategoria(
+                              categoria.subcategorias[0].id
+                            );
+                            setMenuAbierto(false);
+                          }}
+                        >
+                          {categoria.nombre}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Link to="/promociones" className="nav-link">
+            Promociones
+          </Link>
+
+          <a href="#" className="nav-link">
+            Ayuda
+          </a>
+        </div>
+
       </header>
 
       {/* CARRITO */}
@@ -573,50 +577,7 @@ const Home = () => {
             </button>
           </section>
 
-          {busqueda.trim().length === 0 && (
-            <div className="info-toggle-wrapper">
-              <button
-                className={`info-toggle-btn ${menuMasInfo ? 'abierto' : ''}`}
-                onClick={() => setMenuMasInfo(!menuMasInfo)}
-              >
-                Más información ▾
-              </button>
 
-              {menuMasInfo && (
-                <div className="info-panel">
-                  <div className="info-column">
-                    <h4>Acerca de</h4>
-                    <Link to="/Acerca-de/Dulce-Hogar">Dulce Hogar</Link>
-                  </div>
-
-                  <div className="info-column">
-                    <h4>Redes sociales</h4>
-                    <a
-                      href="https://www.facebook.com/dulce.hogar.3192479"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Facebook
-                    </a>
-                    <a
-                      href="https://www.instagram.com/dulcehogarcaicedonia?igsh=ZnA2MWVicnZod2ly"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Instagram
-                    </a>
-                    <a
-                      href="https://wa.me/573103749429?text=Hola,+quiero+más+información"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      WhatsApp
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </main>
       ) : (
         /* Mostrar productos ya sea por búsqueda o por categoría */
