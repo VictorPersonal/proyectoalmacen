@@ -115,8 +115,9 @@
   margin: 0;
 }
 
+/* Precio con descuento en VERDE */
 .precio-descuento {
-  color: #d84040;
+  color: #22C55E;
   font-weight: 800;
   font-size: 17px;
   margin: 0;
@@ -170,12 +171,13 @@
   pointer-events: none;
 }
 
+/* Badge de descuento en ROJO */
 .discount-badge {
   position: absolute;
   top: 10px;
   left: 10px;
 
-  background: #d84040;
+  background: #D84040;
   color: #ffffff;
   padding: 5px 9px;
   border-radius: 9px;

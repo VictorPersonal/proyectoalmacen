@@ -303,7 +303,10 @@ const DescripcionProducto = () => {
       return;
     }
 
-    if (producto.stock <= 0) {
+    // ✅ Usar stock real (?? 0)
+    const stockReal = producto?.stock ?? 0;
+    
+    if (stockReal <= 0) {
       Swal.fire({
         icon: "error",
         title: "Producto sin stock",
@@ -314,11 +317,11 @@ const DescripcionProducto = () => {
       return;
     }
 
-    if (cantidad > producto.stock) {
+    if (cantidad > stockReal) {
       Swal.fire({
         icon: "warning",
         title: "Stock insuficiente",
-        html: `Solo hay <strong>${producto.stock}</strong> unidades disponibles.<br>
+        html: `Solo hay <strong>${stockReal}</strong> unidades disponibles.<br>
                Por favor, selecciona una cantidad menor o igual al stock disponible.`,
         confirmButtonText: "Entendido",
         padding: "1.5rem",
@@ -398,7 +401,10 @@ const DescripcionProducto = () => {
       return;
     }
 
-    if (producto.stock <= 0) {
+    // ✅ Usar stock real (?? 0)
+    const stockReal = producto?.stock ?? 0;
+    
+    if (stockReal <= 0) {
       Swal.fire({
         icon: "error",
         title: "Producto sin stock",
@@ -409,11 +415,11 @@ const DescripcionProducto = () => {
       return;
     }
 
-    if (cantidad > producto.stock) {
+    if (cantidad > stockReal) {
       Swal.fire({
         icon: "warning",
         title: "Stock insuficiente",
-        html: `Solo hay <strong>${producto.stock}</strong> unidades disponibles.<br>
+        html: `Solo hay <strong>${stockReal}</strong> unidades disponibles.<br>
               Por favor, selecciona una cantidad menor o igual al stock disponible.`,
         confirmButtonText: "Entendido",
         padding: "1.5rem",
@@ -554,11 +560,20 @@ const DescripcionProducto = () => {
     return (suma / reseñas.length).toFixed(1);
   };
 
+  // ✅ Función CORREGIDA para opciones de cantidad
   const getCantidadOpciones = () => {
-    const stockDisponible = producto?.stock || 10;
+    // Usar el stock real, si es null o undefined usar 0
+    const stockReal = producto?.stock ?? 0;
     const opciones = [];
     
-    for (let i = 1; i <= Math.min(stockDisponible, 10); i++) {
+    // Si no hay stock, retornar array vacío
+    if (stockReal <= 0) {
+      return opciones;
+    }
+    
+    // Mostrar máximo 10 opciones o el stock disponible
+    const maxOpciones = Math.min(stockReal, 10);
+    for (let i = 1; i <= maxOpciones; i++) {
       opciones.push(i);
     }
     
@@ -597,7 +612,8 @@ const DescripcionProducto = () => {
 
   const imagenes = producto?.producto_imagen || [];
   const imagenActual = imagenes[imagenSeleccionada];
-  const stockDisponible = producto.stock || 10;
+  // ✅ CORREGIDO: usar ?? 0 en lugar de || 10
+  const stockDisponible = producto?.stock ?? 0;
   const cantidadOpciones = getCantidadOpciones();
   const promedioCalificacion = calcularPromedio();
   const distribucionCalificaciones = calcularDistribucion();
@@ -709,7 +725,6 @@ const DescripcionProducto = () => {
                 </p>
               )}
 
-              {/* Calificación compacta - usa EstrellasPromedio para mostrar fracciones */}
               <div className="calificacion-compacta">
                 <div className="estrellas-container">
                   <EstrellasPromedio promedio={promedioCalificacion} size="18px" />
@@ -831,7 +846,6 @@ const DescripcionProducto = () => {
                 <div className="resumen-calificaciones">
                   <div className="promedio-grande">
                     <div className="numero-promedio">{promedioCalificacion}</div>
-                    {/* Estrellas grandes - usa EstrellasPromedio para mostrar fracciones */}
                     <div className="estrellas-grandes">
                       <EstrellasPromedio promedio={promedioCalificacion} size="22px" />
                     </div>
@@ -872,7 +886,6 @@ const DescripcionProducto = () => {
                           })}
                         </span>
                       </div>
-                      {/* Estrellas individuales - estas SÍ son enteras, sin fracciones */}
                       <div className="reseña-estrellas">
                         {[...Array(5)].map((_, i) => (
                           <FaStar 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/pages/Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight } from "react-icons/fa";
+import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight, FaSearch } from "react-icons/fa";
 import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
@@ -373,7 +373,7 @@ const Home = () => {
             </div>
           </div>
 
-          {/* ✅ BUSCADOR CORREGIDO - Solo un botón visible a la vez */}
+          {/* ✅ BUSCADOR CON FaSearch */}
           <div className="search-container-home" id="search-container">
             <input
               type="text"
@@ -393,18 +393,18 @@ const Home = () => {
               ✕
             </button>
             
-            {/* Botón Lupa - Solo visible cuando NO hay texto */}
+            {/* Botón Lupa con FaSearch - Solo visible cuando NO hay texto */}
             <button
               className="search-btn"
               onClick={handleBuscar}
               title="Buscar"
               style={{ display: busqueda.trim() ? 'none' : 'flex' }}
             >
-              🔍
+              <FaSearch />
             </button>
           </div>
 
-        <div className="auth-links" id="auth-links"> {/*Se deve mover el contenido de este div*/ }
+        <div className="auth-links" id="auth-links">
           {usuarioLogueado ? (
             <div className="perfil-menu">
               <button className="perfil-btn" onClick={togglePerfilMenu}>
@@ -463,13 +463,10 @@ const Home = () => {
           </div>
         </div>
 
-
-
-
         </nav>
 
-        {/* ← nav-links FUERA del nav, pero dentro del header */}
-        <div className="nav-links" id="nav-links"> {/*Se deve mover el contenido de este div*/ }
+        {/* nav-links FUERA del nav, pero dentro del header */}
+        <div className="nav-links" id="nav-links">
           <div className="categorias-menu">
             <button className="nav-link categorias-btn" onClick={toggleMenu}>
               Categorías ∨
@@ -549,7 +546,7 @@ const Home = () => {
       {/* CONTENIDO ACTUALIZADO */}
       {mostrarCarrusel ? (
         <main id="main">
-          {/* ✅ CARRUSEL ACTUALIZADO CON NUEVA TRANSICIÓN (SIN INDICADORES) */}
+          {/* CARRUSEL */}
           <section className="hero-section" id="hero-section">
             <button className="carousel-btn prev" onClick={prevSlide}>
               <FaChevronLeft />
@@ -577,12 +574,11 @@ const Home = () => {
             </button>
           </section>
 
-
         </main>
       ) : (
         /* Mostrar productos ya sea por búsqueda o por categoría */
         <main className="resultados">
-          {/* ⭐ Si hay mensaje por categoría (sin productos) */}
+          {/* Si hay mensaje por categoría (sin productos) */}
           {mensajeCategoria && (
             <p className="no-result">{mensajeCategoria}</p>
           )}
