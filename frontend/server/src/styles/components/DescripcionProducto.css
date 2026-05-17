@@ -1,5 +1,3 @@
-/* DescripcionProducto.css - Versión VERDE (sin rojo) */
-
 :root {
   --verde-principal: #22C55E;
   --verde-oscuro: #16A34A;
@@ -816,8 +814,8 @@
 
 .carrito-modal-btn {
   position: fixed;
-  top: 100px;
-  right: 30px;
+  top: 50px;
+  right: 10px;
   background: var(--blanco);
   border: none;
   cursor: pointer;
@@ -830,9 +828,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .carrito-modal-btn:hover {
@@ -860,8 +858,11 @@
 }
 
 .corazon-favorito svg {
-  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  display: block;
   color: var(--gris-claro);
+  margin: 0 auto;
 }
 
 .corazon-favorito.activo svg {
