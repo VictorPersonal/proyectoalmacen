@@ -1,11 +1,57 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../styles/components/DescripcionProducto.css";
 import Swal from "sweetalert2";
-import { FaStar, FaHeart, FaShoppingCart, FaArrowLeft, FaExclamationTriangle } from "react-icons/fa";
-import { SiVisa, SiMastercard, SiAmericanexpress, SiJcb } from "react-icons/si";
 import axios from "axios";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Carrito from "./Carrito";
+
+import { 
+  FaStar,
+  FaHeart,
+  FaShoppingCart,
+  FaArrowLeft,
+  FaExclamationTriangle,
+  FaPenFancy,
+  FaCheckCircle,
+  FaUserCircle,
+  FaCalendarAlt
+} from "react-icons/fa";
+
+import { 
+  SiVisa,
+  SiMastercard,
+  SiAmericanexpress,
+  SiJcb
+} from "react-icons/si";
+
+// =========================================================
+// COMPONENTE PARA ESTRELLAS CON FRACCIONES (4.5, 3.7, etc.)
+// =========================================================
+const EstrellasPromedio = ({ promedio, size = "18px" }) => {
+  const pct = (parseFloat(promedio) / 5) * 100;
+  return (
+    <div style={{ position: "relative", display: "inline-flex", fontSize: size }}>
+      {/* Estrellas grises de fondo */}
+      <div style={{ display: "flex", gap: "4px", color: "#e2e8f0" }}>
+        {[...Array(5)].map((_, i) => <FaStar key={i} />)}
+      </div>
+      {/* Estrellas doradas encima, recortadas al porcentaje */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        overflow: "hidden",
+        width: `${pct}%`,
+        display: "flex",
+        gap: "4px",
+        color: "#fbbf24",
+        whiteSpace: "nowrap"
+      }}>
+        {[...Array(5)].map((_, i) => <FaStar key={i} />)}
+      </div>
+    </div>
+  );
+};
 
 const DescripcionProducto = () => {
   const { id } = useParams();
@@ -19,9 +65,14 @@ const DescripcionProducto = () => {
   const [cargando, setCargando] = useState(true);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
   const [verificandoFavorito, setVerificandoFavorito] = useState(false);
+  
+  const [reseñas, setReseñas] = useState([]);
+  const [mostrarModalReseña, setMostrarModalReseña] = useState(false);
+  const [nuevaReseña, setNuevaReseña] = useState({ calificacion: 5, comentario: '' });
+  const [cargandoReseñas, setCargandoReseñas] = useState(false);
+  
   const ejecutadoRef = useRef(false);
 
-  // 🔒 Efecto para deshabilitar el scroll cuando el modal está abierto
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = 'hidden';
@@ -31,25 +82,21 @@ const DescripcionProducto = () => {
     };
   }, []);
 
-  // Cargar producto desde API o desde state
-  useEffect(() => {
-    const cargarProducto = async () => {
-      setCargando(true);
-      
-      if (location.state?.productoData) {
-        setProducto(location.state.productoData);
-        setCargando(false);
-        // Verificar si el producto está en favoritos
-        await verificarFavorito(location.state.productoData.id_producto || location.state.productoData.id || location.state.productoData.idproducto);
-      } else {
-        await cargarProductoDesdeAPI();
+  const cargarReseñas = async (productoId) => {
+    setCargandoReseñas(true);
+    try {
+      const response = await fetch(`http://localhost:4000/api/resenas/producto/${productoId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setReseñas(data);
       }
-    };
+    } catch (error) {
+      console.error("Error cargando reseñas:", error);
+    } finally {
+      setCargandoReseñas(false);
+    }
+  };
 
-    cargarProducto();
-  }, [id, location.state]);
-
-  // Función para verificar si el producto está en favoritos
   const verificarFavorito = async (productoId) => {
     setVerificandoFavorito(true);
     try {
@@ -76,6 +123,24 @@ const DescripcionProducto = () => {
     }
   };
 
+  useEffect(() => {
+    const cargarProducto = async () => {
+      setCargando(true);
+      
+      if (location.state?.productoData) {
+        setProducto(location.state.productoData);
+        const productoId = location.state.productoData.id_producto || location.state.productoData.id || location.state.productoData.idproducto;
+        await verificarFavorito(productoId);
+        await cargarReseñas(productoId);
+        setCargando(false);
+      } else {
+        await cargarProductoDesdeAPI();
+      }
+    };
+
+    cargarProducto();
+  }, [id, location.state]);
+
   const cargarProductoDesdeAPI = async () => {
     try {
       const response = await fetch(`http://localhost:4000/api/productos/${id}`);
@@ -84,8 +149,9 @@ const DescripcionProducto = () => {
       }
       const data = await response.json();
       setProducto(data);
-      // Verificar si el producto está en favoritos
-      await verificarFavorito(data.id_producto || data.id || data.idproducto);
+      const productoId = data.id_producto || data.id || data.idproducto;
+      await verificarFavorito(productoId);
+      await cargarReseñas(productoId);
     } catch (error) {
       console.error("Error cargando producto:", error);
       Swal.fire({
@@ -111,7 +177,6 @@ const DescripcionProducto = () => {
     setMostrarCarrito(false);
   };
 
-  // 🔹 Función para agregar/quitar de favoritos
   const handleFavoritoClick = async () => {
     const userInfo = localStorage.getItem("usuarioInfo");
 
@@ -121,7 +186,7 @@ const DescripcionProducto = () => {
         title: "Inicia sesión",
         text: "Debes iniciar sesión para agregar productos a favoritos.",
         confirmButtonText: "Entendido",
-        confirmButtonColor: "#D84040",
+        confirmButtonColor: "#22C55E",
       });
       return;
     }
@@ -130,7 +195,6 @@ const DescripcionProducto = () => {
     const nombreProducto = producto.nombre;
 
     if (esFavorito) {
-      // Quitar de favoritos
       const result = await Swal.fire({
         title: "¿Quitar de favoritos?",
         html: `¿Estás seguro de quitar <strong>"${nombreProducto}"</strong> de favoritos?`,
@@ -160,7 +224,7 @@ const DescripcionProducto = () => {
               title: "¡Quitado!",
               text: "Producto quitado de favoritos correctamente.",
               confirmButtonText: "Aceptar",
-              confirmButtonColor: "#D84040",
+              confirmButtonColor: "#22C55E",
               timer: 2000,
               timerProgressBar: true,
             });
@@ -174,12 +238,11 @@ const DescripcionProducto = () => {
             title: "Error",
             text: "No se pudo quitar el producto de favoritos.",
             confirmButtonText: "Aceptar",
-            confirmButtonColor: "#D84040",
+            confirmButtonColor: "#22C55E",
           });
         }
       }
     } else {
-      // Agregar a favoritos
       try {
         const productoFavorito = {
           idproducto: productoId,
@@ -205,7 +268,7 @@ const DescripcionProducto = () => {
             title: "¡Agregado!",
             html: `"<strong>${nombreProducto}</strong>" fue agregado a favoritos.`,
             confirmButtonText: "Aceptar",
-            confirmButtonColor: "#D84040",
+            confirmButtonColor: "#22C55E",
             timer: 2000,
             timerProgressBar: true,
           });
@@ -220,13 +283,12 @@ const DescripcionProducto = () => {
           title: "Error",
           text: `No se pudo agregar el producto a favoritos: ${error.message}`,
           confirmButtonText: "Aceptar",
-          confirmButtonColor: "#D84040",
+          confirmButtonColor: "#22C55E",
         });
       }
     }
   };
 
-  // 🔹 Función para agregar al carrito CON VALIDACIÓN DE STOCK
   const handleAgregarCarrito = async () => {
     const userInfo = localStorage.getItem("usuarioInfo");
 
@@ -241,7 +303,6 @@ const DescripcionProducto = () => {
       return;
     }
 
-    // Validar que haya stock disponible
     if (producto.stock <= 0) {
       Swal.fire({
         icon: "error",
@@ -253,7 +314,6 @@ const DescripcionProducto = () => {
       return;
     }
 
-    // Validar que la cantidad no exceda el stock
     if (cantidad > producto.stock) {
       Swal.fire({
         icon: "warning",
@@ -287,7 +347,6 @@ const DescripcionProducto = () => {
       });
 
     } catch (error) {
-      // Manejar error específico de stock insuficiente
       if (error.response?.status === 400 && error.response?.data?.message?.includes("Stock insuficiente")) {
         Swal.fire({
           icon: "warning",
@@ -320,10 +379,9 @@ const DescripcionProducto = () => {
     }
   };
 
-  // 🔹 Función para comprar ahora CON VALIDACIÓN DE STOCK Y PROMOCIÓN
   const handleComprarAhora = () => {
     if (ejecutadoRef.current) {
-      console.log("⏭️ Compra ya en proceso...");
+      console.log("Compra ya en proceso...");
       return;
     }
 
@@ -404,7 +462,7 @@ const DescripcionProducto = () => {
         cantidadTotal: cantidad,
       };
 
-      console.log("📦 Datos de compra directa con promoción:", compraDirecta);
+      console.log("Datos de compra directa con promoción:", compraDirecta);
 
       navigate("/checkout/forma-entrega", {
         state: {
@@ -413,14 +471,91 @@ const DescripcionProducto = () => {
         },
       });
     } catch (error) {
-      console.error("❌ Error en compra directa:", error);
+      console.error("Error en compra directa:", error);
       ejecutadoRef.current = false;
     }
   };
 
-  // 🔹 Función para actualizar las opciones de cantidad basadas en el stock
+  const enviarReseña = async () => {
+    const userInfo = localStorage.getItem("usuarioInfo");
+    if (!userInfo) {
+      Swal.fire({
+        icon: "warning",
+        title: "Inicia sesión",
+        text: "Debes iniciar sesión para escribir una reseña.",
+        confirmButtonColor: "#22C55E"
+      });
+      return;
+    }
+
+    if (!nuevaReseña.comentario.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Comentario vacío",
+        text: "Por favor escribe un comentario para tu reseña.",
+        confirmButtonColor: "#22C55E"
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:4000/api/resenas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          id_producto: producto.id_producto || producto.id || producto.idproducto,
+          calificacion: nuevaReseña.calificacion,
+          comentario: nuevaReseña.comentario
+        })
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Gracias",
+          text: "Tu reseña ha sido publicada",
+          confirmButtonColor: "#22C55E"
+        });
+        setMostrarModalReseña(false);
+        setNuevaReseña({ calificacion: 5, comentario: '' });
+        await cargarReseñas(producto.id_producto || producto.id || producto.idproducto);
+      } else {
+        throw new Error("Error al publicar reseña");
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo publicar la reseña",
+        confirmButtonColor: "#22C55E"
+      });
+    }
+  };
+
+  const calcularDistribucion = () => {
+    const distribucion = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    reseñas.forEach(r => {
+      if (distribucion[r.calificacion] !== undefined) {
+        distribucion[r.calificacion]++;
+      }
+    });
+    const total = reseñas.length;
+    return [5, 4, 3, 2, 1].map(estrellas => ({
+      estrellas,
+      porcentaje: total > 0 ? (distribucion[estrellas] / total) * 100 : 0,
+      count: distribucion[estrellas]
+    }));
+  };
+
+  const calcularPromedio = () => {
+    if (reseñas.length === 0) return 0;
+    const suma = reseñas.reduce((acc, r) => acc + r.calificacion, 0);
+    return (suma / reseñas.length).toFixed(1);
+  };
+
   const getCantidadOpciones = () => {
-    const stockDisponible = producto.stock || 10;
+    const stockDisponible = producto?.stock || 10;
     const opciones = [];
     
     for (let i = 1; i <= Math.min(stockDisponible, 10); i++) {
@@ -430,7 +565,6 @@ const DescripcionProducto = () => {
     return opciones;
   };
 
-  // Si está cargando, mostrar loading
   if (cargando) {
     return (
       <div className="descripcion-producto">
@@ -446,7 +580,6 @@ const DescripcionProducto = () => {
     );
   }
 
-  // Si no hay producto después de cargar, mostrar error
   if (!producto || !producto.nombre) {
     return (
       <div className="descripcion-producto">
@@ -466,6 +599,8 @@ const DescripcionProducto = () => {
   const imagenActual = imagenes[imagenSeleccionada];
   const stockDisponible = producto.stock || 10;
   const cantidadOpciones = getCantidadOpciones();
+  const promedioCalificacion = calcularPromedio();
+  const distribucionCalificaciones = calcularDistribucion();
 
   const siguienteImagen = () => {
     if (imagenes.length > 1) {
@@ -481,7 +616,6 @@ const DescripcionProducto = () => {
 
   return (
     <div className="descripcion-producto">
-      {/* ✅ Icono del carrito FUERA del modal - SE OCULTA CUANDO EL CARRITO ESTÁ ABIERTO */}
       {!mostrarCarrito && (
         <button 
           className="carrito-modal-btn"
@@ -493,12 +627,10 @@ const DescripcionProducto = () => {
       )}
 
       <div className="producto-detalle">
-        {/* ✅ Botón volver - SOLO FLECHA */}
         <button onClick={cerrarModal} className="btn-volver" title="Volver">
           <FaArrowLeft />
         </button>
 
-        {/* ❤️ Corazón de favoritos */}
         <button 
           className={`corazon-favorito ${esFavorito ? 'activo' : ''} ${verificandoFavorito ? 'cargando' : ''}`}
           onClick={handleFavoritoClick}
@@ -507,186 +639,320 @@ const DescripcionProducto = () => {
           title={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
         >
           <FaHeart />
-          {verificandoFavorito && <span className="cargando-favorito"></span>}
         </button>
 
-        {/* 📦 Sección de Imágenes */}
-        <div className="producto-imagen-placeholder">
-          <div className="imagen-cuadro">
-            {imagenActual?.url ? (
-              <img 
-                src={imagenActual.url} 
-                alt={producto.nombre}
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'contain',
-                  borderRadius: '8px',
-                  background: '#f5f5f5'
-                }}
-              />
-            ) : (
-              <p>Imagen del producto</p>
-            )}
-            
-            {imagenes.length > 1 && (
-              <>
-                <button 
-                  className="flecha-navegacion flecha-izquierda"
-                  onClick={anteriorImagen}
-                >
-                  ‹
-                </button>
-                <button 
-                  className="flecha-navegacion flecha-derecha"
-                  onClick={siguienteImagen}
-                >
-                  ›
-                </button>
-              </>
-            )}
-          </div>
-
-          {imagenes.length > 1 && (
-            <div className="contador-imagenes">
-              {imagenSeleccionada + 1} / {imagenes.length}
-            </div>
-          )}
-        </div>
-
-        {/* 📋 Información del Producto */}
-        <div className="producto-info">
-          <h2>{producto.nombre}</h2>
-          
-          {producto.descripcion ? (
-            <p className="producto-descripcion">{producto.descripcion}</p>
-          ) : producto.descripcion_producto ? (
-            <p className="producto-descripcion">{producto.descripcion_producto}</p>
-          ) : producto.descripcion_text ? (
-            <p className="producto-descripcion">{producto.descripcion_text}</p>
-          ) : (
-            <p className="producto-descripcion sin-descripcion">
-              Este producto no tiene descripción disponible.
-            </p>
-          )}
-
-          <div className="producto-precio-box">
-            {producto.tiene_promocion ? (
-              <>
-                <span className="producto-descuento-badge">
-                  -{producto.descuento_porcentaje}% OFF
-                </span>
-
-                <p className="producto-precio-original">
-                  ${Number(producto.precio_original || producto.precio).toLocaleString("es-CO")}
-                </p>
-
-                <p className="producto-precio-final">
-                  ${Number(producto.precio_final || producto.precio).toLocaleString("es-CO")}
-                </p>
-
-                {producto.promocion_nombre && (
-                  <small className="producto-promocion-nombre">
-                    Promo: {producto.promocion_nombre}
-                  </small>
+        <div className="producto-contenedor">
+          <div className="producto-layout-principal">
+            <div className="producto-imagenes-columna">
+              <div className="imagen-principal">
+                {imagenActual?.url ? (
+                  <img 
+                    src={imagenActual.url} 
+                    alt={producto.nombre}
+                  />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8' }}>
+                    Sin imagen
+                  </div>
                 )}
+                
+                {imagenes.length > 1 && (
+                  <>
+                    <button 
+                      className="flecha-navegacion flecha-izquierda"
+                      onClick={anteriorImagen}
+                    >
+                      ‹
+                    </button>
+                    <button 
+                      className="flecha-navegacion flecha-derecha"
+                      onClick={siguienteImagen}
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {imagenes.length > 1 && (
+                <>
+                  <div className="miniaturas-container">
+                    {imagenes.map((img, idx) => (
+                      <div 
+                        key={idx}
+                        className={`miniatura ${imagenSeleccionada === idx ? 'activa' : ''}`}
+                        onClick={() => setImagenSeleccionada(idx)}
+                      >
+                        <img src={img.url} alt={`Miniatura ${idx + 1}`} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="contador-imagenes">
+                    {imagenSeleccionada + 1} / {imagenes.length}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="producto-info-columna">
+              <h1 className="producto-titulo">{producto.nombre}</h1>
+              
+              {producto.descripcion ? (
+                <p className="producto-descripcion">{producto.descripcion}</p>
+              ) : producto.descripcion_producto ? (
+                <p className="producto-descripcion">{producto.descripcion_producto}</p>
+              ) : producto.descripcion_text ? (
+                <p className="producto-descripcion">{producto.descripcion_text}</p>
+              ) : (
+                <p className="producto-descripcion sin-descripcion">
+                  Este producto no tiene descripción disponible.
+                </p>
+              )}
+
+              {/* Calificación compacta - usa EstrellasPromedio para mostrar fracciones */}
+              <div className="calificacion-compacta">
+                <div className="estrellas-container">
+                  <EstrellasPromedio promedio={promedioCalificacion} size="18px" />
+                </div>
+                <span className="promedio-texto">{promedioCalificacion}</span>
+                <span className="reseñas-count">({reseñas.length} reseñas)</span>
+                {reseñas.length > 0 && (
+                  <span 
+                    className="ver-reseñas-link" 
+                    onClick={() => document.querySelector('.reseñas-seccion')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Ver reseñas
+                  </span>
+                )}
+              </div>
+
+              <div className="producto-precio-box">
+                {producto.tiene_promocion ? (
+                  <>
+                    <span className="producto-descuento-badge">
+                      -{producto.descuento_porcentaje}% OFF
+                    </span>
+                    <span className="producto-precio-original">
+                      ${Number(producto.precio_original || producto.precio).toLocaleString("es-CO")}
+                    </span>
+                    <span className="producto-precio-final">
+                      ${Number(producto.precio_final || producto.precio).toLocaleString("es-CO")}
+                    </span>
+                    {producto.promocion_nombre && (
+                      <small className="producto-promocion-nombre">
+                        Promo: {producto.promocion_nombre}
+                      </small>
+                    )}
+                  </>
+                ) : (
+                  <span className="producto-precio-normal">
+                    ${Number(producto.precio || 0).toLocaleString("es-CO")}
+                  </span>
+                )}
+              </div>
+
+              <div className="cantidad-stock-container">
+                <div className="producto-cantidad">
+                  <label htmlFor="cantidad">Cantidad:</label>
+                  <select
+                    id="cantidad"
+                    value={cantidad}
+                    onChange={(e) => setCantidad(Number(e.target.value))}
+                    disabled={stockDisponible <= 0}
+                  >
+                    {cantidadOpciones.map((opcion) => (
+                      <option key={opcion} value={opcion}>
+                        {opcion} {opcion === 1 ? 'unidad' : 'unidades'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="producto-stock">
+                  {stockDisponible <= 0 ? (
+                    <div className="stock-out-alert">
+                      <FaExclamationTriangle className="stock-out-alert-icon" />
+                      <span className="stock-out-alert-text">Producto agotado</span>
+                    </div>
+                  ) : (
+                    <p className={stockDisponible <= 5 ? "stock-bajo" : "stock-normal"}>
+                      <FaCheckCircle />
+                      {stockDisponible} unidades disponibles
+                      {stockDisponible <= 5 && stockDisponible > 0 && " - Ultimas unidades"}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="medios-pago">
+                <p>Medios de pago</p>
+                <div className="logos-pago">
+                  <SiVisa className="tarjeta-icono" title="Visa" />
+                  <SiMastercard className="tarjeta-icono" title="Mastercard" />
+                  <SiAmericanexpress className="tarjeta-icono" title="American Express" />
+                  <SiJcb className="tarjeta-icono" title="JCB" />
+                </div>
+              </div>
+
+              <div className="botones-compra">
+                <button 
+                  className="btn-comprar" 
+                  onClick={handleComprarAhora}
+                  disabled={stockDisponible <= 0}
+                >
+                  {stockDisponible <= 0 ? "Producto agotado" : "Comprar Ahora"}
+                </button>
+                <button 
+                  className="btn-agregar" 
+                  onClick={handleAgregarCarrito}
+                  disabled={stockDisponible <= 0}
+                >
+                  <FaShoppingCart />
+                  {stockDisponible <= 0 ? "Sin stock" : "Agregar al carrito"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="reseñas-seccion">
+            <div className="reseñas-header">
+              <h3>
+                <FaStar className="estrella-activa" />
+                Opiniones de clientes
+              </h3>
+              <button className="btn-escribir-reseña" onClick={() => setMostrarModalReseña(true)}>
+                <FaPenFancy />
+                Escribir una reseña
+              </button>
+            </div>
+
+            {reseñas.length > 0 ? (
+              <>
+                <div className="resumen-calificaciones">
+                  <div className="promedio-grande">
+                    <div className="numero-promedio">{promedioCalificacion}</div>
+                    {/* Estrellas grandes - usa EstrellasPromedio para mostrar fracciones */}
+                    <div className="estrellas-grandes">
+                      <EstrellasPromedio promedio={promedioCalificacion} size="22px" />
+                    </div>
+                    <div className="total-reseñas">
+                      {reseñas.length} {reseñas.length === 1 ? 'reseña' : 'reseñas'} verificadas
+                    </div>
+                  </div>
+
+                  <div className="barras-calificacion">
+                    {distribucionCalificaciones.map(({ estrellas, porcentaje, count }) => (
+                      <div key={estrellas} className="barra-item">
+                        <span className="barra-label">{estrellas} estrella</span>
+                        <div className="barra-bg">
+                          <div className="barra-fill" style={{ width: `${porcentaje}%` }}></div>
+                        </div>
+                        <span className="barra-porcentaje">{Math.round(porcentaje)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="lista-reseñas">
+                  {reseñas.map((reseña, idx) => (
+                    <div key={idx} className="tarjeta-reseña">
+                      <div className="reseña-header">
+                        <div className="reseña-usuario">
+                          <div className="avatar-placeholder">
+                            {reseña.usuario_nombre?.charAt(0) || "U"}
+                          </div>
+                          <span className="usuario-nombre">{reseña.usuario_nombre || "Usuario"}</span>
+                        </div>
+                        <span className="reseña-fecha">
+                          <FaCalendarAlt />
+                          {new Date(reseña.fecha_creacion || reseña.fecha).toLocaleDateString("es-CO", {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                      {/* Estrellas individuales - estas SÍ son enteras, sin fracciones */}
+                      <div className="reseña-estrellas">
+                        {[...Array(5)].map((_, i) => (
+                          <FaStar 
+                            key={i} 
+                            className={i < reseña.calificacion ? "estrella-activa" : "estrella-inactiva"}
+                          />
+                        ))}
+                      </div>
+                      <p className="reseña-comentario">{reseña.comentario}</p>
+                    </div>
+                  ))}
+                </div>
               </>
             ) : (
-              <p className="producto-precio-normal">
-                ${Number(producto.precio || 0).toLocaleString("es-CO")}
-              </p>
+              <div className="sin-reseñas">
+                <p>
+                  <FaStar className="estrella-activa" />
+                  Se el primero en opinar sobre este producto
+                </p>
+                <p className="sin-reseñas-subtext">Tu opinión ayuda a otros compradores a tomar mejores decisiones</p>
+                <button className="btn-escribir-reseña" onClick={() => setMostrarModalReseña(true)} style={{ marginTop: '20px' }}>
+                  <FaPenFancy />
+                  Escribir una reseña
+                </button>
+              </div>
             )}
-          </div>
-
-          <div className="producto-calificacion">
-            {[...Array(5)].map((_, i) => (
-              <FaStar key={i} color="#FFD700" />
-            ))}
-            <p>Calificación promedio</p>
-          </div>
-
-          {/* ⚠️ Mensaje de sin stock */}
-          {stockDisponible <= 0 && (
-            <div className="stock-out-alert">
-              <FaExclamationTriangle className="stock-out-alert-icon" />
-              <span className="stock-out-alert-text">
-                Producto agotado temporalmente
-              </span>
-            </div>
-          )}
-
-          <div className="producto-cantidad" style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-            <label htmlFor="cantidad">Cantidad:</label>
-            <select
-              id="cantidad"
-              value={cantidad}
-              onChange={(e) => setCantidad(Number(e.target.value))}
-              disabled={stockDisponible <= 0}
-              style={{
-                height: "45px",
-                padding: "0 15px",
-                borderRadius: "8px",
-                fontSize: "16px",
-                border: stockDisponible <= 0 ? "1px solid #ccc" : "1px solid #ddd",
-                backgroundColor: stockDisponible <= 0 ? "#f8f9fa" : "white",
-                cursor: stockDisponible <= 0 ? "not-allowed" : "pointer",
-                color: stockDisponible <= 0 ? "#6c757d" : "#212529"
-              }}
-            >
-              {cantidadOpciones.map((opcion) => (
-                <option key={opcion} value={opcion}>
-                  {opcion} {opcion === 1 ? 'unidad' : 'unidades'}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="producto-stock">
-            <p className={stockDisponible <= 5 ? "stock-bajo" : "stock-normal"}>
-              N° Disponibles: {stockDisponible}
-              {stockDisponible <= 5 && stockDisponible > 0 }
-              {stockDisponible <= 0 && " ❌"}
-            </p>
-          </div>
-
-          <div className="medios-pago">
-            <p>Medios de pago</p>
-            <div className="logos-pago">
-              <SiVisa className="tarjeta-icono" title="Visa" />
-              <SiMastercard className="tarjeta-icono" title="Mastercard" />
-              <SiAmericanexpress className="tarjeta-icono" title="American Express" />
-              <SiJcb className="tarjeta-icono" title="JCB" />
-            </div>
-          </div>
-
-          <div className="botones-compra">
-            <button 
-              className="btn-comprar" 
-              onClick={handleComprarAhora}
-              disabled={stockDisponible <= 0}
-              style={{
-                opacity: stockDisponible <= 0 ? 0.6 : 1,
-                cursor: stockDisponible <= 0 ? "not-allowed" : "pointer"
-              }}
-            >
-              {stockDisponible <= 0 ? "Producto agotado" : "Comprar Ahora"}
-            </button>
-            <button 
-              className="btn-agregar" 
-              onClick={handleAgregarCarrito}
-              disabled={stockDisponible <= 0}
-              style={{
-                opacity: stockDisponible <= 0 ? 0.6 : 1,
-                cursor: stockDisponible <= 0 ? "not-allowed" : "pointer"
-              }}
-            >
-              {stockDisponible <= 0 ? "Sin stock" : "Agregar al carrito"}
-            </button>
           </div>
         </div>
       </div>
 
-      {/* ✅ CARRITO RENDERIZADO DENTRO DEL MODAL */}
+      {mostrarModalReseña && (
+        <div className="modal-reseña-overlay" onClick={() => setMostrarModalReseña(false)}>
+          <div className="modal-reseña" onClick={(e) => e.stopPropagation()}>
+            <h3>
+              <FaPenFancy />
+              Escribe tu opinión
+            </h3>
+            <p className="modal-subtext">Comparte tu experiencia con este producto</p>
+            
+            <div className="modal-campo">
+              <label>Tu calificación</label>
+              <select 
+                value={nuevaReseña.calificacion} 
+                onChange={(e) => setNuevaReseña({ ...nuevaReseña, calificacion: parseInt(e.target.value) })}
+              >
+                <option value={5}>5 estrellas - Excelente</option>
+                <option value={4}>4 estrellas - Muy bueno</option>
+                <option value={3}>3 estrellas - Bueno</option>
+                <option value={2}>2 estrellas - Regular</option>
+                <option value={1}>1 estrella - Malo</option>
+              </select>
+            </div>
+
+            <div className="modal-campo">
+              <label>Tu comentario</label>
+              <textarea 
+                placeholder="Que te pareció el producto? Como fue tu experiencia?"
+                value={nuevaReseña.comentario}
+                onChange={(e) => setNuevaReseña({ ...nuevaReseña, comentario: e.target.value })}
+                rows="4"
+              />
+            </div>
+
+            <div className="modal-botones">
+              <button className="btn-cancelar" onClick={() => setMostrarModalReseña(false)}>
+                Cancelar
+              </button>
+              <button 
+                className="btn-enviar" 
+                onClick={enviarReseña} 
+                disabled={!nuevaReseña.comentario.trim()}
+              >
+                <FaCheckCircle />
+                Publicar reseña
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {mostrarCarrito && (
         <Carrito
           abierto={mostrarCarrito}
