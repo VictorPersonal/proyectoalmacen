@@ -496,7 +496,7 @@ const Home = () => {
 
           {/* ✅ Botón Promociones - Ahora abre el modal */}
           <button 
-            className="nav-link" 
+            className="nav-link promociones-btn" 
             onClick={() => setMostrarPromociones(true)}
           >
             Promociones

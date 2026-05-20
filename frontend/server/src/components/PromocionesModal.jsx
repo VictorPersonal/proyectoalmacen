@@ -130,7 +130,7 @@ const PromocionesModal = ({ isOpen, onClose }) => {
         <div className="promociones-modal-content">
           {cargando ? (
             <div className="loading-state">
-              <div className="spinner"></div>
+              <div className="promo-spinner"></div>
               <p>Cargando ofertas...</p>
             </div>
           ) : productosFiltrados.length === 0 ? (
@@ -139,7 +139,7 @@ const PromocionesModal = ({ isOpen, onClose }) => {
               <p>No hay productos en oferta en esta categoría</p>
             </div>
           ) : (
-            <div className="productos-grid">
+            <div className="promo-productos-grid">
               {productosFiltrados.map((producto) => (
                 <div 
                   key={producto.idproducto} 
