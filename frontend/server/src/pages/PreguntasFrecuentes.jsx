@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/pages/PreguntasFrecuentes.css';
 import { 
   FaPhone, 
@@ -12,15 +13,20 @@ import {
   FaMinus,
   FaMapMarkerAlt,
   FaHome,
-  FaArrowRight
+  FaArrowRight,
+  FaArrowLeft
 } from 'react-icons/fa';
 
-
 const FAQPage = () => {
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
 
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);
   };
 
   const faqData = [
@@ -76,6 +82,11 @@ const FAQPage = () => {
 
   return (
     <div className="faq-page">
+      {/* Botón volver */}
+      <button className="faq-back-btn" onClick={handleGoBack}>
+        <FaArrowLeft /> Volver
+      </button>
+
       {/* Header */}
       <header className="faq-header">
         <div className="container">
@@ -94,12 +105,10 @@ const FAQPage = () => {
       {/* Breadcrumb */}
       <nav className="breadcrumb">
         <div className="container">
-          <a href="/" className="breadcrumb-link">
-            <FaHome className="breadcrumb-icon" />
-            Inicio
-          </a>
-          <FaArrowRight className="breadcrumb-arrow" />
-          <span className="breadcrumb-current">Preguntas Frecuentes</span>
+          <button className="breadcrumb-link" onClick={handleGoBack}>
+            <FaArrowLeft className="breadcrumb-icon" />
+            Volver atrás
+          </button>
         </div>
       </nav>
 

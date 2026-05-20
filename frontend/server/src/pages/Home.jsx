@@ -8,6 +8,7 @@ import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
 import Carrito from "../components/Carrito";
 import SimpleFooter from "../components/SimpleFooter";
+import PromocionesModal from "../components/PromocionesModal";
 
 const Home = () => {
   const [menuMasInfo, setMenuMasInfo] = useState(false);
@@ -16,6 +17,7 @@ const Home = () => {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [submenuAbierto, setSubmenuAbierto] = useState(null);
   const [perfilMenuAbierto, setPerfilMenuAbierto] = useState(false);
+  const [mostrarPromociones, setMostrarPromociones] = useState(false);
 
   // ✅ INICIALIZAR ESTADO DESDE sessionStorage
   const getEstadoInicial = () => {
@@ -87,7 +89,7 @@ const Home = () => {
 
   // ✅ EFECTO PARA CAMBIO AUTOMÁTICO DE SLIDES
   useEffect(() => {
-    if (images.length <= 1) return; // No hacer nada si solo hay una imagen
+    if (images.length <= 1) return;
     
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => 
@@ -95,7 +97,7 @@ const Home = () => {
       );
     }, 15000); 
 
-    return () => clearInterval(interval); // Limpiar intervalo al desmontar
+    return () => clearInterval(interval);
   }, [images.length]);
 
   // CATEGORÍAS ACTUALIZADAS - Estructura mejorada con IDs
@@ -161,7 +163,7 @@ const Home = () => {
 
   const handleCerrarSesion = () => {
     localStorage.removeItem("usuarioInfo");
-    sessionStorage.removeItem('homeEstado'); // ✅ Limpiar estado al cerrar sesión
+    sessionStorage.removeItem('homeEstado');
     setUsuarioLogueado(false);
     setUsuarioInfo(null);
     setPerfilMenuAbierto(false);
@@ -173,7 +175,6 @@ const Home = () => {
       ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
       : "";
 
-  // FILTRO MEJORADO - más estricto
   const filtrarProductos = (productos, query) => {
     if (!query.trim()) return productos;
     
@@ -184,7 +185,6 @@ const Home = () => {
       const nombreNormalizado = normalizar(producto.nombre);
       const descripcionNormalizada = normalizar(producto.descripcion);
       
-      // Buscar coincidencias exactas de palabras
       return palabras.some(palabra => 
         nombreNormalizado.includes(palabra) || 
         descripcionNormalizada.includes(palabra)
@@ -202,24 +202,16 @@ const Home = () => {
       const aDesc = normalizar(a.descripcion);
       const bDesc = normalizar(b.descripcion);
       
-      // Puntuación más precisa
       let aPuntos = 0;
       let bPuntos = 0;
       
       palabras.forEach(palabra => {
-        // Coincidencia exacta en nombre
         if (aNombre === palabra) aPuntos += 10;
         if (bNombre === palabra) bPuntos += 10;
-        
-        // Empieza con la palabra
         if (aNombre.startsWith(palabra)) aPuntos += 5;
         if (bNombre.startsWith(palabra)) bPuntos += 5;
-        
-        // Contiene la palabra en nombre
         if (aNombre.includes(palabra)) aPuntos += 3;
         if (bNombre.includes(palabra)) bPuntos += 3;
-        
-        // Contiene en descripción
         if (aDesc.includes(palabra)) aPuntos += 1;
         if (bDesc.includes(palabra)) bPuntos += 1;
       });
@@ -256,7 +248,6 @@ const Home = () => {
       const data = await response.json();
       const productosRecibidos = Array.isArray(data) ? data : [];
       
-      // Aplicar filtro adicional en frontend
       const productosFiltrados = filtrarProductos(productosRecibidos, query);
       const productosOrdenados = ordenarPorRelevancia(productosFiltrados, query);
       
@@ -292,19 +283,17 @@ const Home = () => {
 
   const toggleCarrito = () => setMostrarCarrito(!mostrarCarrito);
 
-  // ✅ FUNCIÓN ACTUALIZADA: Navegación a producto con modal superpuesto
   const handleSeleccionarProducto = (producto) => {
     navigate(`/producto/${producto.id_producto || producto.id || producto.idproducto}`, {
       state: { 
         backgroundLocation: location,
         productoData: producto,
-        from: 'producto' // ✅ Indicar que venimos del producto
+        from: 'producto'
       }
     });
   };
 
-  // FUNCIÓN NUEVA PARA CARGAR PRODUCTOS POR CATEGORÍA
-    const cargarProductosPorCategoria = async (idCategoria) => {
+  const cargarProductosPorCategoria = async (idCategoria) => {
     setCategoriaSeleccionada(idCategoria);   
     setCargando(true);
     
@@ -315,17 +304,9 @@ const Home = () => {
       const response = await fetch(`http://localhost:4000/api/productos`);
       const data = await response.json();
       
-      console.log("🔍 Productos recibidos (primeros 3):", data.slice(0, 3));
-      console.log("🔍 ¿El primer producto tiene promoción?", data[0]?.tiene_promocion);
-      
-      // Filtrar por categoría
       const productosFiltradosPorCategoria = data.filter(
         producto => Number(producto.idcategoria) === Number(idCategoria)
       );
-      
-      console.log(`✅ Filtrados categoría ${idCategoria}:`, productosFiltradosPorCategoria.length);
-      console.log("🎯 Primer producto filtrado:", productosFiltradosPorCategoria[0]);
-      console.log("🎯 ¿Tiene promoción?", productosFiltradosPorCategoria[0]?.tiene_promocion);
       
       setProductos(productosFiltradosPorCategoria);
       setProductosFiltrados(productosFiltradosPorCategoria);
@@ -342,7 +323,6 @@ const Home = () => {
     }
   };
 
-  // ✅ FUNCIÓN MEJORADA: Limpiar búsqueda completamente
   const limpiarBusqueda = () => {
     setBusqueda("");
     setProductos([]);
@@ -352,10 +332,6 @@ const Home = () => {
     sessionStorage.removeItem('homeEstado');
   };
 
-  // Determinar qué productos mostrar
-  const productosAMostrar = categoriaSeleccionada ? productosFiltrados : productosFiltrados;
-
-  // ✅ NUEVO: Determinar si mostrar el carrusel o los resultados
   const mostrarCarrusel = !categoriaSeleccionada && busqueda.trim().length === 0 && productos.length === 0;
 
   return (
@@ -373,7 +349,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* ✅ BUSCADOR CON FaSearch */}
           <div className="search-container-home" id="search-container">
             <input
               type="text"
@@ -383,7 +358,6 @@ const Home = () => {
               onKeyDown={handleKeyPress}
             />
             
-            {/* Botón X - Solo visible cuando hay texto */}
             <button
               className="clear-btn"
               onClick={limpiarBusqueda}
@@ -393,7 +367,6 @@ const Home = () => {
               ✕
             </button>
             
-            {/* Botón Lupa con FaSearch - Solo visible cuando NO hay texto */}
             <button
               className="search-btn"
               onClick={handleBuscar}
@@ -404,68 +377,66 @@ const Home = () => {
             </button>
           </div>
 
-        <div className="auth-links" id="auth-links">
-          {usuarioLogueado ? (
-            <div className="perfil-menu">
-              <button className="perfil-btn" onClick={togglePerfilMenu}>
-                <FaUserCircle className="perfil-icon" />
-                <span className="nombre-usuario">
-                  {usuarioInfo?.nombre || usuarioInfo?.cedula}
-                </span>
-              </button>
+          <div className="auth-links" id="auth-links">
+            {usuarioLogueado ? (
+              <div className="perfil-menu">
+                <button className="perfil-btn" onClick={togglePerfilMenu}>
+                  <FaUserCircle className="perfil-icon" />
+                  <span className="nombre-usuario">
+                    {usuarioInfo?.nombre || usuarioInfo?.cedula}
+                  </span>
+                </button>
 
-              {perfilMenuAbierto && (
-                <div className="perfil-desplegable">
-                  <Link
-                    to="/ajustes-de-cuenta"
-                    className="perfil-item"
-                    onClick={() => setPerfilMenuAbierto(false)}
-                  >
-                    Ajustes de cuenta
-                  </Link>
+                {perfilMenuAbierto && (
+                  <div className="perfil-desplegable">
+                    <Link
+                      to="/ajustes-de-cuenta"
+                      className="perfil-item"
+                      onClick={() => setPerfilMenuAbierto(false)}
+                    >
+                      Ajustes de cuenta
+                    </Link>
 
-                  <button
-                    className="perfil-item cerrar-sesion"
-                    onClick={handleCerrarSesion}
-                  >
-                    Cerrar sesión
-                  </button>
-                  {usuarioInfo?.rol === "administrador" && (
-                  <button
-                    className="nav-link admin-panel-btn"
-                    onClick={() => navigate("/admin")}
-                    style={{ marginRight: "10px" }}
-                  >
-                    Panel Admin
-                  </button>
-                  )}
-                </div>
-              )}
+                    <button
+                      className="perfil-item cerrar-sesion"
+                      onClick={handleCerrarSesion}
+                    >
+                      Cerrar sesión
+                    </button>
+                    {usuarioInfo?.rol === "administrador" && (
+                      <button
+                        className="nav-link admin-panel-btn"
+                        onClick={() => navigate("/admin")}
+                        style={{ marginRight: "10px" }}
+                      >
+                        Panel Admin
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link to="/registro" id="link-registrarse">
+                  Registrarse
+                </Link>
+                <Link to="/login" id="link-login">
+                  Iniciar sesión
+                </Link>
+              </>
+            )}
+
+            <Link to="/favoritos" className="nav-link favoritos-link">
+              <FaHeart className="favoritos-icon" />
+              Favoritos
+            </Link>
+
+            <div className="cart-icon" onClick={toggleCarrito}>
+              <FaShoppingCart />
             </div>
-          ) : (
-            <>
-              <Link to="/registro" id="link-registrarse">
-                Registrarse
-              </Link>
-              <Link to="/login" id="link-login">
-                Iniciar sesión
-              </Link>
-            </>
-          )}
-
-          <Link to="/favoritos" className="nav-link favoritos-link">
-            <FaHeart className="favoritos-icon" />
-            Favoritos
-          </Link>
-
-          <div className="cart-icon" onClick={toggleCarrito}>
-            <FaShoppingCart />
           </div>
-        </div>
-
         </nav>
 
-        {/* nav-links FUERA del nav, pero dentro del header */}
         <div className="nav-links" id="nav-links">
           <div className="categorias-menu">
             <button className="nav-link categorias-btn" onClick={toggleMenu}>
@@ -523,15 +494,18 @@ const Home = () => {
             )}
           </div>
 
-          <Link to="/promociones" className="nav-link">
+          {/* ✅ Botón Promociones - Ahora abre el modal */}
+          <button 
+            className="nav-link promociones-btn" 
+            onClick={() => setMostrarPromociones(true)}
+          >
             Promociones
-          </Link>
+          </button>
 
           <a href="#" className="nav-link">
             Ayuda
           </a>
         </div>
-
       </header>
 
       {/* CARRITO */}
@@ -543,10 +517,15 @@ const Home = () => {
         />
       )}
 
+      {/* MODAL DE PROMOCIONES */}
+      <PromocionesModal 
+        isOpen={mostrarPromociones} 
+        onClose={() => setMostrarPromociones(false)} 
+      />
+
       {/* CONTENIDO ACTUALIZADO */}
       {mostrarCarrusel ? (
         <main id="main">
-          {/* CARRUSEL */}
           <section className="hero-section" id="hero-section">
             <button className="carousel-btn prev" onClick={prevSlide}>
               <FaChevronLeft />
@@ -573,17 +552,13 @@ const Home = () => {
               <FaRight />
             </button>
           </section>
-
         </main>
       ) : (
-        /* Mostrar productos ya sea por búsqueda o por categoría */
         <main className="resultados">
-          {/* Si hay mensaje por categoría (sin productos) */}
           {mensajeCategoria && (
             <p className="no-result">{mensajeCategoria}</p>
           )}
 
-          {/* Información de búsqueda */}
           {busqueda.trim() && (
             <div className="resultados-header">
               <span className="resultados-count">
@@ -592,7 +567,6 @@ const Home = () => {
             </div>
           )}
 
-          {/*Contador de resultados para categorías*/}
           {!busqueda.trim() && !cargando && productosFiltrados.length > 0 && (
             <div className="resultados-header">
               <span className="resultados-count">
@@ -601,7 +575,6 @@ const Home = () => {
             </div>
           )}
 
-          {/*Mostrar los productos*/}    
           {cargando ? (
             <div className="spinner-container">
               <div className="spinner"></div>

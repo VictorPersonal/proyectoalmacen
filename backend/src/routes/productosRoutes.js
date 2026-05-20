@@ -33,6 +33,10 @@ router.get("/productos", async (req, res) => {
         idcategoria,
         idmarca,
         activo,
+        categoria_id: idcategoria (
+          idcategoria,
+          descripcionCategoria
+        ),
         producto_imagen (
           idimagen,
           url
@@ -57,8 +61,15 @@ router.get("/productos", async (req, res) => {
 
     if (promoError) throw promoError;
 
+    // Añadir nombre_categoria a cada producto usando el campo correcto
+    const productosConCategoria = (productos || []).map(producto => ({
+      ...producto,
+      nombre_categoria: producto.categoria_id?.descripcionCategoria || `Categoría ${producto.idcategoria}`,
+      categoria_id: undefined // Limpiar el objeto anidado
+    }));
+
     const productosConPromocion = enriquecerProductosConPromociones(
-      productos || [],
+      productosConCategoria,
       promociones || []
     );
 
@@ -87,6 +98,10 @@ router.get("/productos/:id", async (req, res) => {
         idcategoria,
         idmarca,
         activo,
+        categoria_id: idcategoria (
+          idcategoria,
+          descripcionCategoria
+        ),
         producto_imagen (
           idimagen,
           url
@@ -107,6 +122,13 @@ router.get("/productos/:id", async (req, res) => {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
 
+    // Añadir nombre_categoria usando el campo correcto
+    const productoConCategoria = {
+      ...producto,
+      nombre_categoria: producto.categoria_id?.descripcionCategoria || `Categoría ${producto.idcategoria}`,
+      categoria_id: undefined
+    };
+
     const { data: promociones, error: promoError } = await supabaseDB
       .from("promociones")
       .select("*");
@@ -114,7 +136,7 @@ router.get("/productos/:id", async (req, res) => {
     if (promoError) throw promoError;
 
     const productoConPromocion = calcularPrecioPromocional(
-      producto,
+      productoConCategoria,
       promociones || []
     );
 
