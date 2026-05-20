@@ -175,4 +175,25 @@ router.delete("/favoritos/:idproducto", async (req, res) => {
   }
 });
 
+router.get("/favoritos/verificar/:idproducto", async (req, res) => {
+  const { idproducto } = req.params;
+  const cedula = req.usuario.id;
+
+  try {
+    const { data, error } = await supabase
+      .from("favoritoproducto")
+      .select("idfavorito")
+      .eq("cedula", cedula)
+      .eq("idproducto", idproducto)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    res.status(200).json({ esFavorito: !!data });
+  } catch (error) {
+    console.error("❌ Error al verificar favorito:", error.message);
+    res.status(500).json({ message: "Error al verificar favorito" });
+  }
+});
+
 export default router;

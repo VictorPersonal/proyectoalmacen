@@ -1,36 +1,122 @@
-:root{
-  --bg: #F1F5F9;
-  --card: #ffffff;
-  --text: #0f172a;
-  --muted: #6b7280;
-  --border: #e6e9ef;
+:root {
+  --bg: linear-gradient(135deg, #16A34A 0%, #22C55E 100%);
+  --card-bg: rgba(255, 255, 255, 0.98);
+  --text: #1E293B;
+  --muted: #475569;
+  --border: rgba(255, 255, 255, 0.4);
+  --primary: #22C55E;
+  --primary-light: #4ADE80;
+  --success: #22C55E;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+  --radius: 20px;
 }
 
-.cs-wrapper{
-  padding: 20px;
+.cs-wrapper {
+  padding: 40px 24px;
   display: flex;
   justify-content: center;
-  font-family: Inter, sans-serif;
-  background: transparent; 
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
 }
 
-.cs-card{
+/* Decoración de fondo */
+.cs-wrapper::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+}
+
+.cs-wrapper::after {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  bottom: -80px;
+  left: -80px;
+}
+
+.cs-card {
   width: 100%;
-  max-width: 700px;
-  background: var(--card);
-  padding: 20px;
-  border-radius: 10px;
+  max-width: 500px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 28px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow);
+  position: relative;
+  z-index: 1;
 }
 
-.cs-title{
-  margin: 0 0 12px 0;
-  font-size: 22px;
+/* Botón volver */
+.cs-back-btn {
+  position: absolute;
+  top: 20px;
+  left: -120px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 30px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text);
+  transition: all 0.2s ease;
+  z-index: 10;
+  font-family: inherit;
 }
 
-.cs-list{
+.cs-back-btn:hover {
+  background: white;
+  transform: translateX(-3px);
+  color: var(--primary);
+}
+
+.cs-back-btn svg {
+  font-size: 16px;
+}
+
+.cs-title {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cs-title-icon {
+  font-size: 28px;
+  color: var(--primary);
+}
+
+.cs-subtitle {
+  margin: 0 0 24px 0;
+  font-size: 13px;
+  color: var(--muted);
+  border-left: 3px solid var(--primary);
+  padding-left: 12px;
+}
+
+.cs-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -39,21 +125,96 @@
   gap: 12px;
 }
 
-.cs-item{
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
+.cs-item {
+  padding: 14px 16px;
+  background: white;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #eef2ff;
+  position: relative;
+  overflow: hidden;
 }
 
-.cs-item-title{
-  margin: 0 0 4px 0;
-  font-size: 16px;
+.cs-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--primary);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.cs-item:hover {
+  transform: translateX(4px);
+  border-color: var(--primary-light);
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.15);
+}
+
+.cs-item:hover::before {
+  transform: scaleY(1);
+}
+
+.cs-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.cs-item-icon {
+  font-size: 18px;
+  color: var(--primary);
+}
+
+.cs-item-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text);
 }
 
-.cs-item-desc{
-  margin: 0;
-  font-size: 14px;
+.cs-item-desc {
+  margin: 0 0 0 28px;
+  font-size: 12px;
   color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .cs-wrapper {
+    padding: 20px 16px;
+  }
+  
+  .cs-card {
+    padding: 20px;
+  }
+  
+  .cs-back-btn {
+    top: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .cs-title {
+    font-size: 20px;
+  }
+  
+  .cs-title-icon {
+    font-size: 24px;
+  }
+  
+  .cs-item {
+    padding: 12px 14px;
+  }
+  
+  .cs-item-desc {
+    margin-left: 24px;
+    font-size: 11px;
+  }
 }
