@@ -995,3 +995,101 @@ main {
   .logo-text h1 { font-size: 13px; }
   .nombre-usuario { display: none; }
 }
+/* ========== SEARCH + FILTROS WRAPPER ========== */
+.search-and-filter-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 660px;
+  margin: 0 20px;
+}
+
+.search-and-filter-wrapper .search-container-home {
+  flex: 1;
+  width: auto;
+  max-width: none;
+  margin: 0;
+}
+
+/* ── Botón filtros ── */
+.filtros-toggle-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 12px;
+  width: 42px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.filtros-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: #fff;
+}
+
+.filtros-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.filtros-toggle-btn.filtros-toggle-activo {
+  background: #fff;
+  border-color: #fff;
+}
+
+.filtros-toggle-btn.filtros-toggle-activo .filtros-toggle-icon {
+  color: #16A34A;
+}
+
+.filtros-toggle-icon {
+  font-size: 16px;
+  color: #fff;
+}
+
+/* Punto indicador de filtros activos */
+.filtros-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  background: #EF4444;
+  border-radius: 50%;
+  border: 1.5px solid #16A34A;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .search-and-filter-wrapper {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin: 4px 0;
+    gap: 8px;
+  }
+
+  .filtros-toggle-btn {
+    height: 36px;
+    width: 38px;
+  }
+
+  .filtros-toggle-icon {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-and-filter-wrapper {
+    gap: 6px;
+  }
+
+  .filtros-toggle-btn {
+    height: 34px;
+    width: 36px;
+  }
+}

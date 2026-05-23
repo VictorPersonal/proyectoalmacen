@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import "../styles/pages/Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight, FaSearch } from "react-icons/fa";
+import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight, FaSearch, FaSlidersH } from "react-icons/fa";
 import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
 import Carrito from "../components/Carrito";
 import SimpleFooter from "../components/SimpleFooter";
 import PromocionesModal from "../components/PromocionesModal";
+import FiltrosModal from "../components/FiltrosModal";
 
 const Home = () => {
   const [menuMasInfo, setMenuMasInfo] = useState(false);
@@ -54,6 +55,14 @@ const Home = () => {
   const [mensajeCategoria, setMensajeCategoria] = useState(estadoInicial.mensajeCategoria);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(estadoInicial.categoriaSeleccionada);
+
+  // \u2500\u2500 FILTROS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  const FILTROS_DEFAULT = { ordenar: "recientes", precioMin: 0, precioMax: 5000000, idMarca: "todas" };
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [filtrosActivos, setFiltrosActivos] = useState(FILTROS_DEFAULT);
+
+  const hayFiltrosAplicados = (f) =>
+    f.ordenar !== "recientes" || f.precioMin > 0 || f.precioMax < 5000000 || f.idMarca !== "todas";
 
   // ✅ GUARDAR ESTADO EN sessionStorage CUANDO CAMBIE
   useEffect(() => {
@@ -220,9 +229,24 @@ const Home = () => {
     });
   };
 
-  const handleBuscar = async () => {
+  // Construye la URL con filtros completos
+  const construirURL = (query, filtros) => {
+    const params = new URLSearchParams();
+    if (query && query.trim()) params.set("search", query.trim());
+    if (filtros.idMarca && filtros.idMarca !== "todas") params.set("idMarca", filtros.idMarca);
+    if (filtros.precioMin > 0) params.set("precioMin", filtros.precioMin);
+    if (filtros.precioMax < 5000000) params.set("precioMax", filtros.precioMax);
+    if (filtros.ordenar && filtros.ordenar !== "recientes") params.set("ordenar", filtros.ordenar);
+    return `http://localhost:4000/api/productos?${params.toString()}`;
+  };
+
+  const handleBuscar = async (filtrosOverride) => {
     const query = busqueda.trim();
-    if (query === "") {
+    const filtros = filtrosOverride || filtrosActivos;
+    const tieneQuery = query !== "";
+    const tieneFiltros = hayFiltrosAplicados(filtros);
+
+    if (!tieneQuery && !tieneFiltros) {
       setProductos([]);
       setProductosFiltrados([]);
       setCategoriaSeleccionada(null);
@@ -230,38 +254,52 @@ const Home = () => {
       return;
     }
     setCargando(true);
-    
-    const minLoadingTime = new Promise(resolve => setTimeout(resolve, 2000));
-    
+    const minLoadingTime = new Promise(resolve => setTimeout(resolve, 800));
     try {
-      const [_, response] = await Promise.all([
-        minLoadingTime,
-        fetch(
-          `http://localhost:4000/api/productos?search=${encodeURIComponent(
-            query
-          )}&soloActivos=true`
-        )
-      ]);
-      
-      if (!response.ok) throw new Error("Error en la búsqueda");
-
+      const url = construirURL(query, filtros);
+      const [_, response] = await Promise.all([minLoadingTime, fetch(url)]);
+      if (!response.ok) throw new Error("Error en la busqueda");
       const data = await response.json();
       const productosRecibidos = Array.isArray(data) ? data : [];
-      
-      const productosFiltrados = filtrarProductos(productosRecibidos, query);
-      const productosOrdenados = ordenarPorRelevancia(productosFiltrados, query);
-      
+      let resultados = productosRecibidos;
+      if (tieneQuery && (filtros.ordenar === "recientes" || !filtros.ordenar)) {
+        const filtradosTexto = filtrarProductos(productosRecibidos, query);
+        resultados = ordenarPorRelevancia(filtradosTexto, query);
+      }
       setProductos(productosRecibidos);
-      setProductosFiltrados(productosOrdenados);
+      setProductosFiltrados(resultados);
       setCategoriaSeleccionada(null);
       setMensajeCategoria("");
-      
     } catch (error) {
       setProductos([]);
       setProductosFiltrados([]);
     } finally {
       setCargando(false);
     }
+  };
+
+  const handleAplicarFiltros = (nuevosFiltros) => {
+    setFiltrosActivos(nuevosFiltros);
+    // Use ref trick: call buscar with new filtros directly
+    const query = document.querySelector('.search-container-home input')?.value.trim() || "";
+    const params = new URLSearchParams();
+    if (query) params.set("search", query);
+    if (nuevosFiltros.idMarca && nuevosFiltros.idMarca !== "todas") params.set("idMarca", nuevosFiltros.idMarca);
+    if (nuevosFiltros.precioMin > 0) params.set("precioMin", nuevosFiltros.precioMin);
+    if (nuevosFiltros.precioMax < 5000000) params.set("precioMax", nuevosFiltros.precioMax);
+    if (nuevosFiltros.ordenar && nuevosFiltros.ordenar !== "recientes") params.set("ordenar", nuevosFiltros.ordenar);
+    setCargando(true);
+    fetch(`http://localhost:4000/api/productos?${params.toString()}`)
+      .then(r => r.json())
+      .then(data => {
+        const lista = Array.isArray(data) ? data : [];
+        setProductos(lista);
+        setProductosFiltrados(lista);
+        setCategoriaSeleccionada(null);
+        setMensajeCategoria(lista.length === 0 ? "No se encontraron productos con esos filtros." : "");
+      })
+      .catch(() => { setProductos([]); setProductosFiltrados([]); })
+      .finally(() => setCargando(false));
   };
 
   useEffect(() => {
@@ -329,6 +367,7 @@ const Home = () => {
     setProductosFiltrados([]);
     setCategoriaSeleccionada(null);
     setMensajeCategoria("");
+    setFiltrosActivos(FILTROS_DEFAULT);
     sessionStorage.removeItem('homeEstado');
   };
 
@@ -349,31 +388,44 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="search-container-home" id="search-container">
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              onKeyDown={handleKeyPress}
-            />
-            
+          <div className="search-and-filter-wrapper">
+            <div className="search-container-home" id="search-container">
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                onKeyDown={handleKeyPress}
+              />
+              
+              <button
+                className="clear-btn"
+                onClick={limpiarBusqueda}
+                title="Limpiar búsqueda"
+                style={{ display: busqueda.trim() ? 'flex' : 'none' }}
+              >
+                ✕
+              </button>
+              
+              <button
+                className="search-btn"
+                onClick={() => handleBuscar()}
+                title="Buscar"
+                style={{ display: busqueda.trim() ? 'none' : 'flex' }}
+              >
+                <FaSearch />
+              </button>
+            </div>
+
             <button
-              className="clear-btn"
-              onClick={limpiarBusqueda}
-              title="Limpiar búsqueda"
-              style={{ display: busqueda.trim() ? 'flex' : 'none' }}
+              className={`filtros-toggle-btn${hayFiltrosAplicados(filtrosActivos) ? " filtros-toggle-activo" : ""}`}
+              onClick={() => setMostrarFiltros(true)}
+              title="Filtros"
             >
-              ✕
-            </button>
-            
-            <button
-              className="search-btn"
-              onClick={handleBuscar}
-              title="Buscar"
-              style={{ display: busqueda.trim() ? 'none' : 'flex' }}
-            >
-              <FaSearch />
+              <FaSlidersH className="filtros-toggle-icon" />
+              {hayFiltrosAplicados(filtrosActivos) && (
+                <span className="filtros-badge" />
+              )}
             </button>
           </div>
 
@@ -521,6 +573,14 @@ const Home = () => {
       <PromocionesModal 
         isOpen={mostrarPromociones} 
         onClose={() => setMostrarPromociones(false)} 
+      />
+
+      {/* MODAL DE FILTROS */}
+      <FiltrosModal
+        isOpen={mostrarFiltros}
+        onClose={() => setMostrarFiltros(false)}
+        onAplicar={handleAplicarFiltros}
+        filtrosActivos={filtrosActivos}
       />
 
       {/* CONTENIDO ACTUALIZADO */}

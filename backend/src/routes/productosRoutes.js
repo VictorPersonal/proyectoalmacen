@@ -17,10 +17,11 @@ const enriquecerProductosConPromociones = (productos = [], promociones = []) => 
    PRODUCTOS - PÚBLICO (LISTA + DETALLE)
 ========================================================= */
 
-// Lista de productos (solo activos, con imágenes, opcional search)
+// Lista de productos (solo activos, con imágenes, filtros completos)
+// Query params: search, precioMin, precioMax, idMarca, idCategoria, ordenar
 router.get("/productos", async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search, precioMin, precioMax, idMarca, idCategoria, ordenar } = req.query;
 
     let query = supabaseDB
       .from("producto")
@@ -42,13 +43,47 @@ router.get("/productos", async (req, res) => {
           url
         )
       `)
-      .eq("activo", true)
-      .order("idproducto", { ascending: false });
+      .eq("activo", true);
 
-    if (search) {
+    // ── Filtro de texto ──────────────────────────────────────────
+    if (search && search.trim()) {
       query = query.or(
-        `nombre.ilike.%${search}%,descripcion.ilike.%${search}%`
+        `nombre.ilike.%${search.trim()}%,descripcion.ilike.%${search.trim()}%`
       );
+    }
+
+    // ── Filtro por rango de precio ───────────────────────────────
+    if (precioMin !== undefined && precioMin !== "") {
+      query = query.gte("precio", Number(precioMin));
+    }
+    if (precioMax !== undefined && precioMax !== "") {
+      query = query.lte("precio", Number(precioMax));
+    }
+
+    // ── Filtro por marca ─────────────────────────────────────────
+    if (idMarca && idMarca !== "todas") {
+      query = query.eq("idmarca", Number(idMarca));
+    }
+
+    // ── Filtro por categoría ─────────────────────────────────────
+    if (idCategoria && idCategoria !== "todas") {
+      query = query.eq("idcategoria", Number(idCategoria));
+    }
+
+    // ── Ordenamiento ─────────────────────────────────────────────
+    switch (ordenar) {
+      case "precio_asc":
+        query = query.order("precio", { ascending: true });
+        break;
+      case "precio_desc":
+        query = query.order("precio", { ascending: false });
+        break;
+      case "nombre_asc":
+        query = query.order("nombre", { ascending: true });
+        break;
+      default:
+        // "recientes" o sin ordenar
+        query = query.order("idproducto", { ascending: false });
     }
 
     const { data: productos, error } = await query;
@@ -65,7 +100,7 @@ router.get("/productos", async (req, res) => {
     const productosConCategoria = (productos || []).map(producto => ({
       ...producto,
       nombre_categoria: producto.categoria_id?.descripcionCategoria || `Categoría ${producto.idcategoria}`,
-      categoria_id: undefined // Limpiar el objeto anidado
+      categoria_id: undefined
     }));
 
     const productosConPromocion = enriquecerProductosConPromociones(
