@@ -347,7 +347,9 @@ header {
   color: #22C55E;
 }
 
-/* MENÚ DE PERFIL */
+/* ========================================
+   MENÚ DE PERFIL - VERSIÓN MEJORADA
+   ======================================== */
 .perfil-menu {
   position: relative;
   display: flex;
@@ -361,9 +363,23 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 10px;
-  border-radius: 20px;
-  transition: background-color 0.3s ease;
+  padding: 6px 12px;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* Flecha indicadora */
+.perfil-btn::after {
+  content: "▼";
+  font-size: 9px;
+  color: #FFFFFF;
+  margin-left: 6px;
+  transition: transform 0.3s ease;
+}
+
+.perfil-menu.open .perfil-btn::after {
+  transform: rotate(180deg);
 }
 
 .perfil-btn:hover {
@@ -371,7 +387,7 @@ header {
 }
 
 .perfil-icon {
-  font-size: 24px;
+  font-size: 22px;
   color: #FFFFFF;
 }
 
@@ -385,49 +401,75 @@ header {
   white-space: nowrap;
 }
 
+/* Menú desplegable moderno */
 .perfil-desplegable {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
-  background: white;
-  border: 1px solid #E2E8F0;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  min-width: 200px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  min-width: 240px;
   z-index: 1000;
-  margin-top: 10px;
-  padding: 0;
+  margin-top: 0;
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  border: 1px solid #E2E8F0;
 }
 
+.perfil-menu.open .perfil-desplegable {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Info del usuario */
 .info-usuario {
-  padding: 12px 15px;
+  padding: 14px 16px;
   border-bottom: 1px solid #E2E8F0;
   background-color: #F8FAFC;
+  margin-bottom: 6px;
 }
 
 .usuario-nombre {
   display: block;
-  font-weight: bold;
+  font-weight: 700;
   color: #1E293B;
   font-size: 14px;
   margin-bottom: 4px;
 }
 
-.usuario-cedula,
-.usuario-rol {
+.usuario-cedula {
   display: block;
-  font-size: 12px;
-  color: #475569;
+  font-size: 11px;
+  color: #64748B;
   margin-bottom: 2px;
 }
 
+.usuario-rol {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  background: #F0FDF4;
+  color: #22C55E;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+
+/* Items del menú */
 .perfil-item {
-  display: block;
-  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
   text-decoration: none;
   color: #1E293B !important;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  font-size: 13px;
+  transition: all 0.2s ease;
   font-weight: 500;
   background: none;
   border: none;
@@ -439,13 +481,89 @@ header {
 
 .perfil-item:hover {
   background-color: #F0FDF4;
+  color: #22C55E !important;
+}
+
+.perfil-item svg {
+  font-size: 14px;
+  color: #64748B;
+  transition: all 0.2s ease;
+}
+
+.perfil-item:hover svg {
   color: #22C55E;
 }
 
+/* Botón cerrar sesión */
 .cerrar-sesion {
-  margin-top: 0;
+  color: #EF4444 !important;
+  border-top: 1px solid #E2E8F0;
+  margin-top: 4px;
   padding-top: 12px;
-  color: #EF4444;
+}
+
+.cerrar-sesion svg {
+  color: #EF4444 !important;
+}
+
+.cerrar-sesion:hover {
+  background-color: #FEF2F2;
+  color: #DC2626 !important;
+}
+
+.cerrar-sesion:hover svg {
+  color: #DC2626 !important;
+}
+
+/* Panel admin button */
+.admin-panel-btn {
+  background-color: transparent;
+  color: #1E293B !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+.admin-panel-btn:hover {
+  background-color: #F0FDF4;
+  color: #22C55E !important;
+}
+
+/* Responsive móvil para perfil */
+@media (max-width: 768px) {
+  .perfil-desplegable {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .perfil-menu.open .perfil-desplegable {
+    transform: translateY(0);
+  }
+  
+  .perfil-btn::after {
+    display: none;
+  }
+  
+  .nombre-usuario {
+    max-width: 80px;
+    font-size: 12px;
+  }
+  
+  .perfil-icon {
+    font-size: 20px;
+  }
+  
+  .perfil-item {
+    padding: 14px 20px;
+    font-size: 14px;
+  }
 }
 
 /* ========== MAIN ========== */
@@ -522,16 +640,6 @@ main {
 @keyframes zoomIn {
   0% { transform: scale(1.05); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes slideIn {
-  0% { transform: translateX(100%); opacity: 0; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
 }
 
 .carousel-btn {
@@ -995,6 +1103,7 @@ main {
   .logo-text h1 { font-size: 13px; }
   .nombre-usuario { display: none; }
 }
+
 /* ========== SEARCH + FILTROS WRAPPER ========== */
 .search-and-filter-wrapper {
   display: flex;
