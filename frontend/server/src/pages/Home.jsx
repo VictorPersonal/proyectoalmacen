@@ -2,7 +2,17 @@ import React, { useState, useEffect } from "react";
 import "../styles/pages/Home.css";
 import logo from "../assets/Logo dulce hogar.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaShoppingCart, FaChevronRight, FaUserCircle, FaHeart, FaChevronLeft, FaChevronRight as FaRight, FaSearch, FaSlidersH } from "react-icons/fa";
+import { 
+  FaShoppingCart, 
+  FaChevronRight, 
+  FaUserCircle, 
+  FaHeart, 
+  FaChevronLeft, 
+  FaChevronRight as FaRight, 
+  FaSearch, 
+  FaSlidersH,
+  FaHeadset
+} from "react-icons/fa";
 import image1 from "../assets/home1.png";
 import image2 from "../assets/home2.png";
 import ProductCard from "../components/productoCard";
@@ -56,7 +66,9 @@ const Home = () => {
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(estadoInicial.categoriaSeleccionada);
 
-  // \u2500\u2500 FILTROS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  // ─────────────────────────────────────────────────────────────
+  // FILTROS
+  // ─────────────────────────────────────────────────────────────
   const FILTROS_DEFAULT = { ordenar: "recientes", precioMin: 0, precioMax: 5000000, idMarca: "todas" };
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [filtrosActivos, setFiltrosActivos] = useState(FILTROS_DEFAULT);
@@ -78,7 +90,6 @@ const Home = () => {
 
   // ✅ LIMPIAR ESTADO CUANDO SE ENTRE DIRECTAMENTE AL HOME SIN BÚSQUEDA ACTIVA
   useEffect(() => {
-    // Solo limpiar si venimos de una navegación externa (no del modal de producto)
     const isNavigationFromProduct = 
       location.state?.from === 'producto' || 
       location.state?.backgroundLocation;
@@ -86,7 +97,6 @@ const Home = () => {
     const hasActiveSearch = estadoInicial.busqueda || estadoInicial.categoriaSeleccionada;
     
     if (!isNavigationFromProduct && !hasActiveSearch) {
-      // Limpiar todo el estado
       setBusqueda("");
       setProductos([]);
       setProductosFiltrados([]);
@@ -109,7 +119,7 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  // CATEGORÍAS ACTUALIZADAS - Estructura mejorada con IDs
+  // CATEGORÍAS
   const categorias = [
     {
       nombre: "Tecnología",
@@ -229,7 +239,6 @@ const Home = () => {
     });
   };
 
-  // Construye la URL con filtros completos
   const construirURL = (query, filtros) => {
     const params = new URLSearchParams();
     if (query && query.trim()) params.set("search", query.trim());
@@ -280,7 +289,6 @@ const Home = () => {
 
   const handleAplicarFiltros = (nuevosFiltros) => {
     setFiltrosActivos(nuevosFiltros);
-    // Use ref trick: call buscar with new filtros directly
     const query = document.querySelector('.search-container-home input')?.value.trim() || "";
     const params = new URLSearchParams();
     if (query) params.set("search", query);
@@ -334,25 +342,20 @@ const Home = () => {
   const cargarProductosPorCategoria = async (idCategoria) => {
     setCategoriaSeleccionada(idCategoria);   
     setCargando(true);
-    
     setBusqueda("");
     setMensajeCategoria("");
 
     try {
       const response = await fetch(`http://localhost:4000/api/productos`);
       const data = await response.json();
-      
       const productosFiltradosPorCategoria = data.filter(
         producto => Number(producto.idcategoria) === Number(idCategoria)
       );
-      
       setProductos(productosFiltradosPorCategoria);
       setProductosFiltrados(productosFiltradosPorCategoria);
-      
       if (productosFiltradosPorCategoria.length === 0) {
         setMensajeCategoria("No se encontraron productos para esta categoría.");
       }
-      
     } catch (err) {
       console.error("Error cargando productos:", err);
       setMensajeCategoria("Error al cargar productos.");
@@ -431,7 +434,7 @@ const Home = () => {
 
           <div className="auth-links" id="auth-links">
             {usuarioLogueado ? (
-              <div className="perfil-menu">
+              <div className={`perfil-menu ${perfilMenuAbierto ? 'open' : ''}`}>
                 <button className="perfil-btn" onClick={togglePerfilMenu}>
                   <FaUserCircle className="perfil-icon" />
                   <span className="nombre-usuario">
@@ -441,6 +444,12 @@ const Home = () => {
 
                 {perfilMenuAbierto && (
                   <div className="perfil-desplegable">
+                    <div className="info-usuario">
+                      <span className="usuario-nombre">{usuarioInfo?.nombre || "Usuario"}</span>
+                      <span className="usuario-cedula">CC: {usuarioInfo?.cedula}</span>
+                      <span className="usuario-rol">{usuarioInfo?.rol || "cliente"}</span>
+                    </div>
+
                     <Link
                       to="/ajustes-de-cuenta"
                       className="perfil-item"
@@ -449,21 +458,33 @@ const Home = () => {
                       Ajustes de cuenta
                     </Link>
 
+                    <Link
+                      to="/soporte"
+                      className="perfil-item"
+                      onClick={() => setPerfilMenuAbierto(false)}
+                    >
+                      <FaHeadset className="menu-icon" />
+                      Chat consultas
+                    </Link>
+
+                    {usuarioInfo?.rol === "administrador" && (
+                      <button
+                        className="perfil-item"
+                        onClick={() => {
+                          setPerfilMenuAbierto(false);
+                          navigate("/admin");
+                        }}
+                      >
+                        Panel Administrador
+                      </button>
+                    )}
+
                     <button
                       className="perfil-item cerrar-sesion"
                       onClick={handleCerrarSesion}
                     >
                       Cerrar sesión
                     </button>
-                    {usuarioInfo?.rol === "administrador" && (
-                      <button
-                        className="nav-link admin-panel-btn"
-                        onClick={() => navigate("/admin")}
-                        style={{ marginRight: "10px" }}
-                      >
-                        Panel Admin
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
@@ -546,7 +567,6 @@ const Home = () => {
             )}
           </div>
 
-          {/* ✅ Botón Promociones - Ahora abre el modal */}
           <button 
             className="nav-link promociones-btn" 
             onClick={() => setMostrarPromociones(true)}

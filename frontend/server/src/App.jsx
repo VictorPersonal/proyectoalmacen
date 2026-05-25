@@ -19,7 +19,8 @@ import PreguntasFrecuentes from "./pages/PreguntasFrecuentes";
 import DescripcionProducto from "./components/DescripcionProducto";
 import ConsejodeSeguridad from "./pages/ConsejodeSeguridad";
 import WhatsAppButton from "./components/WhatsAppButton";
-
+import SupportScreen from "./pages/SupportScreen";
+import SupportChatScreen from "./pages/SupportChatScreen";
 
 
 
@@ -50,6 +51,8 @@ function AppWrapper() {
         <Route path="/registro/terminosycondiciones" element={<TerminosYCondiciones />} />
         <Route path="/Consejo-de-Seguridad" element={<ConsejodeSeguridad />} />
         <Route path="/producto/:id" element={<DescripcionProducto />} />
+        <Route path="/soporte" element={<SupportScreen />} />
+        <Route path="/soporte/:id" element={<SupportChatScreen />} />
       </Routes>
 
       {/* Modal superpuesto */}

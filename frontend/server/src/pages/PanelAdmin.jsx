@@ -26,6 +26,11 @@ import {
   FaBell,
   FaTags,
   FaTrash,
+  FaHeadset,
+  FaCommentDots,
+  FaCheckCircle,
+  FaPaperPlane,
+  FaArrowLeft
 } from "react-icons/fa";
 
 const ESTADOS_PEDIDO = [
@@ -36,6 +41,325 @@ const ESTADOS_PEDIDO = [
   "Cancelado",
 ];
 
+// ============================================================
+// COMPONENTE DE SOPORTE PARA ADMIN
+// ============================================================
+const AdminSoporte = () => {
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [mensajeNuevo, setMensajeNuevo] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const cargarTickets = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("http://localhost:4000/api/soporte/admin/todos", {
+        withCredentials: true,
+      });
+      setTickets(response.data || []);
+    } catch (error) {
+      console.error("Error cargando tickets:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudieron cargar los tickets de soporte",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarTickets();
+  }, []);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (selectedTicket?.mensajes) {
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [selectedTicket?.mensajes]);
+
+  const verDetalleTicket = async (ticket) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/api/soporte/${ticket.idreclamo}`, {
+        withCredentials: true,
+      });
+      setSelectedTicket(response.data);
+      setShowChatModal(true);
+    } catch (error) {
+      console.error("Error cargando detalle:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo cargar el detalle del ticket",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    }
+  };
+
+  const enviarMensaje = async () => {
+    if (!mensajeNuevo.trim() || enviando) return;
+
+    setEnviando(true);
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/soporte/${selectedTicket.idreclamo}/mensajes`,
+        { mensaje: mensajeNuevo.trim() },
+        { withCredentials: true }
+      );
+
+      if (response.data) {
+        setSelectedTicket(prev => ({
+          ...prev,
+          mensajes: [...prev.mensajes, response.data.mensaje]
+        }));
+        setMensajeNuevo("");
+        setTimeout(scrollToBottom, 100);
+      }
+    } catch (error) {
+      console.error("Error enviando mensaje:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo enviar el mensaje",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  const cerrarTicket = async () => {
+    const confirm = await Swal.fire({
+      title: "Cerrar ticket",
+      text: "¿Estás seguro de cerrar este ticket? El cliente ya no podrá responder.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cerrar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.patch(
+        `http://localhost:4000/api/soporte/${selectedTicket.idreclamo}/cerrar`,
+        {},
+        { withCredentials: true }
+      );
+      
+      Swal.fire({
+        title: "Ticket cerrado",
+        text: "El ticket ha sido cerrado correctamente",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      
+      setShowChatModal(false);
+      cargarTickets();
+    } catch (error) {
+      console.error("Error cerrando ticket:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo cerrar el ticket",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    }
+  };
+
+  const formatFecha = (fecha) => {
+    if (!fecha) return "";
+    try {
+      const d = new Date(fecha);
+      const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+      return `${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+    } catch {
+      return fecha;
+    }
+  };
+
+  const formatHora = (fecha) => {
+    if (!fecha) return "";
+    try {
+      const d = new Date(fecha);
+      return d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return "";
+    }
+  };
+
+  const filteredTickets = tickets.filter(ticket =>
+    ticket.asunto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ticket.cliente.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="soporte-admin-section">
+      <div className="section-header">
+        <h2>
+          <FaHeadset className="section-icon" />
+          Soporte y Consultas
+        </h2>
+        <p>Gestiona los tickets de soporte de los clientes</p>
+      </div>
+
+      <div className="search-wrapper">
+        <div className="search-container">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Buscar por asunto o cliente..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="loading-indicator">
+          <FaSpinner className="loading-spinner" />
+          <span>Cargando tickets...</span>
+        </div>
+      ) : filteredTickets.length === 0 ? (
+        <div className="empty-state-tickets">
+          <FaCommentDots className="empty-icon" />
+          <h3>No hay consultas</h3>
+          <p>{searchTerm ? "No se encontraron tickets con ese criterio" : "Aún no hay tickets de soporte"}</p>
+        </div>
+      ) : (
+        <div className="table-wrapper">
+          <table className="soporte-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Asunto</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Mensajes</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTickets.map((ticket) => (
+                <tr key={ticket.idreclamo} className={ticket.tieneNuevos ? "ticket-nuevo" : ""}>
+                  <td>{ticket.idreclamo}</td>
+                  <td className="ticket-asunto">{ticket.asunto}</td>
+                  <td>{ticket.cliente}</td>
+                  <td>
+                    <span className={`ticket-status ${ticket.estado === "Abierto" ? "status-open" : "status-closed"}`}>
+                      {ticket.estado}
+                    </span>
+                  </td>
+                  <td>{formatFecha(ticket.fecha)}</td>
+                  <td className="mensajes-col">
+                    {ticket.totalMensajes || 0}
+                    {ticket.tieneNuevos && <span className="new-badge">Nuevo</span>}
+                   </td>
+                  <td>
+                    <button
+                      className="btn btn--view"
+                      onClick={() => verDetalleTicket(ticket)}
+                    >
+                      <FaCommentDots /> Ver chat
+                    </button>
+                   </td>
+                 </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Modal de chat */}
+      {showChatModal && selectedTicket && (
+        <div className="modal soporte-chat-modal" onClick={() => setShowChatModal(false)}>
+          <div className="modal-content chat-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="chat-modal-header">
+              <div className="chat-header-info">
+                <h3>
+                  <FaCommentDots /> {selectedTicket.asunto}
+                </h3>
+                <span className={`chat-status ${selectedTicket.cerrado ? "status-closed" : "status-open"}`}>
+                  {selectedTicket.cerrado ? "Cerrado" : "Abierto"}
+                </span>
+              </div>
+              <button className="close-btn" onClick={() => setShowChatModal(false)}>
+                <FaTimes />
+              </button>
+            </div>
+
+            <div className="chat-cliente-info">
+              <FaUserCircle />
+              <span>Cliente: {selectedTicket.cliente}</span>
+            </div>
+
+            <div className="chat-messages">
+              {selectedTicket.mensajes?.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`chat-message ${msg.esAdmin ? "message-admin" : "message-client"}`}
+                >
+                  <div className="message-bubble">
+                    <div className="message-text">{msg.mensaje}</div>
+                    <div className="message-time">{formatHora(msg.fechaenvio)}</div>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {!selectedTicket.cerrado && (
+              <div className="chat-input-area">
+                <textarea
+                  value={mensajeNuevo}
+                  onChange={(e) => setMensajeNuevo(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      enviarMensaje();
+                    }
+                  }}
+                  placeholder="Escribe tu respuesta..."
+                  rows={2}
+                />
+                <button onClick={enviarMensaje} disabled={enviando || !mensajeNuevo.trim()}>
+                  {enviando ? <FaSpinner className="spinning" /> : <FaPaperPlane />}
+                </button>
+              </div>
+            )}
+
+            <div className="chat-modal-actions">
+              {!selectedTicket.cerrado && (
+                <button className="btn btn--status btn--close" onClick={cerrarTicket}>
+                  <FaCheckCircle /> Cerrar ticket
+                </button>
+              )}
+              <button className="btn btn--delete" onClick={() => setShowChatModal(false)}>
+                <FaTimes /> Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
+// PANEL ADMIN PRINCIPAL
+// ============================================================
 const PanelAdmin = () => {
   const [currentSection, setCurrentSection] = useState("productos");
   const [modalVisible, setModalVisible] = useState(false);
@@ -52,12 +376,7 @@ const PanelAdmin = () => {
   const [loading, setLoading] = useState(false);
 
   // Procesamiento de imágenes
-  const [processingImages, setProcessingImages] = useState([
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [processingImages, setProcessingImages] = useState([false, false, false, false]);
   const [autoRemoveBg, setAutoRemoveBg] = useState(true);
 
   // Pedidos
@@ -144,12 +463,10 @@ const PanelAdmin = () => {
       text: "¿Estás seguro de que deseas salir del panel de administración?",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, cerrar sesión",
       cancelButtonText: "Cancelar",
-      background: "#fff",
-      color: "#333",
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem("usuarioInfo");
@@ -183,8 +500,6 @@ const PanelAdmin = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Sí, ir al inicio",
       cancelButtonText: "Cancelar",
-      background: "#fff",
-      color: "#333",
     }).then((result) => {
       if (result.isConfirmed) {
         setShowProfileMenu(false);
@@ -242,7 +557,6 @@ const PanelAdmin = () => {
     if (!file) return null;
     return URL.createObjectURL(file);
   };
-
 
   useEffect(() => {
     if (currentSection !== "promociones") return;
@@ -307,12 +621,6 @@ const PanelAdmin = () => {
         "Error al obtener notificaciones:",
         err.response?.data || err.message
       );
-      Swal.fire({
-        title: "Error",
-        text: "No se pudieron cargar las notificaciones",
-        icon: "error",
-        confirmButtonText: "Entendido",
-      });
     } finally {
       setNotificationsLoading(false);
     }
@@ -659,11 +967,7 @@ const PanelAdmin = () => {
 
         Swal.fire({
           title: "¡Éxito!",
-          text: `Producto actualizado ${
-            response.data.message
-              ? response.data.message.toLowerCase()
-              : "correctamente"
-          }`,
+          text: `Producto actualizado ${response.data.message ? response.data.message.toLowerCase() : "correctamente"}`,
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -681,11 +985,7 @@ const PanelAdmin = () => {
 
         Swal.fire({
           title: "¡Producto Creado!",
-          text: `Producto creado ${
-            response.data.message
-              ? response.data.message.toLowerCase()
-              : "correctamente"
-          }`,
+          text: `Producto creado ${response.data.message ? response.data.message.toLowerCase() : "correctamente"}`,
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -714,9 +1014,7 @@ const PanelAdmin = () => {
 
       Swal.fire({
         title: "Error",
-        text: `Error al guardar producto: ${
-          err.response?.data?.message || err.message
-        }`,
+        text: `Error al guardar producto: ${err.response?.data?.message || err.message}`,
         icon: "error",
         confirmButtonText: "Entendido",
       });
@@ -761,17 +1059,13 @@ const PanelAdmin = () => {
 
     Swal.fire({
       title: `${nuevoEstado ? "Activar" : "Desactivar"} producto`,
-      text: `¿Estás seguro de que deseas ${
-        nuevoEstado ? "activar" : "desactivar"
-      } "${product.nombre}"?`,
+      text: `¿Estás seguro de que deseas ${nuevoEstado ? "activar" : "desactivar"} "${product.nombre}"?`,
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: nuevoEstado ? "#28a745" : "#d33",
+      confirmButtonColor: nuevoEstado ? "#22C55E" : "#d33",
       cancelButtonColor: "#6c757d",
       confirmButtonText: nuevoEstado ? "Sí, activar" : "Sí, desactivar",
       cancelButtonText: "Cancelar",
-      background: "#fff",
-      color: "#333",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -786,9 +1080,7 @@ const PanelAdmin = () => {
 
           Swal.fire({
             title: "¡Estado Actualizado!",
-            text: `Producto ${
-              nuevoEstado ? "activado" : "desactivado"
-            } correctamente`,
+            text: `Producto ${nuevoEstado ? "activado" : "desactivado"} correctamente`,
             icon: "success",
             timer: 1500,
             showConfirmButton: false,
@@ -941,8 +1233,7 @@ const PanelAdmin = () => {
       idcategoria: promo.idcategoria || "",
       fecha_inicio: formatDateTimeLocal(promo.fecha_inicio),
       fecha_fin: formatDateTimeLocal(promo.fecha_fin),
-      activo_manual:
-        promo.activo_manual === undefined ? true : promo.activo_manual,
+      activo_manual: promo.activo_manual === undefined ? true : promo.activo_manual,
     });
     setPromoModalVisible(true);
   };
@@ -957,9 +1248,7 @@ const PanelAdmin = () => {
 
       Swal.fire({
         title: "Actualizado",
-        text: `Promoción ${
-          promo.activo_manual ? "desactivada" : "activada"
-        } correctamente`,
+        text: `Promoción ${promo.activo_manual ? "desactivada" : "activada"} correctamente`,
         icon: "success",
         timer: 1400,
         showConfirmButton: false,
@@ -1241,7 +1530,7 @@ const PanelAdmin = () => {
     <div className="admin-panel">
       <aside className="sidebar">
         <div
-          className="admin-profile profile-clickable"
+          className={`admin-profile ${showProfileMenu ? 'open' : ''}`}
           onClick={() => setShowProfileMenu(!showProfileMenu)}
           ref={profileRef}
         >
@@ -1256,9 +1545,9 @@ const PanelAdmin = () => {
             <div className="profile-menu">
               <button onClick={handleGoHome}>
                 <FaHome className="menu-icon" />
-                Ir al menú
+                Ir al inicio
               </button>
-              <button onClick={handleLogout}>
+              <button onClick={handleLogout} className="cerrar-sesion-btn">
                 <FaPowerOff className="menu-icon" />
                 Cerrar sesión
               </button>
@@ -1269,9 +1558,7 @@ const PanelAdmin = () => {
         <nav className="sidebar-nav">
           <button
             type="button"
-            className={`nav-item ${
-              currentSection === "productos" ? "active" : ""
-            }`}
+            className={`nav-item ${currentSection === "productos" ? "active" : ""}`}
             onClick={() => setCurrentSection("productos")}
           >
             <FaBox className="nav-icon" />
@@ -1280,9 +1567,7 @@ const PanelAdmin = () => {
 
           <button
             type="button"
-            className={`nav-item ${
-              currentSection === "pedidos" ? "active" : ""
-            }`}
+            className={`nav-item ${currentSection === "pedidos" ? "active" : ""}`}
             onClick={() => setCurrentSection("pedidos")}
           >
             <FaShoppingCart className="nav-icon" />
@@ -1291,9 +1576,7 @@ const PanelAdmin = () => {
 
           <button
             type="button"
-            className={`nav-item ${
-              currentSection === "promociones" ? "active" : ""
-            }`}
+            className={`nav-item ${currentSection === "promociones" ? "active" : ""}`}
             onClick={() => setCurrentSection("promociones")}
           >
             <FaTags className="nav-icon" />
@@ -1302,9 +1585,16 @@ const PanelAdmin = () => {
 
           <button
             type="button"
-            className={`nav-item ${
-              currentSection === "dashboard" ? "active" : ""
-            }`}
+            className={`nav-item ${currentSection === "soporte" ? "active" : ""}`}
+            onClick={() => setCurrentSection("soporte")}
+          >
+            <FaHeadset className="nav-icon" />
+            Soporte
+          </button>
+
+          <button
+            type="button"
+            className={`nav-item ${currentSection === "dashboard" ? "active" : ""}`}
             onClick={() => setCurrentSection("dashboard")}
           >
             <FaChartBar className="nav-icon" />
@@ -1312,26 +1602,6 @@ const PanelAdmin = () => {
           </button>
         </nav>
       </aside>
-
-      {showHelp && (
-        <div className="modal">
-          <div className="modal-content help-modal">
-            <h3>
-              <FaQuestionCircle className="help-icon" />
-              Ayuda del Administrador
-            </h3>
-            <p>
-              Desde aquí puedes gestionar productos, pedidos y promociones.
-              También puedes programar descuentos por porcentaje con fecha de
-              inicio y fin.
-            </p>
-            <button className="btn btn--add" onClick={() => setShowHelp(false)}>
-              <FaTimes className="btn-icon" />
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
 
       <main className="main-content">
         <div className="top-buttons">
@@ -1350,6 +1620,26 @@ const PanelAdmin = () => {
             <FaQuestionCircle size={18} />
           </button>
         </div>
+
+        {showHelp && (
+          <div className="modal">
+            <div className="modal-content help-modal">
+              <h3>
+                <FaQuestionCircle className="help-icon" />
+                Ayuda del Administrador
+              </h3>
+              <p>
+                Desde aquí puedes gestionar productos, pedidos y promociones.
+                También puedes programar descuentos por porcentaje con fecha de
+                inicio y fin.
+              </p>
+              <button className="btn btn--add" onClick={() => setShowHelp(false)}>
+                <FaTimes className="btn-icon" />
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
 
         {showNotifications && (
           <div className="notifications-panel">
@@ -1502,9 +1792,7 @@ const PanelAdmin = () => {
                         <td>{getNombreCategoria(prod)}</td>
                         <td>
                           <span
-                            className={`image-count ${
-                              contarImagenes(prod) === 0 ? "no-images" : ""
-                            }`}
+                            className={`image-count ${contarImagenes(prod) === 0 ? "no-images" : ""}`}
                           >
                             <FaImage className="count-icon" />
                             {contarImagenes(prod)} img
@@ -1512,9 +1800,7 @@ const PanelAdmin = () => {
                         </td>
                         <td>
                           <span
-                            className={`status-badge ${
-                              prod.activo ? "status-active" : "status-inactive"
-                            }`}
+                            className={`status-badge ${prod.activo ? "status-active" : "status-inactive"}`}
                           >
                             {prod.activo ? (
                               <>
@@ -1540,9 +1826,7 @@ const PanelAdmin = () => {
                             </button>
 
                             <button
-                              className={`btn btn--status ${
-                                prod.activo ? "btn--inactive" : "btn--add"
-                              }`}
+                              className={`btn btn--status ${prod.activo ? "btn--inactive" : "btn--add"}`}
                               onClick={() => handleToggleActive(prod)}
                               disabled={
                                 (prod.stock === 0 && !prod.activo) || loading
@@ -1585,9 +1869,7 @@ const PanelAdmin = () => {
               {[...Array(totalPages)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`page-number ${
-                    currentPage === i + 1 ? "active" : ""
-                  }`}
+                  className={`page-number ${currentPage === i + 1 ? "active" : ""}`}
                   onClick={() => setCurrentPage(i + 1)}
                   disabled={loading}
                 >
@@ -1771,17 +2053,13 @@ const PanelAdmin = () => {
                         <td>{promo.nombre}</td>
                         <td>{promo.valor_descuento}%</td>
                         <td>{promo.scope}</td>
-
-
                         <td>
                           {(() => {
                             const estado = getPromoEstadoReal(promo);
                             return <span className={estado.clase}>{estado.texto}</span>;
                           })()}
                         </td>
-
                         <td>{getPromoCountdown(promo)}</td>
-
                         <td>
                           <div className="action-buttons">
                             <button className="btn btn--edit" onClick={() => handleEditPromo(promo)}>
@@ -1790,9 +2068,7 @@ const PanelAdmin = () => {
                             </button>
 
                             <button
-                              className={`btn btn--status ${
-                                promo.activo_manual ? "btn--inactive" : "btn--add"
-                              }`}
+                              className={`btn btn--status ${promo.activo_manual ? "btn--inactive" : "btn--add"}`}
                               onClick={() => togglePromoEstado(promo)}
                             >
                               {promo.activo_manual ? "Desactivar" : "Activar"}
@@ -1804,7 +2080,7 @@ const PanelAdmin = () => {
                             </button>
                           </div>
                         </td>
-                      </tr> 
+                      </tr>
                     ))
                   )}
                 </tbody>
@@ -1813,9 +2089,12 @@ const PanelAdmin = () => {
           </div>
         )}
 
+        {currentSection === "soporte" && <AdminSoporte />}
+
         {currentSection === "dashboard" && <Dashboard />}
       </main>
 
+      {/* Modales */}
       {modalVisible && (
         <div className="modal">
           <div className="modal-content">
