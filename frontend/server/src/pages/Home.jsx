@@ -20,6 +20,7 @@ import Carrito from "../components/Carrito";
 import SimpleFooter from "../components/SimpleFooter";
 import PromocionesModal from "../components/PromocionesModal";
 import FiltrosModal from "../components/FiltrosModal";
+import WhatsAppButton from "../components/WhatsAppButton";
 
 const Home = () => {
   const [menuMasInfo, setMenuMasInfo] = useState(false);
@@ -683,6 +684,7 @@ const Home = () => {
 
       {/* FOOTER */}
       <SimpleFooter />
+      <WhatsAppButton />
     </div>
   );
 };

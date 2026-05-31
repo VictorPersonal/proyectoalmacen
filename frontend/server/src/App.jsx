@@ -69,7 +69,6 @@ function App() {
   return (
       <Router>
         <AppWrapper />
-        <WhatsAppButton />
       </Router>
   );
 }

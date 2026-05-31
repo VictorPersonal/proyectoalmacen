@@ -41,6 +41,73 @@ const ESTADOS_PEDIDO = [
   "Cancelado",
 ];
 
+// Función unificada para formatear fechas
+const formatFecha = (fecha) => {
+  if (!fecha) return "";
+  try {
+    const d = new Date(fecha);
+    const dias = d.getDate().toString().padStart(2, '0');
+    const meses = (d.getMonth() + 1).toString().padStart(2, '0');
+    const años = d.getFullYear();
+    return `${dias}/${meses}/${años}`;
+  } catch {
+    return fecha;
+  }
+};
+
+// Componente de paginación dinámica
+const DynamicPagination = ({ currentPage, totalPages, onPageChange, disabled }) => {
+  const getVisiblePages = () => {
+    const maxVisible = 4;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = startPage + maxVisible - 1;
+    
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+    
+    const pages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const visiblePages = getVisiblePages();
+
+  return (
+    <div className="pagination">
+      <button
+        className="page-btn"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1 || disabled}
+      >
+        ‹
+      </button>
+      
+      {visiblePages.map(page => (
+        <button
+          key={page}
+          className={`page-number ${currentPage === page ? "active" : ""}`}
+          onClick={() => onPageChange(page)}
+          disabled={disabled}
+        >
+          {page}
+        </button>
+      ))}
+      
+      <button
+        className="page-btn"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages || disabled}
+      >
+        ›
+      </button>
+    </div>
+  );
+};
+
 // ============================================================
 // COMPONENTE DE SOPORTE PARA ADMIN
 // ============================================================
@@ -53,6 +120,9 @@ const AdminSoporte = () => {
   const [mensajeNuevo, setMensajeNuevo] = useState("");
   const [enviando, setEnviando] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  const [currentTicketPage, setCurrentTicketPage] = useState(1);
+  const ticketsPerPage = 4;
 
   const cargarTickets = async () => {
     setLoading(true);
@@ -61,6 +131,7 @@ const AdminSoporte = () => {
         withCredentials: true,
       });
       setTickets(response.data || []);
+      setCurrentTicketPage(1);
     } catch (error) {
       console.error("Error cargando tickets:", error);
       Swal.fire({
@@ -178,17 +249,6 @@ const AdminSoporte = () => {
     }
   };
 
-  const formatFecha = (fecha) => {
-    if (!fecha) return "";
-    try {
-      const d = new Date(fecha);
-      const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-      return `${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
-    } catch {
-      return fecha;
-    }
-  };
-
   const formatHora = (fecha) => {
     if (!fecha) return "";
     try {
@@ -203,6 +263,29 @@ const AdminSoporte = () => {
     ticket.asunto.toLowerCase().includes(searchTerm.toLowerCase()) ||
     ticket.cliente.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const indexOfLastTicket = currentTicketPage * ticketsPerPage;
+  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
+  const currentTickets = filteredTickets.slice(indexOfFirstTicket, indexOfLastTicket);
+  const totalTicketPages = Math.ceil(filteredTickets.length / ticketsPerPage);
+
+  // Efecto para teclado en Tickets
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+      if (showChatModal) return;
+
+      if (e.key === "ArrowRight") {
+        if (currentTicketPage < totalTicketPages) setCurrentTicketPage(currentTicketPage + 1);
+      } else if (e.key === "ArrowLeft") {
+        if (currentTicketPage > 1) setCurrentTicketPage(currentTicketPage - 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentTicketPage, totalTicketPages, showChatModal]);
 
   return (
     <div className="soporte-admin-section">
@@ -221,7 +304,10 @@ const AdminSoporte = () => {
             type="text"
             placeholder="Buscar por asunto o cliente..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentTicketPage(1);
+            }}
           />
         </div>
       </div>
@@ -238,48 +324,59 @@ const AdminSoporte = () => {
           <p>{searchTerm ? "No se encontraron tickets con ese criterio" : "Aún no hay tickets de soporte"}</p>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="soporte-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Asunto</th>
-                <th>Cliente</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Mensajes</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTickets.map((ticket) => (
-                <tr key={ticket.idreclamo} className={ticket.tieneNuevos ? "ticket-nuevo" : ""}>
-                  <td>{ticket.idreclamo}</td>
-                  <td className="ticket-asunto">{ticket.asunto}</td>
-                  <td>{ticket.cliente}</td>
-                  <td>
-                    <span className={`ticket-status ${ticket.estado === "Abierto" ? "status-open" : "status-closed"}`}>
-                      {ticket.estado}
-                    </span>
-                  </td>
-                  <td>{formatFecha(ticket.fecha)}</td>
-                  <td className="mensajes-col">
-                    {ticket.totalMensajes || 0}
-                    {ticket.tieneNuevos && <span className="new-badge">Nuevo</span>}
-                   </td>
-                  <td>
-                    <button
-                      className="btn btn--view"
-                      onClick={() => verDetalleTicket(ticket)}
-                    >
-                      <FaCommentDots /> Ver chat
-                    </button>
-                   </td>
-                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="table-wrapper">
+            <table className="soporte-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Asunto</th>
+                  <th>Cliente</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Mensajes</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTickets.map((ticket) => (
+                  <tr key={ticket.idreclamo} className={ticket.tieneNuevos ? "ticket-nuevo" : ""}>
+                    <td>{ticket.idreclamo}</td>
+                    <td className="ticket-asunto">{ticket.asunto}</td>
+                    <td>{ticket.cliente}</td>
+                    <td>
+                      <span className={`ticket-status ${ticket.estado === "Abierto" ? "status-open" : "status-closed"}`}>
+                        {ticket.estado}
+                      </span>
+                    </td>
+                    <td>{formatFecha(ticket.fecha)}</td>
+                    <td className="mensajes-col">
+                      {ticket.totalMensajes || 0}
+                      {ticket.tieneNuevos && <span className="new-badge">Nuevo</span>}
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn--view"
+                        onClick={() => verDetalleTicket(ticket)}
+                      >
+                        <FaCommentDots /> Ver chat
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {totalTicketPages > 1 && (
+            <DynamicPagination
+              currentPage={currentTicketPage}
+              totalPages={totalTicketPages}
+              onPageChange={setCurrentTicketPage}
+              disabled={loading}
+            />
+          )}
+        </>
       )}
 
       {/* Modal de chat */}
@@ -365,7 +462,7 @@ const PanelAdmin = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 5;
+  const productsPerPage = 4;
   const [editingProduct, setEditingProduct] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -375,27 +472,27 @@ const PanelAdmin = () => {
   const [marcas, setMarcas] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Procesamiento de imágenes
   const [processingImages, setProcessingImages] = useState([false, false, false, false]);
   const [autoRemoveBg, setAutoRemoveBg] = useState(true);
 
-  // Pedidos
   const [pedidos, setPedidos] = useState([]);
   const [pedidosLoading, setPedidosLoading] = useState(false);
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [estadoEditando, setEstadoEditando] = useState("");
   const [showPedidoModal, setShowPedidoModal] = useState(false);
+  const [currentPedidoPage, setCurrentPedidoPage] = useState(1);
+  const pedidosPerPage = 4;
 
-  // Notificaciones
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
 
-  // Promociones
   const [promociones, setPromociones] = useState([]);
   const [promoModalVisible, setPromoModalVisible] = useState(false);
   const [editingPromo, setEditingPromo] = useState(null);
   const [promoLoading, setPromoLoading] = useState(false);
+  const [currentPromoPage, setCurrentPromoPage] = useState(1);
+  const promosPerPage = 4;
 
   const [promoForm, setPromoForm] = useState({
     nombre: "",
@@ -424,9 +521,6 @@ const PanelAdmin = () => {
 
   const [, setPromoClock] = useState(Date.now());
 
-  /* =========================================================
-     BLOQUEAR BOTÓN ATRÁS SOLO EN ADMIN
-  ========================================================= */
   useEffect(() => {
     const bloquearNavegacion = () => {
       navigate(0);
@@ -440,9 +534,6 @@ const PanelAdmin = () => {
     };
   }, [navigate]);
 
-  /* =========================================================
-     CARGAR INFO ADMIN DESDE localStorage
-  ========================================================= */
   useEffect(() => {
     const stored = localStorage.getItem("usuarioInfo");
     if (stored) {
@@ -454,9 +545,6 @@ const PanelAdmin = () => {
     }
   }, []);
 
-  /* =========================================================
-     CERRAR SESIÓN
-  ========================================================= */
   const handleLogout = () => {
     Swal.fire({
       title: "¿Cerrar sesión?",
@@ -487,9 +575,6 @@ const PanelAdmin = () => {
     });
   };
 
-  /* =========================================================
-     IR AL HOME SIN CERRAR SESIÓN
-  ========================================================= */
   const handleGoHome = () => {
     Swal.fire({
       title: "Ir al inicio",
@@ -508,9 +593,6 @@ const PanelAdmin = () => {
     });
   };
 
-  /* =========================================================
-     CERRAR MENÚ DE PERFIL AL HACER CLICK AFUERA
-  ========================================================= */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -521,9 +603,6 @@ const PanelAdmin = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* =========================================================
-     HELPERS IMÁGENES
-  ========================================================= */
   const resetProcessingImages = () => {
     setProcessingImages([false, false, false, false]);
   };
@@ -568,9 +647,6 @@ const PanelAdmin = () => {
     return () => clearInterval(interval);
   }, [currentSection]);
 
-  /* =========================================================
-     HELPERS PROMOCIONES
-  ========================================================= */
   const formatDateTimeLocal = (value) => {
     if (!value) return "";
     const date = new Date(value);
@@ -601,9 +677,6 @@ const PanelAdmin = () => {
     }));
   };
 
-  /* =========================================================
-     NOTIFICACIONES
-  ========================================================= */
   const fetchNotifications = async () => {
     try {
       setNotificationsLoading(true);
@@ -633,9 +706,6 @@ const PanelAdmin = () => {
     setShowNotifications((prev) => !prev);
   };
 
-  /* =========================================================
-     TRAER PRODUCTOS
-  ========================================================= */
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -697,9 +767,6 @@ const PanelAdmin = () => {
     fetchProducts();
   }, []);
 
-  /* =========================================================
-     TRAER CATEGORÍAS Y MARCAS
-  ========================================================= */
   useEffect(() => {
     const fetchCatalogos = async () => {
       try {
@@ -719,9 +786,6 @@ const PanelAdmin = () => {
     fetchCatalogos();
   }, []);
 
-  /* =========================================================
-     TRAER PROMOCIONES
-  ========================================================= */
   const fetchPromociones = async () => {
     try {
       setPromoLoading(true);
@@ -729,6 +793,7 @@ const PanelAdmin = () => {
         withCredentials: true,
       });
       setPromociones(res.data || []);
+      setCurrentPromoPage(1);
     } catch (err) {
       console.error("Error promociones:", err.response?.data || err.message);
       Swal.fire({
@@ -749,23 +814,22 @@ const PanelAdmin = () => {
 
   useEffect(() => {
     setCurrentPage(1);
+    setCurrentPromoPage(1);
+    setCurrentPedidoPage(1);
   }, [searchTerm]);
 
   useEffect(() => {
     setSearchTerm("");
+    setCurrentPage(1);
+    setCurrentPromoPage(1);
+    setCurrentPedidoPage(1);
   }, [currentSection]);
 
-  /* =========================================================
-     MANEJO DE INPUTS
-  ========================================================= */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  /* =========================================================
-     IMÁGENES MÚLTIPLES + REMOVE BACKGROUND
-  ========================================================= */
   const handleImageChange = async (e, index) => {
     const files = e.target.files;
     if (!files || !files[0]) return;
@@ -831,16 +895,10 @@ const PanelAdmin = () => {
     setFormData((prev) => ({ ...prev, imagenes: newImages }));
   };
 
-  /* =========================================================
-     BÚSQUEDA
-  ========================================================= */
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  /* =========================================================
-     HELPERS CATEGORÍA / MARCA
-  ========================================================= */
   const getNombreCategoria = (productOrId) => {
     if (productOrId && typeof productOrId === "object") {
       const p = productOrId;
@@ -919,9 +977,6 @@ const PanelAdmin = () => {
     return nueva.idmarca;
   };
 
-  /* =========================================================
-     CREAR / EDITAR PRODUCTO
-  ========================================================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -1023,9 +1078,6 @@ const PanelAdmin = () => {
     }
   };
 
-  /* =========================================================
-     PREPARAR EDICIÓN PRODUCTO
-  ========================================================= */
   const handleEdit = (product) => {
     setEditingProduct(product);
     resetProcessingImages();
@@ -1041,9 +1093,6 @@ const PanelAdmin = () => {
     setModalVisible(true);
   };
 
-  /* =========================================================
-     ACTIVAR / DESACTIVAR PRODUCTO
-  ========================================================= */
   const handleToggleActive = async (product) => {
     if (product.stock === 0 && !product.activo) {
       Swal.fire({
@@ -1104,9 +1153,6 @@ const PanelAdmin = () => {
     });
   };
 
-  /* =========================================================
-     HELPERS PRODUCTO
-  ========================================================= */
   const getPrimeraImagen = (product) => {
     if (product.producto_imagen && product.producto_imagen.length > 0) {
       return product.producto_imagen[0].url;
@@ -1125,9 +1171,6 @@ const PanelAdmin = () => {
     return product.producto_imagen && product.producto_imagen.length > 0;
   };
 
-  /* =========================================================
-     CRUD PROMOCIONES
-  ========================================================= */
   const handleSavePromo = async () => {
     const descuento = Number(promoForm.valor_descuento);
 
@@ -1294,9 +1337,6 @@ const PanelAdmin = () => {
     }
   };
 
-  /* =========================================================
-     FILTRO + PAGINACIÓN PRODUCTOS
-  ========================================================= */
   const filteredProducts = products.filter((prod) =>
     prod.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -1312,24 +1352,29 @@ const PanelAdmin = () => {
     Math.ceil(filteredProducts.length / productsPerPage)
   );
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  /* =========================================================
-     FILTRO PROMOCIONES
-  ========================================================= */
   const filteredPromociones = promociones.filter((promo) =>
     promo.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  const indexOfLastPromo = currentPromoPage * promosPerPage;
+  const indexOfFirstPromo = indexOfLastPromo - promosPerPage;
+  const currentPromos = filteredPromociones.slice(indexOfFirstPromo, indexOfLastPromo);
+  const totalPromoPages = Math.ceil(filteredPromociones.length / promosPerPage);
 
-  /* =========================================================
-     PAGINACIÓN CON TECLADO
-  ========================================================= */
+  const filteredPedidos = pedidos.filter((p) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      p.numero?.toLowerCase().includes(term) ||
+      p.cliente?.toLowerCase().includes(term)
+    );
+  });
+  
+  const indexOfLastPedido = currentPedidoPage * pedidosPerPage;
+  const indexOfFirstPedido = indexOfLastPedido - pedidosPerPage;
+  const currentPedidos = filteredPedidos.slice(indexOfFirstPedido, indexOfLastPedido);
+  const totalPedidoPages = Math.ceil(filteredPedidos.length / pedidosPerPage);
+
+  // Efecto para teclado en Productos
   useEffect(() => {
     if (currentSection !== "productos") return;
 
@@ -1338,22 +1383,54 @@ const PanelAdmin = () => {
       if (tag === "input" || tag === "textarea" || tag === "select") return;
 
       if (e.key === "ArrowRight") {
-        handleNextPage();
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
       } else if (e.key === "ArrowLeft") {
-        handlePrevPage();
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentPage, totalPages, currentSection]);
 
-  /* =========================================================
-     PEDIDOS
-  ========================================================= */
+  // Efecto para teclado en Promociones
+  useEffect(() => {
+    if (currentSection !== "promociones") return;
+
+    const handleKeyDown = (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+      if (e.key === "ArrowRight") {
+        if (currentPromoPage < totalPromoPages) setCurrentPromoPage(currentPromoPage + 1);
+      } else if (e.key === "ArrowLeft") {
+        if (currentPromoPage > 1) setCurrentPromoPage(currentPromoPage - 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentPromoPage, totalPromoPages, currentSection]);
+
+  // Efecto para teclado en Pedidos
+  useEffect(() => {
+    if (currentSection !== "pedidos") return;
+
+    const handleKeyDown = (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+      if (e.key === "ArrowRight") {
+        if (currentPedidoPage < totalPedidoPages) setCurrentPedidoPage(currentPedidoPage + 1);
+      } else if (e.key === "ArrowLeft") {
+        if (currentPedidoPage > 1) setCurrentPedidoPage(currentPedidoPage - 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentPedidoPage, totalPedidoPages, currentSection]);
+
   const fetchPedidos = async () => {
     try {
       setPedidosLoading(true);
@@ -1361,6 +1438,7 @@ const PanelAdmin = () => {
         withCredentials: true,
       });
       setPedidos(res.data || []);
+      setCurrentPedidoPage(1);
     } catch (err) {
       console.error(
         "Error al obtener pedidos:",
@@ -1382,14 +1460,6 @@ const PanelAdmin = () => {
       fetchPedidos();
     }
   }, [currentSection, pedidos.length]);
-
-  const filteredPedidos = pedidos.filter((p) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      p.numero?.toLowerCase().includes(term) ||
-      p.cliente?.toLowerCase().includes(term)
-    );
-  });
 
   const getEstadoBadgeClass = (estado) => {
     if (!estado) return "estado-pedido estado-desconocido";
@@ -1676,7 +1746,7 @@ const PanelAdmin = () => {
                       <span className="notification-total">
                         ${pedido.total.toLocaleString()}
                       </span>
-                      <span className="notification-date">{pedido.fecha}</span>
+                      <span className="notification-date">{formatFecha(pedido.fecha)}</span>
                     </div>
                     <button
                       className="notification-btn"
@@ -1858,32 +1928,14 @@ const PanelAdmin = () => {
               </table>
             </div>
 
-            <div className="pagination">
-              <button
-                className="page-btn"
-                onClick={handlePrevPage}
-                disabled={currentPage === 1 || loading}
-              >
-                ‹
-              </button>
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  className={`page-number ${currentPage === i + 1 ? "active" : ""}`}
-                  onClick={() => setCurrentPage(i + 1)}
-                  disabled={loading}
-                >
-                  {i + 1}
-                </button>
-              ))}
-              <button
-                className="page-btn"
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages || loading}
-              >
-                ›
-              </button>
-            </div>
+            {totalPages > 1 && (
+              <DynamicPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                disabled={loading}
+              />
+            )}
           </>
         )}
 
@@ -1930,7 +1982,7 @@ const PanelAdmin = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPedidos.length === 0 ? (
+                  {currentPedidos.length === 0 ? (
                     <tr>
                       <td colSpan="7" className="no-products">
                         {searchTerm
@@ -1939,7 +1991,7 @@ const PanelAdmin = () => {
                       </td>
                     </tr>
                   ) : (
-                    filteredPedidos.map((pedido) => (
+                    currentPedidos.map((pedido) => (
                       <tr key={pedido.idpedido}>
                         <td className="pedido-numero">{pedido.numero}</td>
                         <td className="pedido-cliente">{pedido.cliente}</td>
@@ -1960,7 +2012,7 @@ const PanelAdmin = () => {
                           $
                           {Number(pedido.total || 0).toLocaleString("es-CO")}
                         </td>
-                        <td className="pedido-fecha">{pedido.fecha}</td>
+                        <td className="pedido-fecha">{formatFecha(pedido.fecha)}</td>
                         <td>
                           <div className="action-buttons">
                             <button
@@ -1979,6 +2031,15 @@ const PanelAdmin = () => {
                 </tbody>
               </table>
             </div>
+            
+            {totalPedidoPages > 1 && (
+              <DynamicPagination
+                currentPage={currentPedidoPage}
+                totalPages={totalPedidoPages}
+                onPageChange={setCurrentPedidoPage}
+                disabled={pedidosLoading}
+              />
+            )}
           </div>
         )}
 
@@ -2038,16 +2099,16 @@ const PanelAdmin = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPromociones.length === 0 ? (
+                  {currentPromos.length === 0 ? (
                     <tr>
-                      <td colSpan="10" className="no-products">
+                      <td colSpan="7" className="no-products">
                         {searchTerm
                           ? "No se encontraron promociones"
                           : "No hay promociones registradas"}
                       </td>
                     </tr>
                   ) : (
-                    filteredPromociones.map((promo) => (
+                    currentPromos.map((promo) => (
                       <tr key={promo.idpromocion}>
                         <td>{promo.idpromocion}</td>
                         <td>{promo.nombre}</td>
@@ -2086,6 +2147,15 @@ const PanelAdmin = () => {
                 </tbody>
               </table>
             </div>
+            
+            {totalPromoPages > 1 && (
+              <DynamicPagination
+                currentPage={currentPromoPage}
+                totalPages={totalPromoPages}
+                onPageChange={setCurrentPromoPage}
+                disabled={promoLoading}
+              />
+            )}
           </div>
         )}
 
@@ -2512,7 +2582,7 @@ const PanelAdmin = () => {
                   <strong>Ciudad:</strong> {selectedPedido.ciudad || "N/D"}
                 </p>
                 <p>
-                  <strong>Fecha:</strong> {selectedPedido.fecha}
+                  <strong>Fecha:</strong> {formatFecha(selectedPedido.fecha)}
                 </p>
               </div>
 
