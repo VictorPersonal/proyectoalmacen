@@ -60,7 +60,7 @@ function ActualizarPerfil() {
     const cargarPerfil = async () => {
       setCargando(true);
       try {
-        const res = await fetch("http://localhost:4000/api/auth/usuario/perfil", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/usuario/perfil`, {
           method: "GET",
           credentials: "include",
         });
@@ -174,7 +174,7 @@ function ActualizarPerfil() {
     };
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/usuario/perfil", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/usuario/perfil`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

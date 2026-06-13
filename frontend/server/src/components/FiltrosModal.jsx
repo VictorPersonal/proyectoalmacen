@@ -17,7 +17,7 @@ const FiltrosModal = ({ isOpen, onClose, onAplicar, filtrosActivos }) => {
   useEffect(() => {
     if (!isOpen) return;
     setCargandoMarcas(true);
-    fetch("http://localhost:4000/api/marcas")
+    fetch(`${import.meta.env.VITE_API_URL}/api/marcas`)
       .then((r) => r.json())
       .then((data) => setMarcas(Array.isArray(data) ? data : []))
       .catch(() => setMarcas([]))

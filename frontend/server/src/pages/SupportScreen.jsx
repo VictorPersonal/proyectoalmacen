@@ -37,8 +37,8 @@ const SupportScreen = () => {
     
     try {
       const url = esAdmin 
-        ? "http://localhost:4000/api/soporte/admin/todos"
-        : "http://localhost:4000/api/soporte/mis-tickets";
+        ? `${import.meta.env.VITE_API_URL}/api/soporte/admin/todos`
+        : `${import.meta.env.VITE_API_URL}/api/soporte/mis-tickets`;
       
       const response = await fetch(url, {
         credentials: "include"

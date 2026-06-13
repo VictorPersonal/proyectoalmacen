@@ -247,7 +247,7 @@ const Home = () => {
     if (filtros.precioMin > 0) params.set("precioMin", filtros.precioMin);
     if (filtros.precioMax < 5000000) params.set("precioMax", filtros.precioMax);
     if (filtros.ordenar && filtros.ordenar !== "recientes") params.set("ordenar", filtros.ordenar);
-    return `http://localhost:4000/api/productos?${params.toString()}`;
+    return `${import.meta.env.VITE_API_URL}/api/productos?${params.toString()}`;
   };
 
   const handleBuscar = async (filtrosOverride) => {
@@ -298,7 +298,7 @@ const Home = () => {
     if (nuevosFiltros.precioMax < 5000000) params.set("precioMax", nuevosFiltros.precioMax);
     if (nuevosFiltros.ordenar && nuevosFiltros.ordenar !== "recientes") params.set("ordenar", nuevosFiltros.ordenar);
     setCargando(true);
-    fetch(`http://localhost:4000/api/productos?${params.toString()}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/productos?${params.toString()}`)
       .then(r => r.json())
       .then(data => {
         const lista = Array.isArray(data) ? data : [];
@@ -347,7 +347,7 @@ const Home = () => {
     setMensajeCategoria("");
 
     try {
-      const response = await fetch(`http://localhost:4000/api/productos`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/productos`);
       const data = await response.json();
       const productosFiltradosPorCategoria = data.filter(
         producto => Number(producto.idcategoria) === Number(idCategoria)

@@ -54,7 +54,7 @@ const FavoritoProducto = () => {
 
   const obtenerFavoritos = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/favoritos", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos`, {
         method: "GET",
         credentials: "include",
       });
@@ -83,7 +83,7 @@ const FavoritoProducto = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:4000/api/favoritos/${idproducto}`,
+        `${import.meta.env.VITE_API_URL}/api/favoritos/${idproducto}`,
         {
           method: "DELETE",
           credentials: "include",

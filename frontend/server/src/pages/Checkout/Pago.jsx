@@ -66,7 +66,7 @@ const Pago = () => {
 
       console.log("📤 Enviando a Stripe (solo una vez):", bodyData);
 
-      const res = await fetch("http://localhost:4000/api/pago/crear-preferencia", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pago/crear-preferencia`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),

@@ -127,9 +127,9 @@ const AdminSoporte = () => {
   const cargarTickets = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:4000/api/soporte/admin/todos", {
-        withCredentials: true,
-      });
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/soporte/admin/todos`, {
+          withCredentials: true,
+        });
       setTickets(response.data || []);
       setCurrentTicketPage(1);
     } catch (error) {
@@ -161,9 +161,9 @@ const AdminSoporte = () => {
 
   const verDetalleTicket = async (ticket) => {
     try {
-      const response = await axios.get(`http://localhost:4000/api/soporte/${ticket.idreclamo}`, {
-        withCredentials: true,
-      });
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/soporte/${ticket.idreclamo}`, {
+          withCredentials: true,
+        });
       setSelectedTicket(response.data);
       setShowChatModal(true);
     } catch (error) {
@@ -183,7 +183,7 @@ const AdminSoporte = () => {
     setEnviando(true);
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/soporte/${selectedTicket.idreclamo}/mensajes`,
+          `${import.meta.env.VITE_API_URL}/api/soporte/${selectedTicket.idreclamo}/mensajes`,
         { mensaje: mensajeNuevo.trim() },
         { withCredentials: true }
       );
@@ -223,7 +223,7 @@ const AdminSoporte = () => {
 
     try {
       await axios.patch(
-        `http://localhost:4000/api/soporte/${selectedTicket.idreclamo}/cerrar`,
+          `${import.meta.env.VITE_API_URL}/api/soporte/${selectedTicket.idreclamo}/cerrar`,
         {},
         { withCredentials: true }
       );
@@ -619,7 +619,7 @@ const PanelAdmin = () => {
     data.append("image", file);
 
     const response = await axios.post(
-      "http://localhost:4000/api/images/remove-background",
+        `${import.meta.env.VITE_API_URL}/api/images/remove-background`,
       data,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -681,8 +681,8 @@ const PanelAdmin = () => {
     try {
       setNotificationsLoading(true);
 
-      const res = await axios.get("http://localhost:4000/api/admin/pedidos", {
-        withCredentials: true,
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/pedidos`, {
+          withCredentials: true,
       });
 
       const pedidosData = res.data || [];
@@ -711,7 +711,7 @@ const PanelAdmin = () => {
       setLoading(true);
 
       const res = await axios.get(
-        "http://localhost:4000/api/productosAdmin/admin/productos",
+          `${import.meta.env.VITE_API_URL}/api/productosAdmin/admin/productos`,
         {
           withCredentials: true,
         }
@@ -743,7 +743,7 @@ const PanelAdmin = () => {
       } else {
         try {
           const resPublic = await axios.get(
-            "http://localhost:4000/api/productos",
+            `${import.meta.env.VITE_API_URL}/api/productos`,
             {
               withCredentials: true,
             }
@@ -771,8 +771,8 @@ const PanelAdmin = () => {
     const fetchCatalogos = async () => {
       try {
         const [resCat, resMar] = await Promise.all([
-          axios.get("http://localhost:4000/api/categorias"),
-          axios.get("http://localhost:4000/api/marcas"),
+            axios.get(`${import.meta.env.VITE_API_URL}/api/categorias`),
+            axios.get(`${import.meta.env.VITE_API_URL}/api/marcas`),
         ]);
         setCategorias(resCat.data || []);
         setMarcas(resMar.data || []);
@@ -789,8 +789,8 @@ const PanelAdmin = () => {
   const fetchPromociones = async () => {
     try {
       setPromoLoading(true);
-      const res = await axios.get("http://localhost:4000/api/promociones", {
-        withCredentials: true,
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/promociones`, {
+          withCredentials: true,
       });
       setPromociones(res.data || []);
       setCurrentPromoPage(1);
@@ -948,7 +948,7 @@ const PanelAdmin = () => {
 
     if (existente) return existente.idcategoria;
 
-    const res = await axios.post("http://localhost:4000/api/categorias", {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/categorias`, {
       descripcionCategoria: nombre,
     });
 
@@ -968,7 +968,7 @@ const PanelAdmin = () => {
 
     if (existente) return existente.idmarca;
 
-    const res = await axios.post("http://localhost:4000/api/marcas", {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/marcas`, {
       descripcionMarca: nombre,
     });
 
@@ -1011,7 +1011,7 @@ const PanelAdmin = () => {
 
       if (editingProduct) {
         response = await axios.put(
-          `http://localhost:4000/api/productosAdmin/productos/${editingProduct.idproducto}/con-imagen`,
+          `${import.meta.env.VITE_API_URL}/api/productosAdmin/productos/${editingProduct.idproducto}/con-imagen`,
           data,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -1029,7 +1029,7 @@ const PanelAdmin = () => {
         });
       } else {
         response = await axios.post(
-          "http://localhost:4000/api/productosAdmin/productos/con-imagen",
+          `${import.meta.env.VITE_API_URL}/api/productosAdmin/productos/con-imagen`,
           data,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -1120,7 +1120,7 @@ const PanelAdmin = () => {
         try {
           setLoading(true);
           await axios.patch(
-            `http://localhost:4000/api/productosAdmin/productos/${product.idproducto}/estado`,
+            `${import.meta.env.VITE_API_URL}/api/productosAdmin/productos/${product.idproducto}/estado`,
             { activo: nuevoEstado },
             { withCredentials: true }
           );
@@ -1235,12 +1235,12 @@ const PanelAdmin = () => {
 
       if (editingPromo) {
         await axios.put(
-          `http://localhost:4000/api/promociones/${editingPromo.idpromocion}`,
+          `${import.meta.env.VITE_API_URL}/api/promociones/${editingPromo.idpromocion}`,
           payload,
           { withCredentials: true }
         );
       } else {
-        await axios.post("http://localhost:4000/api/promociones", payload, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/promociones`, payload, {
           withCredentials: true,
         });
       }
@@ -1284,7 +1284,7 @@ const PanelAdmin = () => {
   const togglePromoEstado = async (promo) => {
     try {
       await axios.patch(
-        `http://localhost:4000/api/promociones/${promo.idpromocion}/estado`,
+          `${import.meta.env.VITE_API_URL}/api/promociones/${promo.idpromocion}/estado`,
         { activo_manual: !promo.activo_manual },
         { withCredentials: true }
       );
@@ -1318,7 +1318,7 @@ const PanelAdmin = () => {
 
     try {
       await axios.delete(
-        `http://localhost:4000/api/promociones/${promo.idpromocion}`,
+          `${import.meta.env.VITE_API_URL}/api/promociones/${promo.idpromocion}`,
         { withCredentials: true }
       );
 
@@ -1434,8 +1434,8 @@ const PanelAdmin = () => {
   const fetchPedidos = async () => {
     try {
       setPedidosLoading(true);
-      const res = await axios.get("http://localhost:4000/api/admin/pedidos", {
-        withCredentials: true,
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/pedidos`, {
+          withCredentials: true,
       });
       setPedidos(res.data || []);
       setCurrentPedidoPage(1);
@@ -1471,7 +1471,7 @@ const PanelAdmin = () => {
     try {
       setPedidosLoading(true);
       const res = await axios.get(
-        `http://localhost:4000/api/admin/pedidos/${idpedido}`,
+        `${import.meta.env.VITE_API_URL}/api/admin/pedidos/${idpedido}`,
         { withCredentials: true }
       );
       setSelectedPedido(res.data);
@@ -1509,7 +1509,7 @@ const PanelAdmin = () => {
       setPedidosLoading(true);
 
       await axios.patch(
-        `http://localhost:4000/api/admin/pedidos/${selectedPedido.idpedido}/estado`,
+        `${import.meta.env.VITE_API_URL}/api/admin/pedidos/${selectedPedido.idpedido}/estado`,
         { estado: estadoEditando },
         { withCredentials: true }
       );

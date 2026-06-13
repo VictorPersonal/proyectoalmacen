@@ -155,7 +155,7 @@ const ModificarDireccion = () => {
   useEffect(() => {
     const cargarDireccionActual = async () => {
       try {
-        const respuesta = await fetch("http://localhost:4000/api/usuario/perfil", {
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/api/usuario/perfil`, {
           credentials: "include"
         });
         
@@ -525,7 +525,7 @@ const ModificarDireccion = () => {
     }
 
     try {
-      const perfilResponse = await fetch("http://localhost:4000/api/usuario/perfil", {
+      const perfilResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/usuario/perfil`, {
         credentials: "include"
       });
 
@@ -535,7 +535,7 @@ const ModificarDireccion = () => {
 
       const perfilActual = await perfilResponse.json();
 
-      const respuesta = await fetch("http://localhost:4000/api/usuario/perfil", {
+      const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/api/usuario/perfil`, {
         method: "PUT",
         credentials: "include",
         headers: {

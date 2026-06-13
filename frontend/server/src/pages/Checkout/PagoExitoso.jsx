@@ -24,7 +24,7 @@ const PagoExitoso = () => {
 
     const obtenerFactura = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/pago/factura/${paymentId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pago/factura/${paymentId}`);
         const data = await res.json();
 
         if (data.url) {
@@ -51,7 +51,7 @@ const PagoExitoso = () => {
         ejecutadoRef.current = true;
         console.log("🔔 Confirmando pedido por primera vez para session:", paymentId);
 
-        const res = await fetch("http://localhost:4000/api/pago/pedido/confirmar", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pago/pedido/confirmar`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ payment_id: paymentId }),

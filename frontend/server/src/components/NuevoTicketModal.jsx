@@ -18,7 +18,7 @@ const NuevoTicketModal = ({ isOpen, onClose, onCreado }) => {
     
     try {
       // ✅ URL CORRECTA - sin /soporte duplicado
-      const response = await fetch("http://localhost:4000/api/soporte", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/soporte`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

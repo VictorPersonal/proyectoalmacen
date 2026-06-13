@@ -53,10 +53,10 @@ const Dashboard = () => {
 
   // 🔹 Cargar todos los datos
   const actualizarDatos = () => {
-    fetchData("http://localhost:4000/api/estadisticas/ventas-mensuales", setVentasMensuales);
-    fetchData("http://localhost:4000/api/estadisticas/productos-mas-vendidos", setProductosMasVendidos);
-    fetchData("http://localhost:4000/api/estadisticas/usuarios", setUsuariosPorTipo);
-    fetchData("http://localhost:4000/api/estadisticas/estados-pedidos", setEstadosPedidos);
+    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/ventas-mensuales`, setVentasMensuales);
+    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/productos-mas-vendidos`, setProductosMasVendidos);
+    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/usuarios`, setUsuariosPorTipo);
+    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/estados-pedidos`, setEstadosPedidos);
   };
 
   // 🔁 Refrescar cada 10 segundos

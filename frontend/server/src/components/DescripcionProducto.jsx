@@ -85,7 +85,7 @@ const DescripcionProducto = () => {
   const cargarReseñas = async (productoId) => {
     setCargandoReseñas(true);
     try {
-      const response = await fetch(`http://localhost:4000/api/resenas/producto/${productoId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/resenas/producto/${productoId}`);
       if (response.ok) {
         const data = await response.json();
         setReseñas(data);
@@ -106,7 +106,7 @@ const DescripcionProducto = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:4000/api/favoritos/verificar/${productoId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos/verificar/${productoId}`, {
         method: "GET",
         credentials: "include",
       });
@@ -143,7 +143,7 @@ const DescripcionProducto = () => {
 
   const cargarProductoDesdeAPI = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/api/productos/${id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/productos/${id}`);
       if (!response.ok) {
         throw new Error('Producto no encontrado');
       }
@@ -209,7 +209,7 @@ const DescripcionProducto = () => {
 
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`http://localhost:4000/api/favoritos/${productoId}`, {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos/${productoId}`, {
             method: "DELETE",
             credentials: "include",
             headers: {
@@ -252,7 +252,7 @@ const DescripcionProducto = () => {
           imagen: producto.producto_imagen?.[0]?.url || "",
         };
 
-        const response = await fetch("http://localhost:4000/api/favoritos", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos`, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -336,7 +336,7 @@ const DescripcionProducto = () => {
       };
 
       const res = await axios.post(
-        "http://localhost:4000/api/carrito/agregar",
+        `${import.meta.env.VITE_API_URL}/api/carrito/agregar`,
         productoData,
         { withCredentials: true }
       );
@@ -505,7 +505,7 @@ const DescripcionProducto = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/api/resenas", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/resenas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

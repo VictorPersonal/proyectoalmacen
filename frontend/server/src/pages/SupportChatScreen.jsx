@@ -39,7 +39,7 @@ const SupportChatScreen = () => {
   const cargarTicket = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:4000/api/soporte/${idreclamo}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/soporte/${idreclamo}`, {
         credentials: "include"
       });
       
@@ -59,7 +59,7 @@ const SupportChatScreen = () => {
     
     setEnviando(true);
     try {
-      const response = await fetch(`http://localhost:4000/api/soporte/${idreclamo}/mensajes`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/soporte/${idreclamo}/mensajes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -87,7 +87,7 @@ const SupportChatScreen = () => {
   const handleCerrarTicket = async () => {
     if (window.confirm("¿Cerrar este ticket? El cliente ya no podrá responder.")) {
       try {
-        const response = await fetch(`http://localhost:4000/api/soporte/${idreclamo}/cerrar`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/soporte/${idreclamo}/cerrar`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           credentials: "include"

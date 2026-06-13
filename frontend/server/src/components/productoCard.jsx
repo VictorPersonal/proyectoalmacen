@@ -61,7 +61,7 @@ const ProductoCard = ({ producto }) => {
     setCargando(true);
 
     try {
-      const response = await fetch("http://localhost:4000/api/favoritos", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

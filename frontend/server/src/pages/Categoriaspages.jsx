@@ -8,7 +8,7 @@ const CategoriaPage = () => {
   const [tituloCategoria, setTituloCategoria] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/${id}/productos`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/${id}/productos`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

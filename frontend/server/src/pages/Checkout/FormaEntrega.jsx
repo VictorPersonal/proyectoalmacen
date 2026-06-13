@@ -78,7 +78,7 @@ const FormaEntrega = () => {
         } else {
           setTipoCompra("carrito");
 
-          const respuestaCarrito = await fetch("http://localhost:4000/api/carrito", {
+          const respuestaCarrito = await fetch(`${import.meta.env.VITE_API_URL}/api/carrito`, {
             credentials: "include",
           });
 
@@ -91,7 +91,7 @@ const FormaEntrega = () => {
                 carrito.map(async (itemCarrito) => {
                   try {
                     const respuestaProducto = await fetch(
-                      `http://localhost:4000/api/productos/${itemCarrito.idproducto}`
+                      `${import.meta.env.VITE_API_URL}/api/productos/${itemCarrito.idproducto}`
                     );
 
                     if (respuestaProducto.ok) {
@@ -178,7 +178,7 @@ const FormaEntrega = () => {
         }
 
         const respuestaUsuario = await fetch(
-          "http://localhost:4000/api/usuario/perfil",
+          `${import.meta.env.VITE_API_URL}/api/usuario/perfil`,
           {
             credentials: "include",
           }
