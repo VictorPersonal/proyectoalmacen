@@ -29,7 +29,7 @@ const isProduction = process.env.NODE_ENV === "production";
 app.use(cookieParser());
  
 const FRONTEND_URL = isProduction
-  ? process.env.FRONTEND_URL_PROD
+  ? process.env.FRONTEND_URL
   : "http://localhost:5173";
  
 app.use(cors({
