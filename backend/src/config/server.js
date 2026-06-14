@@ -28,7 +28,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://proyectoalmacen.vercel.app",
+  "https://dulcehogarweb.vercel.app",
 ];
 
 app.use(cors({
@@ -67,5 +67,10 @@ app.use("/api/soporte", soporteRoutes);
 app.use("/api", productosRoutes);
 app.use("/api", adminPedidosRoutes);
 app.use("/api", router);
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});
 
 export default app;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaHeart } from "react-icons/fa";
 import Swal from "sweetalert2";
 import "../styles/components/productoCard.css";
+import API_URL from "../config/api.js";
 
 const ProductoCard = ({ producto }) => {
   const [cargando, setCargando] = useState(false);
@@ -61,7 +62,7 @@ const ProductoCard = ({ producto }) => {
     setCargando(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos`, {
+      const response = await fetch(`${API_URL}/api/favoritos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

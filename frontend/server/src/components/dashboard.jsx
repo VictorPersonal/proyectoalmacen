@@ -15,6 +15,7 @@ import {
   Cell,
 } from "recharts";
 import "../styles/components/dashboard.css";
+import API_URL from "../config/api.js";
 
 const Dashboard = () => {
   const [ventasMensuales, setVentasMensuales] = useState([]);
@@ -53,10 +54,10 @@ const Dashboard = () => {
 
   // 🔹 Cargar todos los datos
   const actualizarDatos = () => {
-    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/ventas-mensuales`, setVentasMensuales);
-    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/productos-mas-vendidos`, setProductosMasVendidos);
-    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/usuarios`, setUsuariosPorTipo);
-    fetchData(`${import.meta.env.VITE_API_URL}/api/estadisticas/estados-pedidos`, setEstadosPedidos);
+    fetchData(`${API_URL}/api/estadisticas/ventas-mensuales`, setVentasMensuales);
+    fetchData(`${API_URL}/api/estadisticas/productos-mas-vendidos`, setProductosMasVendidos);
+    fetchData(`${API_URL}/api/estadisticas/usuarios`, setUsuariosPorTipo);
+    fetchData(`${API_URL}/api/estadisticas/estados-pedidos`, setEstadosPedidos);
   };
 
   // 🔁 Refrescar cada 10 segundos

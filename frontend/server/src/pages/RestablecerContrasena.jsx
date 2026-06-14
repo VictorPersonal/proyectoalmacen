@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import "../styles/pages/RestablecerContrasena.css";
 import SimpleHeader from "../components/SimpleHeader";
 import SimpleFooter from "../components/SimpleFooter";
+import API_URL from "../config/api.js";
 
 const RestablecerContrasena = () => {
   const [nuevaContrasena, setNuevaContrasena] = useState("");
@@ -88,7 +89,7 @@ const RestablecerContrasena = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/restablecer`, {
+      const response = await fetch(`${API_URL}/api/auth/restablecer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, nuevaContrasena }),

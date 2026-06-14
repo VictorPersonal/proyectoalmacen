@@ -8,6 +8,7 @@ import {
   FaFire
 } from "react-icons/fa";
 import "../styles/components/PromocionesModal.css";
+import API_URL from "../config/api.js";
 
 const PromocionesModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const PromocionesModal = ({ isOpen, onClose }) => {
   const cargarProductosConPromociones = async () => {
     setCargando(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/productos`);
+      const response = await fetch(`${API_URL}/api/productos`);
       if (!response.ok) throw new Error("Error al cargar productos");
       
       const data = await response.json();

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ProductoCard from "../components/productoCard"; // <── Importas tu propio componente
+import ProductoCard from "../components/productoCard";
+import API_URL from "../config/api.js";
 
 const CategoriaPage = () => {
   const { id } = useParams();
@@ -8,7 +9,7 @@ const CategoriaPage = () => {
   const [tituloCategoria, setTituloCategoria] = useState("");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/${id}/productos`)
+    fetch(`${API_URL}/api/${id}/productos`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

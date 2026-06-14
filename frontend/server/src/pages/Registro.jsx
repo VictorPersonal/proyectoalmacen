@@ -4,6 +4,7 @@ import "../styles/pages/Registro.css";
 import Swal from "sweetalert2";
 import SimpleHeader from "../components/SimpleHeader";
 import SimpleFooter from "../components/SimpleFooter";
+import API_URL from "../config/api.js";
 
 function Registro() {
   const [email, setEmail] = useState("");
@@ -194,7 +195,7 @@ function Registro() {
     };
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/usuario`, {
+      const res = await fetch(`${API_URL}/api/auth/usuario`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoUsuario),

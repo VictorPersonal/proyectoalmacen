@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import SimpleHeader from "../components/SimpleHeader";
 import SimpleFooter from "../components/SimpleFooter";
+import API_URL from "../config/api.js";
 
 function ActualizarPerfil() {
   const [nombre, setNombre] = useState("");
@@ -60,7 +61,7 @@ function ActualizarPerfil() {
     const cargarPerfil = async () => {
       setCargando(true);
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/usuario/perfil`, {
+        const res = await fetch(`${API_URL}/api/auth/usuario/perfil`, {
           method: "GET",
           credentials: "include",
         });

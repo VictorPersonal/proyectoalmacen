@@ -3,6 +3,7 @@ import "../styles/pages/PanelAdmin.css";
 import Dashboard from "../components/dashboard";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config/api.js";
 import Swal from "sweetalert2";
 import {
   FaBox,
@@ -127,7 +128,7 @@ const AdminSoporte = () => {
   const cargarTickets = async () => {
     setLoading(true);
     try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/soporte/admin/todos`, {
+        const response = await axios.get(`${API_URL}/api/soporte/admin/todos`, {
           withCredentials: true,
         });
       setTickets(response.data || []);
@@ -161,7 +162,7 @@ const AdminSoporte = () => {
 
   const verDetalleTicket = async (ticket) => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/soporte/${ticket.idreclamo}`, {
+        const response = await axios.get(`${API_URL}/api/soporte/${ticket.idreclamo}`, {
           withCredentials: true,
         });
       setSelectedTicket(response.data);
@@ -183,7 +184,7 @@ const AdminSoporte = () => {
     setEnviando(true);
     try {
       const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/soporte/${selectedTicket.idreclamo}/mensajes`,
+          `${API_URL}/api/soporte/${selectedTicket.idreclamo}/mensajes`,
         { mensaje: mensajeNuevo.trim() },
         { withCredentials: true }
       );
@@ -223,7 +224,7 @@ const AdminSoporte = () => {
 
     try {
       await axios.patch(
-          `${import.meta.env.VITE_API_URL}/api/soporte/${selectedTicket.idreclamo}/cerrar`,
+          `${API_URL}/api/soporte/${selectedTicket.idreclamo}/cerrar`,
         {},
         { withCredentials: true }
       );

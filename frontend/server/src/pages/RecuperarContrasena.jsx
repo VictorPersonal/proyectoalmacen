@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import SimpleHeader from "../components/SimpleHeader";
 import SimpleFooter from "../components/SimpleFooter";
+import API_URL from "../config/api.js";
 
 const RecuperarContrasena = () => {
   const [email, setEmail] = useState("");
@@ -29,7 +30,7 @@ const RecuperarContrasena = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/recuperar`, {
+      const response = await fetch(`${API_URL}/api/auth/recuperar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

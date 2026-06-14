@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Carrito from "./Carrito";
+import API_URL from "../config/api.js";
 
 import { 
   FaStar,
@@ -85,7 +86,7 @@ const DescripcionProducto = () => {
   const cargarReseñas = async (productoId) => {
     setCargandoReseñas(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/resenas/producto/${productoId}`);
+      const response = await fetch(`${API_URL}/api/resenas/producto/${productoId}`);
       if (response.ok) {
         const data = await response.json();
         setReseñas(data);
@@ -106,7 +107,7 @@ const DescripcionProducto = () => {
         return;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos/verificar/${productoId}`, {
+      const response = await fetch(`${API_URL}/api/favoritos/verificar/${productoId}`, {
         method: "GET",
         credentials: "include",
       });
@@ -209,7 +210,7 @@ const DescripcionProducto = () => {
 
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos/${productoId}`, {
+          const response = await fetch(`${API_URL}/api/favoritos/${productoId}`, {
             method: "DELETE",
             credentials: "include",
             headers: {
@@ -252,7 +253,7 @@ const DescripcionProducto = () => {
           imagen: producto.producto_imagen?.[0]?.url || "",
         };
 
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos`, {
+        const response = await fetch(`${API_URL}/api/favoritos`, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -336,7 +337,7 @@ const DescripcionProducto = () => {
       };
 
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/carrito/agregar`,
+        `${API_URL}/api/carrito/agregar`,
         productoData,
         { withCredentials: true }
       );

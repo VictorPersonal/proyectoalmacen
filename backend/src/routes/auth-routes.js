@@ -119,8 +119,8 @@ authRoutes.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // true si usas HTTPS
-      sameSite: "lax",
+      secure: true, // true si usas HTTPS
+      sameSite: "none",
       maxAge: 60 * 60 * 1000,
     });
 

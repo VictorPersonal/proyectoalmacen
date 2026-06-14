@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/components/FiltrosModal.css";
+import API_URL from "../config/api.js";
 
 const PRECIO_MAX_DEFAULT = 5000000;
 
@@ -17,7 +18,7 @@ const FiltrosModal = ({ isOpen, onClose, onAplicar, filtrosActivos }) => {
   useEffect(() => {
     if (!isOpen) return;
     setCargandoMarcas(true);
-    fetch(`${import.meta.env.VITE_API_URL}/api/marcas`)
+    fetch(`${API_URL}/api/marcas`)
       .then((r) => r.json())
       .then((data) => setMarcas(Array.isArray(data) ? data : []))
       .catch(() => setMarcas([]))

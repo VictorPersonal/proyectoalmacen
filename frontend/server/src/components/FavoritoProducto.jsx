@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import SimpleHeader from "./SimpleHeader";
 import SimpleFooter from "./SimpleFooter";
 import "../styles/components/FavoritoProducto.css";
+import API_URL from "../config/api.js";
 
 const FavoritoProducto = () => {
   const [favoritos, setFavoritos] = useState([]);
@@ -54,7 +55,7 @@ const FavoritoProducto = () => {
 
   const obtenerFavoritos = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favoritos`, {
+      const response = await fetch(`${API_URL}/api/favoritos`, {
         method: "GET",
         credentials: "include",
       });
@@ -83,7 +84,7 @@ const FavoritoProducto = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/favoritos/${idproducto}`,
+        `${API_URL}/api/favoritos/${idproducto}`,
         {
           method: "DELETE",
           credentials: "include",

@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import NuevoTicketModal from "../components/NuevoTicketModal";
 import "../styles/pages/SupportScreen.css";
+import API_URL from "../config/api.js";
 
 const SupportScreen = () => {
   const navigate = useNavigate();
@@ -37,8 +38,8 @@ const SupportScreen = () => {
     
     try {
       const url = esAdmin 
-        ? `${import.meta.env.VITE_API_URL}/api/soporte/admin/todos`
-        : `${import.meta.env.VITE_API_URL}/api/soporte/mis-tickets`;
+        ? `${API_URL}/api/soporte/admin/todos`
+        : `${API_URL}/api/soporte/mis-tickets`;
       
       const response = await fetch(url, {
         credentials: "include"

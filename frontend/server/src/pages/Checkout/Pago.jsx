@@ -10,6 +10,7 @@ import {
 import "../../styles/pages/checkout/Pago.css";
 import SimpleHeader from "../../components/SimpleHeader";
 import SimpleFooter from "../../components/SimpleFooter";
+import API_URL from "../../config/api.js";
 
 const Pago = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const Pago = () => {
 
       console.log("📤 Enviando a Stripe (solo una vez):", bodyData);
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pago/crear-preferencia`, {
+      const res = await fetch(`${API_URL}/api/pago/crear-preferencia`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),

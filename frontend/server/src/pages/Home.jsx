@@ -21,6 +21,7 @@ import SimpleFooter from "../components/SimpleFooter";
 import PromocionesModal from "../components/PromocionesModal";
 import FiltrosModal from "../components/FiltrosModal";
 import WhatsAppButton from "../components/WhatsAppButton";
+import API_URL from "../config/api.js";
 
 const Home = () => {
   const [menuMasInfo, setMenuMasInfo] = useState(false);
@@ -247,7 +248,7 @@ const Home = () => {
     if (filtros.precioMin > 0) params.set("precioMin", filtros.precioMin);
     if (filtros.precioMax < 5000000) params.set("precioMax", filtros.precioMax);
     if (filtros.ordenar && filtros.ordenar !== "recientes") params.set("ordenar", filtros.ordenar);
-    return `${import.meta.env.VITE_API_URL}/api/productos?${params.toString()}`;
+    return `${API_URL}/api/productos?${params.toString()}`;
   };
 
   const handleBuscar = async (filtrosOverride) => {
@@ -298,7 +299,7 @@ const Home = () => {
     if (nuevosFiltros.precioMax < 5000000) params.set("precioMax", nuevosFiltros.precioMax);
     if (nuevosFiltros.ordenar && nuevosFiltros.ordenar !== "recientes") params.set("ordenar", nuevosFiltros.ordenar);
     setCargando(true);
-    fetch(`${import.meta.env.VITE_API_URL}/api/productos?${params.toString()}`)
+    fetch(`${API_URL}/api/productos?${params.toString()}`)
       .then(r => r.json())
       .then(data => {
         const lista = Array.isArray(data) ? data : [];
@@ -347,7 +348,7 @@ const Home = () => {
     setMensajeCategoria("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/productos`);
+      const response = await fetch(`${API_URL}/api/productos`);
       const data = await response.json();
       const productosFiltradosPorCategoria = data.filter(
         producto => Number(producto.idcategoria) === Number(idCategoria)

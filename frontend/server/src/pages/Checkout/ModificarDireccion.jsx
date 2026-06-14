@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import "../../styles/pages/checkout/ModificarDireccion.css";
 import { useNavigate, Link } from "react-router-dom";
+import API_URL from "../../config/api.js";
 import Swal from 'sweetalert2';
 import { 
   FaSearch, 
@@ -155,7 +156,7 @@ const ModificarDireccion = () => {
   useEffect(() => {
     const cargarDireccionActual = async () => {
       try {
-        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/api/usuario/perfil`, {
+        const respuesta = await fetch(`${API_URL}/api/usuario/perfil`, {
           credentials: "include"
         });
         

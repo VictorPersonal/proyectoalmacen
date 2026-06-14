@@ -13,6 +13,7 @@ import { MdRemoveShoppingCart } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "../styles/components/Carrito.css";
+import API_URL from "../config/api.js";
 
 const Carrito = ({ abierto, onCerrar }) => {
   const [productos, setProductos] = useState([]);
@@ -31,7 +32,7 @@ const Carrito = ({ abierto, onCerrar }) => {
 
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/carrito`,
+        `${API_URL}/api/carrito`,
         { withCredentials: true }
       );
 
@@ -48,7 +49,7 @@ const Carrito = ({ abierto, onCerrar }) => {
             try {
               // Obtener información completa del producto
               const resProducto = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/productos/${productoCarrito.idproducto}`
+                `${ API_URL}/api/productos/${productoCarrito.idproducto}`
               );
               
               console.log(`✅ Producto obtenido para ${productoCarrito.idproducto}:`, resProducto.data);

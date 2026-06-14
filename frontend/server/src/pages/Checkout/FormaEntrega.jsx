@@ -4,6 +4,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import SimpleHeader from "../../components/SimpleHeader";
 import SimpleFooter from "../../components/SimpleFooter";
+import API_URL from "../../config/api.js";
 
 const FormaEntrega = () => {
   const [opcion, setOpcion] = useState("domicilio");
@@ -78,7 +79,7 @@ const FormaEntrega = () => {
         } else {
           setTipoCompra("carrito");
 
-          const respuestaCarrito = await fetch(`${import.meta.env.VITE_API_URL}/api/carrito`, {
+          const respuestaCarrito = await fetch(`${API_URL}/api/carrito`, {
             credentials: "include",
           });
 
@@ -91,7 +92,7 @@ const FormaEntrega = () => {
                 carrito.map(async (itemCarrito) => {
                   try {
                     const respuestaProducto = await fetch(
-                      `${import.meta.env.VITE_API_URL}/api/productos/${itemCarrito.idproducto}`
+                      `${API_URL}/api/productos/${itemCarrito.idproducto}`
                     );
 
                     if (respuestaProducto.ok) {
@@ -178,7 +179,7 @@ const FormaEntrega = () => {
         }
 
         const respuestaUsuario = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/usuario/perfil`,
+          `${API_URL}/api/usuario/perfil`,
           {
             credentials: "include",
           }

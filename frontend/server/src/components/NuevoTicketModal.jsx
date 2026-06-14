@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaTimes, FaCommentDots } from "react-icons/fa";
 import "../styles/components/NuevoTicketModal.css";
+import API_URL from "../config/api.js";
 
 const NuevoTicketModal = ({ isOpen, onClose, onCreado }) => {
   const [asunto, setAsunto] = useState("");
@@ -18,7 +19,7 @@ const NuevoTicketModal = ({ isOpen, onClose, onCreado }) => {
     
     try {
       // ✅ URL CORRECTA - sin /soporte duplicado
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/soporte`, {
+      const response = await fetch(`${API_URL}/api/soporte`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
