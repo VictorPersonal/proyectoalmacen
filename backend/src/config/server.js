@@ -20,33 +20,38 @@ import promocionesRoutes from "../routes/promocionesRoutes.js";
 import resenasRoutes from "../routes/resenasRoutes.js";
 import soporteRoutes from "../routes/soporteRoutes.js";
 
- 
 dotenv.config();
- 
+
 const app = express();
-const isProduction = process.env.NODE_ENV === "production";
- 
+
 app.use(cookieParser());
- 
-const FRONTEND_URL = isProduction
-  ? process.env.FRONTEND_URL
-  : "http://localhost:5173";
- 
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://proyectoalmacen.vercel.app",
+];
+
 app.use(cors({
-  origin: FRONTEND_URL,
-  credentials: true
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (ej. Postman, curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS bloqueado para origen: ${origin}"));
+    }
+  },
+  credentials: true,
 }));
- 
-// express.json() global — aplica a todas las rutas
+
 app.use(express.json());
- 
+
 // 🔹 Inyectar supabase en cada request
 app.use((req, res, next) => {
   req.supabase = supabase;
   next();
 });
- 
-// ✅ Rutas específicas PRIMERO (más largas/concretas antes que las genéricas /api)
+
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", passwordRoutes);
 app.use("/api/", categoriaRoutes);
@@ -60,10 +65,9 @@ app.use("/api/images", removeBgRoutes);
 app.use("/api", promocionesRoutes);
 app.use("/api/resenas", resenasRoutes);
 app.use("/api/soporte", soporteRoutes);
- 
-// ⚠️ Rutas genéricas /api AL FINAL para no interceptar las específicas
+
 app.use("/api", productosRoutes);
 app.use("/api", adminPedidosRoutes);
 app.use("/api", router);
- 
+
 export default app;
