@@ -33,12 +33,11 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir requests sin origin (ej. Postman, curl)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("CORS bloqueado para origen: ${origin}"));
+      callback(new Error(`CORS bloqueado para origen: ${origin}`));
     }
   },
   credentials: true,
@@ -46,7 +45,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// 🔹 Inyectar supabase en cada request
 app.use((req, res, next) => {
   req.supabase = supabase;
   next();
